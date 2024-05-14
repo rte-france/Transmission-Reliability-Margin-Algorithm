@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.rte_france</groupId>
+    <artifactId>trm-algorithm</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>Transfer Reliability Margin algorithm</name>
+    <description>Librairies for Transfer Reliability Margin (TRM) computation</description>
+
+    <developers>
+        <developer>
+            <name>Hugo SCHINDLER</name>
+            <email>hugo.schindler@rte-france.com</email>
+            <organization>RTE</organization>
+            <organizationUrl>http://www.rte-france.com</organizationUrl>
+        </developer>
+
+        <developer>
+            <name>Viktor TERRIER</name>
+            <email>viktor.terrier@rte-france.com</email>
+            <organization>RTE</organization>
+            <organizationUrl>http://www.rte-france.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <properties>
+        <junit-jupiter-engine.version>5.10.2</junit-jupiter-engine.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <maven.checkstyle.version>3.3.1</maven.checkstyle.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.jacoco.version>0.8.10</maven.jacoco.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Compile dependencies -->
+            <!-- Runtime dependencies -->
+            <!-- Test dependencies -->
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>checks</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>${maven.checkstyle.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <configLocation>checkstyle.xml</configLocation>
+                                    <consoleOutput>true</consoleOutput>
+                                    <failsOnError>true</failsOnError>
+                                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven-surefire-plugin.version}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.junit.jupiter</groupId>
+                                <artifactId>junit-jupiter-engine</artifactId>
+                                <version>${junit-jupiter-engine.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${maven.jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <id>pre-unit-tests</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <destFile>${sonar.jacoco.reportPath}</destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>post-unit-test</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <dataFile>${sonar.jacoco.reportPath}</dataFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
