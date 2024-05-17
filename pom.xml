@@ -7,6 +7,10 @@
     <groupId>com.rte_france</groupId>
     <artifactId>trm-algorithm</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>algorithm</module>
+    </modules>
 
     <name>Transfer Reliability Margin algorithm</name>
     <description>Librairies for Transfer Reliability Margin (TRM) computation</description>
@@ -28,20 +32,144 @@
     </developers>
 
     <properties>
-        <junit-jupiter-engine.version>5.10.2</junit-jupiter-engine.version>
-        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
-        <maven.checkstyle.version>3.3.1</maven.checkstyle.version>
+        <!-- Project properties -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+
+        <!-- Sonar properties -->
+        <sonar.jacoco.reportPath>
+            ../distribution/target/site/jacoco-aggregate/jacoco.xml,
+            ../../distribution/target/site/jacoco-aggregate/jacoco.xml,
+            ../../../distribution/target/site/jacoco-aggregate/jacoco.xml
+            ../../../../distribution/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.jacoco.reportPath>
+
+        <!-- Dependencies versions -->
+        <junit-jupiter-engine.version>5.10.2</junit-jupiter-engine.version>
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <maven.checkstyle.version>3.3.1</maven.checkstyle.version>
         <maven.jacoco.version>0.8.10</maven.jacoco.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <powsybl.entsoe.version>2.9.0</powsybl.entsoe.version>
+        <powsybl.openloadflow.version>1.9.0</powsybl.openloadflow.version>
+        <powsybl.version>6.3.1</powsybl.version>
+        <slf4j.version>2.0.13</slf4j.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <!-- Compile dependencies -->
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-commons</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-glsk-document-api</artifactId>
+                <version>${powsybl.entsoe.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-iidm-api</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-loadflow-api</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-sensitivity-analysis-api</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>compile</scope>
+            </dependency>
             <!-- Runtime dependencies -->
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-iidm-impl</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-iidm-serde</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-open-loadflow</artifactId>
+                <version>${powsybl.openloadflow.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-ucte-converter</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>runtime</scope>
+            </dependency>
             <!-- Test dependencies -->
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-cgmes-conformity</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-cgmes-conversion</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-config-test</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-glsk-document-io-api</artifactId>
+                <version>${powsybl.entsoe.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-glsk-document-ucte</artifactId>
+                <version>${powsybl.entsoe.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-triple-store-impl-rdf4j</artifactId>
+                <version>${powsybl.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
