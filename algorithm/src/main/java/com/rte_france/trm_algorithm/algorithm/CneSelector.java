@@ -40,8 +40,8 @@ public final class CneSelector {
             if (country.isPresent()) {
                 return country.get();
             }
-            throw new RuntimeException("Should never get here: country is empty");
+            throw new TrmException("Should never get here: country is empty");
         }
-        throw new RuntimeException("Should never get here: substation is empty");
+        throw new TrmException("Should never get here: substation is empty");
     }
 }
