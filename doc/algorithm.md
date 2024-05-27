@@ -40,6 +40,14 @@ The goal will be to shift exchanges on a given boundary and reset other boundary
 > We do not have implemented this yet.  
 > This simple behavior might change later.
 
+## Flow Extraction
+
+For all selected lines, we can extract:
+- the AC power flow of line in the aligned market-based network
+- the AC power flow of line in the real time snapshot network
+
+> By default, we use the terminal 1 flow as power flow. 
+
 ## Inputs
 
 ### Market-based network
