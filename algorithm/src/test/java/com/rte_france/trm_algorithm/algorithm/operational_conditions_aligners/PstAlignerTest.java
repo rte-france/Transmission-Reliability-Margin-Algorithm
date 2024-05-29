@@ -32,8 +32,8 @@ class PstAlignerTest {
 
     @Test
     void testTwoPstAlignment() {
-        Network network = TestUtils.importNetwork("operational_conditions_aligners/pst/TestCase16Nodes_alignedPsts.uct");
-        Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/TestCase16Nodes_alignedPsts.uct");
+        Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
+        Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         String pstId1 = "BBE2AA1  BBE3AA1  1";
         String pstId2 = "FFR2AA1  FFR4AA1  1";
         network.getTwoWindingsTransformer(pstId1).getPhaseTapChanger().setTapPosition(5);
@@ -45,7 +45,7 @@ class PstAlignerTest {
 
     @Test
     void testTwoDifferentNetworksFail() {
-        Network network = TestUtils.importNetwork("operational_conditions_aligners/pst/TestCase16Nodes_alignedPsts.uct");
+        Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
         TrmException exception = assertThrows(TrmException.class, () -> PstAligner.align(network, marketBasedNetwork));
         assertEquals("Two windings transformer BBE2AA1  BBE3AA1  1 not found", exception.getMessage());

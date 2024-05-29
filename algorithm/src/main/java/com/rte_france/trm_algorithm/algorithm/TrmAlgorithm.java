@@ -7,14 +7,15 @@
  */
 package com.rte_france.trm_algorithm.algorithm;
 
+import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.sensitivity.SensitivityVariableSet;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -22,29 +23,12 @@ import java.util.stream.Collectors;
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
 public class TrmAlgorithm {
-
-    private final LoadFlowParameters loadFlowParameters;
+    private final ZonalSensitivityComputer zonalSensitivityComputer;
+    private final FlowExtractor flowExtractor;
 
     public TrmAlgorithm(LoadFlowParameters loadFlowParameters) {
-        this.loadFlowParameters = loadFlowParameters;
-    }
-
-    public Map<String, Double> run(Network referenceNetwork, Network marketBasedNetwork) {
-        Set<Branch> referenceNetworkElements = CneSelector.getNetworkElements(referenceNetwork);
-        Set<Branch> marketBasedNetworkElements = CneSelector.getNetworkElements(marketBasedNetwork);
-
-        checkIdenticalNetworkElements(referenceNetworkElements, marketBasedNetworkElements, "Market-based");
-        checkIdenticalNetworkElements(marketBasedNetworkElements, referenceNetworkElements, "Real-time");
-
-        OperationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
-        FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
-        Map<String, Double> referenceFlows = flowExtractor.extract(referenceNetwork, referenceNetworkElements);
-        Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, marketBasedNetworkElements);
-        double ptdf = 1.;
-        return referenceFlows.keySet().stream().collect(Collectors.toMap(
-            Function.identity(),
-            key -> (marketBasedFlows.get(key) - referenceFlows.get(key)) / ptdf
-        ));
+        this.flowExtractor = new FlowExtractor(loadFlowParameters);
+        this.zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
     }
 
     private static void checkIdenticalNetworkElements(Set<Branch> networkElement1, Set<Branch> networkElement2, String networkMsg) {
@@ -54,5 +38,21 @@ public class TrmAlgorithm {
         if (!extraReferenceElement.isEmpty()) {
             throw new TrmException(String.format("%s network doesn't contain the following elements: %s.", networkMsg, extraReferenceElement));
         }
+    }
+
+    public Map<String, Double> computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, ZonalData<SensitivityVariableSet> referenceZonalGlsks) {
+        Set<Branch> referenceNetworkElements = CneSelector.getNetworkElements(referenceNetwork);
+        Set<Branch> marketBasedNetworkElements = CneSelector.getNetworkElements(marketBasedNetwork);
+
+        checkIdenticalNetworkElements(referenceNetworkElements, marketBasedNetworkElements, "Market-based");
+        checkIdenticalNetworkElements(marketBasedNetworkElements, referenceNetworkElements, "Real-time");
+
+        OperationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, marketBasedNetworkElements);
+        Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElements, referenceZonalGlsks);
+        return referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
+            Map.Entry::getKey,
+            entry -> (marketBasedFlows.get(entry.getKey()) - entry.getValue().getFlow()) / entry.getValue().getZonalPtdf()
+        ));
     }
 }
