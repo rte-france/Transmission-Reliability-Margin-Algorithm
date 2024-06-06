@@ -39,7 +39,7 @@ class ZonalSensitivityComputerTest {
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
-        Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branches, zonalGlsks);
+        Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branches, Collections.emptySet(), zonalGlsks);
         assertEquals(2, pdtf.keySet().size());
         assertEquals(0.315, pdtf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
         assertEquals(820.095, pdtf.get("FFR2AA1  DDE3AA1  1").getFlow(), EPSILON);
@@ -55,7 +55,7 @@ class ZonalSensitivityComputerTest {
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
-        Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branches, zonalGlsks);
+        Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branches, Collections.emptySet(), zonalGlsks);
         assertTrue(pdtf.keySet().isEmpty());
     }
 
@@ -69,7 +69,7 @@ class ZonalSensitivityComputerTest {
         LoadFlowParameters loadFlowParameters = new LoadFlowParameters().setDc(true);
 
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
-        Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branches, zonalGlsks);
+        Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branches, Collections.emptySet(), zonalGlsks);
         assertEquals(1, pdtf.keySet().size());
         assertEquals(0.315, pdtf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
         assertEquals(820.095, pdtf.get("FFR2AA1  DDE3AA1  1").getFlow(), EPSILON);

@@ -8,6 +8,7 @@
 package com.rte_france.trm_algorithm.algorithm;
 
 import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 
@@ -28,5 +29,14 @@ class CneSelectorTest {
         Set<Branch> branchList = CneSelector.getNetworkElements(network);
         assertEquals(1, branchList.size());
         assertTrue(branchList.contains(network.getBranch("FGEN1 11 BLOAD 11 1")));
+    }
+
+    @Test
+    void testHvdcInterconnectionCneSelector() {
+        Network network = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWithHvdc.xiidm");
+
+        Set<HvdcLine> hvdcLines = CneSelector.getHvdcNetworkElements(network);
+        assertEquals(1, hvdcLines.size());
+        assertTrue(hvdcLines.contains(network.getHvdcLine("BBE2AA11 FFR3AA11 1")));
     }
 }
