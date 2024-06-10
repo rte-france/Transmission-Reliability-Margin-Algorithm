@@ -41,6 +41,14 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
             <artifactId>powsybl-sensitivity-analysis-api</artifactId>
             <scope>compile</scope>
         </dependency>

@@ -9,12 +9,10 @@
 package com.rte_france.trm_algorithm.algorithm;
 
 import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,24 +33,9 @@ class FlowExtractorTest {
         FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
 
         Set<Branch> branchSet = Set.of(network.getBranch("FGEN1 11 BLOAD 11 1"), network.getBranch("BLOAD 11 BGEN2 11 1"));
-        Map<String, Double> result = flowExtractor.extract(network, branchSet, Collections.emptySet());
+        Map<String, Double> result = flowExtractor.extract(network, branchSet);
         assertEquals(100.125, result.get("FGEN1 11 BLOAD 11 1"), EPSILON);
         assertEquals(-99.937, result.get("BLOAD 11 BGEN2 11 1"), EPSILON);
-    }
-
-    @Test
-    void testExtractFlowHvdc() {
-        Network network = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWithHvdc.xiidm");
-
-        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
-        FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
-
-        String hvdcId = "BBE2AA11 FFR3AA11 1";
-        network.getHvdcLine(hvdcId).setActivePowerSetpoint(100);
-
-        Set<HvdcLine> hvdcSet = Set.of(network.getHvdcLine(hvdcId));
-        Map<String, Double> result = flowExtractor.extract(network, Collections.emptySet(), hvdcSet);
-        assertEquals(100.0, result.get(hvdcId), EPSILON);
     }
 
     @Test
@@ -64,7 +47,7 @@ class FlowExtractorTest {
         FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
 
         Set<Branch> branchSet = Set.of(network.getBranch("FGEN1 11 BLOAD 11 1"));
-        Map<String, Double> result = flowExtractor.extract(network, branchSet, Collections.emptySet());
+        Map<String, Double> result = flowExtractor.extract(network, branchSet);
         assertEquals(100.125, result.get("FGEN1 11 BLOAD 11 1"), EPSILON);
     }
 }

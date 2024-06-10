@@ -9,10 +9,10 @@ package com.rte_france.trm_algorithm.algorithm;
 
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.sensitivity.SensitivityVariableSet;
 
 import java.util.Map;
@@ -41,31 +41,16 @@ public class TrmAlgorithm {
         }
     }
 
-    private static void checkIdenticalHvdcLines(Set<HvdcLine> networkElement1, Set<HvdcLine> networkElement2, String networkMsg) {
-        Set<String> extraReferenceElement = networkElement1.stream().map(Identifiable::getId).collect(Collectors.toSet());
-        extraReferenceElement.removeAll(networkElement2.stream().map(Identifiable::getId).collect(Collectors.toSet()));
-
-        if (!extraReferenceElement.isEmpty()) {
-            throw new TrmException(String.format("%s network doesn't contain the following elements: %s.", networkMsg, extraReferenceElement));
-        }
-    }
-
-    public Map<String, Double> computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, ZonalData<SensitivityVariableSet> referenceZonalGlsks) {
+    public Map<String, Double> computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, ZonalData<SensitivityVariableSet> referenceZonalGlsks, Crac crac) {
         Set<Branch> referenceNetworkElements = CneSelector.getNetworkElements(referenceNetwork);
         Set<Branch> marketBasedNetworkElements = CneSelector.getNetworkElements(marketBasedNetwork);
-
-        Set<HvdcLine> referenceNetworkHvdcLines = CneSelector.getHvdcNetworkElements(referenceNetwork);
-        Set<HvdcLine> marketBasedNetworkHvdcLines = CneSelector.getHvdcNetworkElements(marketBasedNetwork);
 
         checkIdenticalNetworkElements(referenceNetworkElements, marketBasedNetworkElements, "Market-based");
         checkIdenticalNetworkElements(marketBasedNetworkElements, referenceNetworkElements, "Real-time");
 
-        checkIdenticalHvdcLines(referenceNetworkHvdcLines, marketBasedNetworkHvdcLines, "Market-based");
-        checkIdenticalHvdcLines(marketBasedNetworkHvdcLines, referenceNetworkHvdcLines, "Real-time");
-
-        OperationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
-        Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, marketBasedNetworkElements, marketBasedNetworkHvdcLines);
-        Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElements, referenceNetworkHvdcLines, referenceZonalGlsks);
+        OperationalConditionAligner.align(referenceNetwork, marketBasedNetwork, crac);
+        Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, marketBasedNetworkElements);
+        Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElements, referenceZonalGlsks);
         return referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
             entry -> (marketBasedFlows.get(entry.getKey()) - entry.getValue().getFlow()) / entry.getValue().getZonalPtdf()

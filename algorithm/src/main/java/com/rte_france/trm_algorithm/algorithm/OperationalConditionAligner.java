@@ -8,6 +8,8 @@
 package com.rte_france.trm_algorithm.algorithm;
 
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.cracapi.Crac;
+import com.rte_france.trm_algorithm.algorithm.operational_conditions_aligners.CracAligner;
 import com.rte_france.trm_algorithm.algorithm.operational_conditions_aligners.HvdcAligner;
 import com.rte_france.trm_algorithm.algorithm.operational_conditions_aligners.PstAligner;
 
@@ -19,7 +21,8 @@ public final class OperationalConditionAligner {
 
     private OperationalConditionAligner() { } // utility class
 
-    public static void align(Network network, Network marketBasedNetwork) {
+    public static void align(Network network, Network marketBasedNetwork, Crac crac) {
+        CracAligner.align(network, marketBasedNetwork, crac);
         HvdcAligner.align(network, marketBasedNetwork);
         PstAligner.align(network, marketBasedNetwork);
     }

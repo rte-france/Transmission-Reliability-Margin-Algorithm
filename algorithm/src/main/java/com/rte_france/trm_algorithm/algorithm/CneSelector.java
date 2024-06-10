@@ -33,11 +33,6 @@ public final class CneSelector {
             getCountry(branch.getTerminal2());
     }
 
-    private static boolean isAnInterconnection(HvdcLine hvdcLine) {
-        return getCountry(hvdcLine.getConverterStation1().getTerminal()) !=
-                getCountry(hvdcLine.getConverterStation2().getTerminal());
-    }
-
     private static Country getCountry(Terminal terminal) {
         Optional<Substation> substation = terminal.getVoltageLevel().getSubstation();
         if (substation.isPresent()) {
@@ -48,11 +43,5 @@ public final class CneSelector {
             throw new TrmException("Should never get here: country is empty");
         }
         throw new TrmException("Should never get here: substation is empty");
-    }
-
-    public static Set<HvdcLine> getHvdcNetworkElements(Network network) {
-        return network.getHvdcLineStream()
-                .filter(CneSelector::isAnInterconnection)
-                .collect(Collectors.toSet());
     }
 }

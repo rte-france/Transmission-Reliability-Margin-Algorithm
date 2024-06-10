@@ -53,6 +53,7 @@
         <maven.jacoco.version>0.8.10</maven.jacoco.version>
         <powsybl.entsoe.version>2.9.0</powsybl.entsoe.version>
         <powsybl.openloadflow.version>1.9.0</powsybl.openloadflow.version>
+        <powsybl.rao.version>5.5.1</powsybl.rao.version>
         <powsybl.version>6.3.1</powsybl.version>
         <slf4j.version>2.0.13</slf4j.version>
     </properties>
@@ -82,6 +83,18 @@
                 <groupId>com.powsybl</groupId>
                 <artifactId>powsybl-loadflow-api</artifactId>
                 <version>${powsybl.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>open-rao-crac-api</artifactId>
+                <version>${powsybl.rao.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>open-rao-crac-impl</artifactId>
+                <version>${powsybl.rao.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>

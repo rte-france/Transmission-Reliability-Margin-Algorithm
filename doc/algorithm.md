@@ -10,6 +10,7 @@ This document describes the current state of the algorithm.
 
 All the interconnections are considered to be CNEs.
 > This simple behavior might change later.
+> Hvdc lines are not selected because we cannot compute their sensitivity
 
 ### Operational condition alignment
 
@@ -19,6 +20,11 @@ The preventive range actions of these operations are not respected.
 
 We assume that the IDs of each network element remains the same between the market-based network and the real time snapshot.
 > This simple behavior might change later.
+
+#### Crac alignment
+
+We apply each network action that has been applied to the real time snapshot to the market-based network.
+> We ignore the usage rules of the network actions. 
 
 #### PST alignment
 
@@ -78,5 +84,9 @@ The real time snapshot represents what has really happened on the network.
 ### Real time GLSK
 
 The real time GLSK are required to compute the zonal PTDF.
+
+### Real time CRAC
+
+The CRAC contains the network actions. 
 
 
