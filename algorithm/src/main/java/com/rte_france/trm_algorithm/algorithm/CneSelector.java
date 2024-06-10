@@ -22,15 +22,15 @@ public final class CneSelector {
         // utility class
     }
 
-    static Set<Branch> getNetworkElements(Network network) {
-        return network.getBranchStream()
+    static Set<Line> getNetworkElements(Network network) {
+        return network.getLineStream()
             .filter(CneSelector::isAnInterconnection)
             .collect(Collectors.toSet());
     }
 
-    private static boolean isAnInterconnection(Branch<?> branch) {
-        return getCountry(branch.getTerminal1()) !=
-            getCountry(branch.getTerminal2());
+    private static boolean isAnInterconnection(Line line) {
+        return getCountry(line.getTerminal1()) !=
+            getCountry(line.getTerminal2());
     }
 
     private static Country getCountry(Terminal terminal) {

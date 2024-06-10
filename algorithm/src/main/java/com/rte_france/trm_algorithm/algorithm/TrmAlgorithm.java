@@ -8,8 +8,8 @@
 package com.rte_france.trm_algorithm.algorithm;
 
 import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Identifiable;
+import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.openrao.data.cracapi.Crac;
@@ -32,7 +32,7 @@ public class TrmAlgorithm {
         this.zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
     }
 
-    private static void checkIdenticalNetworkElements(Set<Branch> networkElement1, Set<Branch> networkElement2, String networkMsg) {
+    private static void checkIdenticalNetworkElements(Set<Line> networkElement1, Set<Line> networkElement2, String networkMsg) {
         Set<String> extraReferenceElement = networkElement1.stream().map(Identifiable::getId).collect(Collectors.toSet());
         extraReferenceElement.removeAll(networkElement2.stream().map(Identifiable::getId).collect(Collectors.toSet()));
 
@@ -42,8 +42,8 @@ public class TrmAlgorithm {
     }
 
     public Map<String, Double> computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, ZonalData<SensitivityVariableSet> referenceZonalGlsks, Crac crac) {
-        Set<Branch> referenceNetworkElements = CneSelector.getNetworkElements(referenceNetwork);
-        Set<Branch> marketBasedNetworkElements = CneSelector.getNetworkElements(marketBasedNetwork);
+        Set<Line> referenceNetworkElements = CneSelector.getNetworkElements(referenceNetwork);
+        Set<Line> marketBasedNetworkElements = CneSelector.getNetworkElements(marketBasedNetwork);
 
         checkIdenticalNetworkElements(referenceNetworkElements, marketBasedNetworkElements, "Market-based");
         checkIdenticalNetworkElements(marketBasedNetworkElements, referenceNetworkElements, "Real-time");

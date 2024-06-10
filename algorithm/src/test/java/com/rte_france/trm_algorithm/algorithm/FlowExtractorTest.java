@@ -8,7 +8,7 @@
 
 package com.rte_france.trm_algorithm.algorithm;
 
-import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.junit.jupiter.api.Test;
@@ -26,14 +26,14 @@ class FlowExtractorTest {
     public static final double EPSILON = 1e-3;
 
     @Test
-    void testExtractFlowTwoBranches() {
+    void testExtractFlowTwoLines() {
         Network network = TestUtils.importNetwork("cne_selection/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
 
         LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
         FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
 
-        Set<Branch> branchSet = Set.of(network.getBranch("FGEN1 11 BLOAD 11 1"), network.getBranch("BLOAD 11 BGEN2 11 1"));
-        Map<String, Double> result = flowExtractor.extract(network, branchSet);
+        Set<Line> lineSet = Set.of(network.getLine("FGEN1 11 BLOAD 11 1"), network.getLine("BLOAD 11 BGEN2 11 1"));
+        Map<String, Double> result = flowExtractor.extract(network, lineSet);
         assertEquals(100.125, result.get("FGEN1 11 BLOAD 11 1"), EPSILON);
         assertEquals(-99.937, result.get("BLOAD 11 BGEN2 11 1"), EPSILON);
     }
@@ -46,8 +46,8 @@ class FlowExtractorTest {
             .setDc(true);
         FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
 
-        Set<Branch> branchSet = Set.of(network.getBranch("FGEN1 11 BLOAD 11 1"));
-        Map<String, Double> result = flowExtractor.extract(network, branchSet);
+        Set<Line> lineSet = Set.of(network.getLine("FGEN1 11 BLOAD 11 1"));
+        Map<String, Double> result = flowExtractor.extract(network, lineSet);
         assertEquals(100.125, result.get("FGEN1 11 BLOAD 11 1"), EPSILON);
     }
 }
