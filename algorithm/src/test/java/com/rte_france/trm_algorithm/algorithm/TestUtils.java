@@ -10,7 +10,10 @@ package com.rte_france.trm_algorithm.algorithm;
 import com.powsybl.commons.PowsyblException;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.commons.ZonalDataImpl;
+import com.powsybl.iidm.modification.scalable.ProportionalScalable;
+import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.*;
+import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.CracFactory;
 import com.powsybl.openrao.data.cracapi.networkaction.ActionType;
@@ -18,9 +21,7 @@ import com.powsybl.sensitivity.SensitivityVariableSet;
 import com.powsybl.sensitivity.WeightedSensitivityVariable;
 
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,8 @@ import java.util.stream.Collectors;
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
 public final class TestUtils {
+    private static final double MINIMAL_ABS_POWER_VALUE = 1e-5;
+
     private TestUtils() {
         // utility class
     }
@@ -55,10 +58,12 @@ public final class TestUtils {
                 .stream()
                 .collect(Collectors.toMap(Function.identity(), country -> new HashMap<>()));
 
-        network.getGeneratorStream().filter(g -> g.getTerminal().isConnected()).forEach(generator -> {
-            Country generatorCountry = getTerminalCountry(generator.getTerminal());
-            glsks.get(generatorCountry).put(generator.getId(), generator.getTargetP());
-        });
+        network.getGeneratorStream()
+            .filter(TestUtils::isCorrect)
+            .forEach(generator -> {
+                Country generatorCountry = getTerminalCountry(generator.getTerminal());
+                glsks.get(generatorCountry).put(generator.getId(), generator.getTargetP());
+            });
         return glsks;
     }
 
@@ -116,5 +121,42 @@ public final class TestUtils {
         crac.newNetworkAction().withId(String.format("Topological action with branch:\"%s\", actionType:%s", branch.getId(), actionType))
             .newTopologicalAction().withNetworkElement(branch.getId()).withActionType(actionType).add()
             .add();
+    }
+
+    public static ZonalData<Scalable> getAutoScalable(Network network) {
+        Map<String, Scalable> scalableZonalData = network.getCountries().stream()
+            .collect(Collectors.toMap(
+                country -> new EICode(country).getAreaCode(),
+                country -> getCountryGeneratorsScalable(network, country)
+            ));
+        return new ZonalDataImpl<>(scalableZonalData);
+    }
+
+    public static ProportionalScalable getCountryGeneratorsScalable(Network network, Country country) {
+        List<Scalable> scalables = new ArrayList<>();
+        List<Double> percentages = new ArrayList<>();
+        List<Generator> generators = network.getGeneratorStream()
+            .filter(generator -> country.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
+            .filter(TestUtils::isCorrect)
+            .toList();
+        double totalAbsoluteCountryP = generators.stream().mapToDouble(TestUtils::absoluteTargetP).sum();
+        generators.forEach(generator -> {
+            double generatorPercentage = 100 * TestUtils.absoluteTargetP(generator) / totalAbsoluteCountryP;
+            percentages.add(generatorPercentage);
+            scalables.add(Scalable.onGenerator(generator.getId()));
+        });
+
+        return Scalable.proportional(percentages, scalables);
+    }
+
+    private static double absoluteTargetP(Generator generator) {
+        return Math.max(MINIMAL_ABS_POWER_VALUE, Math.abs(generator.getTargetP()));
+    }
+
+    private static boolean isCorrect(Injection<?> injection) {
+        return injection != null &&
+            injection.getTerminal().isConnected() &&
+            injection.getTerminal().getBusView().getBus() != null &&
+            injection.getTerminal().getBusView().getBus().isInMainSynchronousComponent();
     }
 }

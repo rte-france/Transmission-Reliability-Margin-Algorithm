@@ -8,6 +8,7 @@
 package com.rte_france.trm_algorithm.algorithm;
 
 import com.powsybl.glsk.commons.ZonalData;
+import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.sensitivity.SensitivityVariableSet;
@@ -69,6 +70,18 @@ class TestUtilsTest {
         assertEquals(1, crac.getNetworkAction("Topological action with branch:\"BLOAD 11 BGEN2 11 1\", actionType:OPEN").getElementaryActions().size());
         assertEquals(1, crac.getNetworkAction("Topological action with branch:\"FGEN1 11 BLOAD 11 1\", actionType:CLOSE").getElementaryActions().size());
         assertEquals(1, crac.getNetworkAction("Topological action with branch:\"FGEN1 11 BLOAD 11 1\", actionType:OPEN").getElementaryActions().size());
+    }
+
+    @Test
+    void testGetAutoScalable() {
+        Network network = TestUtils.importNetwork("cne_selection/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
+
+        ZonalData<Scalable> zonalGlsks = TestUtils.getAutoScalable(network);
+
+        assertEquals(-1000.0, zonalGlsks.getData("10YBE----------2").minimumValue(network), EPSILON);
+        assertEquals(1000.0, zonalGlsks.getData("10YBE----------2").maximumValue(network), EPSILON);
+        assertEquals(-1000.0, zonalGlsks.getData("10YFR-RTE------C").minimumValue(network), EPSILON);
+        assertEquals(1000.0, zonalGlsks.getData("10YFR-RTE------C").maximumValue(network), EPSILON);
     }
 }
 

@@ -24,17 +24,12 @@ We assume that the IDs of each network element remains the same between the mark
 #### Crac alignment
 
 We apply each network action that has been applied to the real time snapshot to the market-based network.
-> We ignore the usage rules of the network actions. 
+> We ignore the usage rules of the network actions. This means that not only preventive network actions will be used, but also curative ones
 
 #### PST alignment
 
 For each PST on the market-based network, their tap is aligned with their corresponding PST on the real time snapshot.  
 A warning is issued when some PSTs do not have any corresponding PST on the other network.
-
-#### Adjusting topology
-
-> We do not change the topology yet.  
-> This simple behavior might change later.
 
 #### Matching HVDC mode and power
 
@@ -42,11 +37,11 @@ For each HVDC line on the market-based network, their mode and power are aligned
 the real time snapshot.  
 A warning is issued when some HVDC lines do not have any corresponding HVDC line on the other line.
 
-#### Shift exchanges
+#### Align exchanges
 
-The goal will be to shift exchanges on a given boundary and reset other boundary exchanges
-> We do not have implemented this yet.  
-> This simple behavior might change later.
+The goal is to align the net positions of the market-based network on the net positions of the real time snapshot.  
+The alignement is done with balances adjustment.  
+The alignment is ignored if the net positions are the same.  
 
 ### Flow extraction
 

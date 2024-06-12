@@ -7,10 +7,17 @@
  */
 package com.rte_france.trm_algorithm.algorithm;
 
+import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
+import com.powsybl.computation.local.LocalComputationManager;
+import com.powsybl.glsk.commons.ZonalDataImpl;
+import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.CracFactory;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,16 +28,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class OperationalConditionAlignerTest {
     @Test
     void testHvdcAndPstAlignment() {
-        Network network = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWithHvdc.xiidm");
+        Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWithHvdc.xiidm");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWithHvdc.xiidm");
         Crac crac = CracFactory.findDefault().create("crac");
         String hvdcId = "BBE2AA11 FFR3AA11 1";
-        network.getHvdcLine(hvdcId).setActivePowerSetpoint(100);
-        assertEquals(100, network.getHvdcLine(hvdcId).getActivePowerSetpoint());
+        referenceNetwork.getHvdcLine(hvdcId).setActivePowerSetpoint(100);
+        assertEquals(100, referenceNetwork.getHvdcLine(hvdcId).getActivePowerSetpoint());
         String pstId = "BBE2AA11 BBE3AA11 1";
-        network.getTwoWindingsTransformer(pstId).getPhaseTapChanger().setTapPosition(-5);
-        assertEquals(-5, network.getTwoWindingsTransformer(pstId).getPhaseTapChanger().getTapPosition());
-        OperationalConditionAligner.align(network, marketBasedNetwork, crac);
+        referenceNetwork.getTwoWindingsTransformer(pstId).getPhaseTapChanger().setTapPosition(-5);
+        assertEquals(-5, referenceNetwork.getTwoWindingsTransformer(pstId).getPhaseTapChanger().getTapPosition());
+        ZonalDataImpl<Scalable> marketZonalScalable = new ZonalDataImpl<>(Collections.emptyMap());
+        new OperationalConditionAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault()).align(referenceNetwork, marketBasedNetwork, crac, marketZonalScalable);
         assertEquals(100, marketBasedNetwork.getHvdcLine(hvdcId).getActivePowerSetpoint());
         assertEquals(-5, marketBasedNetwork.getTwoWindingsTransformer(pstId).getPhaseTapChanger().getTapPosition());
     }

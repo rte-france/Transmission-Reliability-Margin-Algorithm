@@ -7,9 +7,15 @@
  */
 package com.rte_france.trm_algorithm.algorithm;
 
+import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
+import com.powsybl.computation.ComputationManager;
+import com.powsybl.glsk.commons.ZonalData;
+import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.rte_france.trm_algorithm.algorithm.operational_conditions_aligners.CracAligner;
+import com.rte_france.trm_algorithm.algorithm.operational_conditions_aligners.ExchangeAligner;
 import com.rte_france.trm_algorithm.algorithm.operational_conditions_aligners.HvdcAligner;
 import com.rte_france.trm_algorithm.algorithm.operational_conditions_aligners.PstAligner;
 
@@ -17,13 +23,18 @@ import com.rte_france.trm_algorithm.algorithm.operational_conditions_aligners.Ps
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
-public final class OperationalConditionAligner {
+public class OperationalConditionAligner {
 
-    private OperationalConditionAligner() { } // utility class
+    private final ExchangeAligner exchangeAligner;
 
-    public static void align(Network network, Network marketBasedNetwork, Crac crac) {
-        CracAligner.align(network, marketBasedNetwork, crac);
-        HvdcAligner.align(network, marketBasedNetwork);
-        PstAligner.align(network, marketBasedNetwork);
+    OperationalConditionAligner(BalanceComputationParameters balanceComputationParameters, LoadFlow.Runner loadFlowRunner, ComputationManager computationManager) {
+        this.exchangeAligner = new ExchangeAligner(balanceComputationParameters, loadFlowRunner, computationManager);
+    }
+
+    public void align(Network referenceNetwork, Network marketBasedNetwork, Crac crac, ZonalData<Scalable> marketZonalScalable) {
+        CracAligner.align(referenceNetwork, marketBasedNetwork, crac);
+        HvdcAligner.align(referenceNetwork, marketBasedNetwork);
+        PstAligner.align(referenceNetwork, marketBasedNetwork);
+        exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
     }
 }

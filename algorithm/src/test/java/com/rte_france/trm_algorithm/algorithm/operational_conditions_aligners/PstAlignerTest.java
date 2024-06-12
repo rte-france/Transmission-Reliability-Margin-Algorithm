@@ -22,32 +22,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PstAlignerTest {
     @Test
     void testOnePstAlignment() {
-        Network network = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
+        Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
         String pstId = "BLOAD 11 BLOAD 12 2";
-        network.getTwoWindingsTransformer(pstId).getPhaseTapChanger().setTapPosition(3);
-        PstAligner.align(network, marketBasedNetwork);
+        referenceNetwork.getTwoWindingsTransformer(pstId).getPhaseTapChanger().setTapPosition(3);
+        PstAligner.align(referenceNetwork, marketBasedNetwork);
         assertEquals(3, marketBasedNetwork.getTwoWindingsTransformer(pstId).getPhaseTapChanger().getTapPosition());
     }
 
     @Test
     void testTwoPstAlignment() {
-        Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
+        Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         String pstId1 = "BBE2AA1  BBE3AA1  1";
         String pstId2 = "FFR2AA1  FFR4AA1  1";
-        network.getTwoWindingsTransformer(pstId1).getPhaseTapChanger().setTapPosition(5);
-        network.getTwoWindingsTransformer(pstId2).getPhaseTapChanger().setTapPosition(-3);
-        PstAligner.align(network, marketBasedNetwork);
+        referenceNetwork.getTwoWindingsTransformer(pstId1).getPhaseTapChanger().setTapPosition(5);
+        referenceNetwork.getTwoWindingsTransformer(pstId2).getPhaseTapChanger().setTapPosition(-3);
+        PstAligner.align(referenceNetwork, marketBasedNetwork);
         assertEquals(5, marketBasedNetwork.getTwoWindingsTransformer(pstId1).getPhaseTapChanger().getTapPosition());
         assertEquals(-3, marketBasedNetwork.getTwoWindingsTransformer(pstId2).getPhaseTapChanger().getTapPosition());
     }
 
     @Test
     void testTwoDifferentNetworksFail() {
-        Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
+        Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
-        TrmException exception = assertThrows(TrmException.class, () -> PstAligner.align(network, marketBasedNetwork));
+        TrmException exception = assertThrows(TrmException.class, () -> PstAligner.align(referenceNetwork, marketBasedNetwork));
         assertEquals("Two windings transformer BBE2AA1  BBE3AA1  1 not found", exception.getMessage());
     }
 }

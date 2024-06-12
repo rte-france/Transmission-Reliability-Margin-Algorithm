@@ -63,6 +63,12 @@
             <!-- Compile dependencies -->
             <dependency>
                 <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-balances-adjustment</artifactId>
+                <version>${powsybl.entsoe.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
                 <artifactId>powsybl-commons</artifactId>
                 <version>${powsybl.version}</version>
                 <scope>compile</scope>
@@ -137,6 +143,12 @@
             <!-- Test dependencies -->
             <dependency>
                 <groupId>com.powsybl</groupId>
+                <artifactId>open-rao-crac-creator-fb-constraint</artifactId>
+                <version>${powsybl.rao.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
                 <artifactId>powsybl-cgmes-conformity</artifactId>
                 <version>${powsybl.version}</version>
                 <scope>test</scope>
@@ -151,6 +163,12 @@
                 <groupId>com.powsybl</groupId>
                 <artifactId>powsybl-config-test</artifactId>
                 <version>${powsybl.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-glsk-document-cim</artifactId>
+                <version>${powsybl.entsoe.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
