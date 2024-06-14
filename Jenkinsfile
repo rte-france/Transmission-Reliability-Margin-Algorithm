@@ -126,17 +126,16 @@ node('build') {
 			}
 		}
 
-		if (isRelease) {
+        stageDevin ('🚚 Publication') {
+            echo "🚚 Publication NEXUS"
+            deployArtefact {
+                repoReleaseName = 'algoleague-releases'
+                repoSnapshotName = 'algoleague-snapshots'
+                jdk = 'openjdk17'
+            }
+        }
 
-			// Lancement de la construction Docker
-			stageDevin ('🚚 Publication') {
-				echo "🚚 Publication NEXUS"
-				deployArtefact {
-					repoReleaseName = 'astarte-releases'
-					repoSnapshotName = 'astarte-snapshots'
-					jdk = 'openjdk17'
-				}
-			}
+		if (isRelease) {
 
 			stageDevin ('🏷️Tag') {
 				echo "🏷️ Creation du tag de release"
