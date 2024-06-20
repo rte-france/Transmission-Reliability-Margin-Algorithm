@@ -128,6 +128,7 @@ node('build') {
 
         stageDevin ('🚚 Publication') {
             echo "🚚 Publication NEXUS"
+            sh "touch .skip-publish-junit-results" // Temporary fix to disable double test report
             deployArtefact {
                 repoReleaseName = 'algoleague-releases'
                 repoSnapshotName = 'algoleague-snapshots'
