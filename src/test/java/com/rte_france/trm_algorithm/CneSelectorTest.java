@@ -7,14 +7,13 @@
  */
 package com.rte_france.trm_algorithm;
 
-import com.powsybl.iidm.network.Line;
+import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
@@ -23,10 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CneSelectorTest {
     @Test
     void testOneInterconnectionCneSelector() {
-        Network network = TestUtils.importNetwork("cne_selection/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
+        Network network = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
 
-        Set<Line> lineSet = CneSelector.getNetworkElements(network);
-        assertEquals(1, lineSet.size());
-        assertTrue(lineSet.contains(network.getLine("FGEN1 11 BLOAD 11 1")));
+        Set<Branch> branchList = CneSelector.getNetworkElements(network);
+        assertEquals(1, branchList.size());
+        assertTrue(branchList.contains(network.getBranch("FGEN1 11 BLOAD 11 1")));
     }
 }

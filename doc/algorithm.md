@@ -9,8 +9,10 @@ This document describes the current state of the algorithm.
 #### CNE selection
 
 All the interconnections are considered to be CNEs.
-> This simple behavior might change later.
+> This simple behavior might change later.  
 > Hvdc lines are not selected because we cannot compute their sensitivity
+
+The branches selected on the reference network have to be available in the market-based network.  
 
 ### Operational condition alignment
 

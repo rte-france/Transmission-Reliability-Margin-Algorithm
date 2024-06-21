@@ -9,7 +9,6 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.iidm.network.*;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,26 +21,14 @@ public final class CneSelector {
         // utility class
     }
 
-    static Set<Line> getNetworkElements(Network network) {
-        return network.getLineStream()
+    static Set<Branch> getNetworkElements(Network network) {
+        return network.getBranchStream()
             .filter(CneSelector::isAnInterconnection)
             .collect(Collectors.toSet());
     }
 
-    private static boolean isAnInterconnection(Line line) {
-        return getCountry(line.getTerminal1()) !=
-            getCountry(line.getTerminal2());
-    }
-
-    private static Country getCountry(Terminal terminal) {
-        Optional<Substation> substation = terminal.getVoltageLevel().getSubstation();
-        if (substation.isPresent()) {
-            Optional<Country> country = substation.get().getCountry();
-            if (country.isPresent()) {
-                return country.get();
-            }
-            throw new TrmException("Should never get here: country is empty");
-        }
-        throw new TrmException("Should never get here: substation is empty");
+    private static boolean isAnInterconnection(Branch<?> branch) {
+        return TrmUtils.getCountry(branch.getTerminal1()) !=
+            TrmUtils.getCountry(branch.getTerminal2());
     }
 }

@@ -61,8 +61,8 @@ class TrmAlgorithmTest {
     void testSameNetwork12NodesAutoGlsk() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
-        ZonalData<SensitivityVariableSet> zonalGlsks = TestUtils.getAutoGlsk(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = TestUtils.getAutoScalable(marketBasedNetwork);
+        ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
+        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         Map<String, Double> result = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
         assertEquals(4, result.size());
         assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
@@ -185,7 +185,7 @@ class TrmAlgorithmTest {
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
         ZonalData<SensitivityVariableSet> zonalGlsks = null;
         TrmException exception = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable));
-        assertTrue(exception.getMessage().contains("Market-based network doesn't contain the following elements:"));
+        assertTrue(exception.getMessage().contains("Market-based critical network elements doesn't contain the following elements: ["));
     }
 
     @Test
@@ -194,8 +194,8 @@ class TrmAlgorithmTest {
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWith2Hvdc.xiidm");
         referenceNetwork.getHvdcLine("BBE2BB11 FFR3AA11 1").getConverterStation1().disconnect();
         referenceNetwork.getHvdcLine("BBE2BB11 FFR3AA11 1").getConverterStation2().disconnect();
-        ZonalData<SensitivityVariableSet> zonalGlsks = TestUtils.getAutoGlsk(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = TestUtils.getAutoScalable(marketBasedNetwork);
+        ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
+        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         Map<String, Double> result = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
         assertEquals(7, result.size());
         assertEquals(-817.366, result.get("BBE1AA11 FFR5AA11 1"), EPSILON);
@@ -234,17 +234,42 @@ class TrmAlgorithmTest {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12NodesHvdc.uct");
         referenceNetwork.getLine("NNL2AA1  BBE3AA1  1").disconnect();
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12NodesHvdc.uct");
-        ZonalData<SensitivityVariableSet> zonalGlsks = TestUtils.getAutoGlsk(referenceNetwork);
+        ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
         String cracFilePath = "TestCase12Nodes/cbcora_ep10us2case1.xml";
         NativeCrac nativeCrac = NativeCracImporters.importData(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)));
         Crac crac = CracCreators.createCrac(nativeCrac, referenceNetwork, OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC)).getCrac();
         crac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = TestUtils.getAutoScalable(marketBasedNetwork);
+        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         Map<String, Double> result = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
         assertEquals(4, result.size());
         assertEquals(-1383.344, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
         assertEquals(-1383.344, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
         assertEquals(Double.NaN, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
         assertEquals(-1383.344, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
+    }
+
+    @Test
+    void testNetworkWithoutInterconnection() {
+        Network referenceNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
+        referenceNetwork.getLine("FGEN1 11 BLOAD 11 1").remove();
+        Network marketBasedNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
+        ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
+        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        TrmException trmException = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable));
+        assertEquals("Reference critical network elements are empty", trmException.getMessage());
+    }
+
+    @Test
+    void testReferenceNetworkSubpartOfMarketBasedNetwork() {
+        Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        referenceNetwork.getLine("FFR2AA1  DDE3AA1  1").remove();
+        referenceNetwork.getLine("BBE2AA1  FFR3AA1  1").remove();
+        Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
+        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        Map<String, Double> result = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        assertEquals(2, result.size());
+        assertEquals(1260.669, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(1260.669, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
     }
 }

@@ -22,6 +22,7 @@ import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.openrao.commons.EICode;
 import com.rte_france.trm_algorithm.TestUtils;
 import com.rte_france.trm_algorithm.TrmException;
+import com.rte_france.trm_algorithm.TrmUtils;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.rte_france.trm_algorithm.TestUtils.getCountryGeneratorsScalable;
+import static com.rte_france.trm_algorithm.TrmUtils.getCountryGeneratorsScalable;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -74,8 +75,7 @@ class ExchangeAlignerTest {
 
         ZonalData<Scalable> marketZonalScalable = new ZonalDataImpl<>(scalableZonalData);
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
-        TrmException trmException = assertThrows(TrmException.class, () -> exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable));
-        assertEquals("Balance computation failed: FAILED", trmException.getMessage());
+        assertEquals(ExchangeAligner.Status.FAILED, exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable));
     }
 
     @Test
@@ -104,7 +104,7 @@ class ExchangeAlignerTest {
         ZonalData<Scalable> referenceZonalScalable = doc.getZonalScalable(referenceNetwork, instant);
         List<BalanceComputationArea> areas = new ArrayList<>();
         Scalable scalableES = referenceZonalScalable.getData(new EICode(Country.ES).getAreaCode());
-        Scalable scalableFR = TestUtils.getCountryGeneratorsScalable(referenceNetwork, Country.FR);
+        Scalable scalableFR = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.FR);
         Scalable scalablePT = referenceZonalScalable.getData(new EICode(Country.PT).getAreaCode());
         areas.add(new BalanceComputationArea("ES", countryAreaES, scalableES, -1200.));
         areas.add(new BalanceComputationArea("FR", countryAreaFR, scalableFR, 500.));
@@ -147,10 +147,10 @@ class ExchangeAlignerTest {
         assertEquals(-500, countryAreaNL.create(referenceNetwork).getNetPosition(), EPSILON);
 
         List<BalanceComputationArea> areas = new ArrayList<>();
-        Scalable scalableBE = TestUtils.getCountryGeneratorsScalable(referenceNetwork, Country.BE);
-        Scalable scalableDE = TestUtils.getCountryGeneratorsScalable(referenceNetwork, Country.DE);
-        Scalable scalableFR = TestUtils.getCountryGeneratorsScalable(referenceNetwork, Country.FR);
-        Scalable scalableNL = TestUtils.getCountryGeneratorsScalable(referenceNetwork, Country.NL);
+        Scalable scalableBE = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.BE);
+        Scalable scalableDE = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.DE);
+        Scalable scalableFR = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.FR);
+        Scalable scalableNL = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.NL);
         areas.add(new BalanceComputationArea("BE", countryAreaBE, scalableBE, -2500.));
         areas.add(new BalanceComputationArea("BE", countryAreaDE, scalableDE, -1500.));
         areas.add(new BalanceComputationArea("FR", countryAreaFR, scalableFR, 3000.));
@@ -169,7 +169,7 @@ class ExchangeAlignerTest {
         assertEquals(1000, countryAreaNL.create(referenceNetwork).getNetPosition(), EPSILON);
 
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
-        ZonalData<Scalable> marketZonalScalable = TestUtils.getAutoScalable(marketBasedNetwork);
+        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
         ExchangeAligner.Status status = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
         assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, status);
@@ -194,7 +194,7 @@ class ExchangeAlignerTest {
         assertEquals(-500, countryAreaNL.create(referenceNetwork).getNetPosition(), EPSILON);
 
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
-        ZonalData<Scalable> marketZonalScalable = TestUtils.getAutoScalable(marketBasedNetwork);
+        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
         ExchangeAligner.Status status = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
         assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, status);
@@ -208,7 +208,7 @@ class ExchangeAlignerTest {
     void testDifferentNetworks() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
-        ZonalData<Scalable> marketZonalScalable = TestUtils.getAutoScalable(marketBasedNetwork);
+        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
         TrmException exception = assertThrows(TrmException.class, () -> exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable));
         assertEquals("Scalable not found: 10YCB-GERMANY--8", exception.getMessage());

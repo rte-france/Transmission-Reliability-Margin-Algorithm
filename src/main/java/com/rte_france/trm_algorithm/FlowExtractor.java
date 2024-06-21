@@ -8,8 +8,8 @@
 
 package com.rte_france.trm_algorithm;
 
+import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Identifiable;
-import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -29,8 +29,8 @@ public class FlowExtractor {
         this.loadFlowParameters = loadFlowParameters.copy().setDc(false);
     }
 
-    public Map<String, Double> extract(Network network, Set<Line> lineSet) {
+    public Map<String, Double> extract(Network network, Set<Branch> branchSet) {
         LoadFlow.run(network, loadFlowParameters);
-        return lineSet.stream().collect(Collectors.toMap(Identifiable::getId, line -> line.getTerminal1().getP()));
+        return branchSet.stream().collect(Collectors.toMap(Identifiable::getId, branch -> branch.getTerminal1().getP()));
     }
 }

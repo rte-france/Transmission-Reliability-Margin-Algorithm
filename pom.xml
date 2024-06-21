@@ -43,6 +43,7 @@
 
         <!-- Dependencies versions -->
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <logback.version>1.5.6</logback.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven.checkstyle.version>3.3.1</maven.checkstyle.version>
         <maven.jacoco.version>0.8.10</maven.jacoco.version>
@@ -57,6 +58,18 @@
         <!-- Compile dependencies -->
         <dependency>
             <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-commons</artifactId>
+            <version>${powsybl.rao.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-api</artifactId>
+            <version>${powsybl.rao.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
             <artifactId>powsybl-balances-adjustment</artifactId>
             <version>${powsybl.entsoe.version}</version>
             <scope>compile</scope>
@@ -69,7 +82,19 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-glsk-document-api</artifactId>
+            <artifactId>powsybl-computation</artifactId>
+            <version>${powsybl.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-contingency-api</artifactId>
+            <version>${powsybl.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-glsk-commons</artifactId>
             <version>${powsybl.entsoe.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -81,20 +106,20 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-loadflow-api</artifactId>
+            <artifactId>powsybl-iidm-extensions</artifactId>
             <version>${powsybl.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-crac-api</artifactId>
-            <version>${powsybl.rao.version}</version>
+            <artifactId>powsybl-iidm-modification</artifactId>
+            <version>${powsybl.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-crac-impl</artifactId>
-            <version>${powsybl.rao.version}</version>
+            <artifactId>powsybl-loadflow-api</artifactId>
+            <version>${powsybl.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -110,6 +135,12 @@
             <scope>compile</scope>
         </dependency>
         <!-- Runtime dependencies -->
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-impl</artifactId>
+            <version>${powsybl.rao.version}</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-iidm-impl</artifactId>
@@ -136,6 +167,24 @@
         </dependency>
         <!-- Test dependencies -->
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-creator-api</artifactId>
+            <version>${powsybl.rao.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-native-crac-api</artifactId>
+            <version>${powsybl.rao.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-crac-creator-fb-constraint</artifactId>
             <version>${powsybl.rao.version}</version>
@@ -143,13 +192,13 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-cgmes-conformity</artifactId>
-            <version>${powsybl.version}</version>
+            <artifactId>open-rao-native-crac-io-api</artifactId>
+            <version>${powsybl.rao.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-cgmes-conversion</artifactId>
+            <artifactId>powsybl-computation-local</artifactId>
             <version>${powsybl.version}</version>
             <scope>test</scope>
         </dependency>
@@ -167,32 +216,26 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-glsk-document-io-api</artifactId>
-            <version>${powsybl.entsoe.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.powsybl</groupId>
             <artifactId>powsybl-glsk-document-ucte</artifactId>
             <version>${powsybl.entsoe.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-triple-store-impl-rdf4j</artifactId>
+            <artifactId>powsybl-iidm-test</artifactId>
             <version>${powsybl.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

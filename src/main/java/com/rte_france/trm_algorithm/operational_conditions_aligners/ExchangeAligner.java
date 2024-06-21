@@ -39,6 +39,7 @@ public class ExchangeAligner {
     public enum Status {
         ALIGNED_WITH_BALANCE_ADJUSTMENT,
         ALREADY_ALIGNED,
+        FAILED,
     }
 
     public ExchangeAligner(BalanceComputationParameters balanceComputationParameters, LoadFlow.Runner loadFlowRunner, ComputationManager computationManager) {
@@ -62,7 +63,8 @@ public class ExchangeAligner {
         String variantId = marketBasedNetwork.getVariantManager().getWorkingVariantId();
         BalanceComputationResult result = balanceComputation.run(marketBasedNetwork, variantId, balanceComputationParameters).join();
         if (result.getStatus().equals(BalanceComputationResult.Status.FAILED)) {
-            throw new TrmException("Balance computation failed: " + result.getStatus());
+            LOGGER.error("Balance computation failed");
+            return Status.FAILED;
         }
         return Status.ALIGNED_WITH_BALANCE_ADJUSTMENT;
     }
