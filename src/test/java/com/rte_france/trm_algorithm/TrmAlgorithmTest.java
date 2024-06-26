@@ -64,12 +64,12 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
-        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -80,12 +80,12 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
-        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -96,16 +96,16 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(8, result.size());
-        assertEquals(0.0, result.get("BBE1AA1  FFR5AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("BBE4AA1  FFR5AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("FFR4AA1  DDE1AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("FFR4AA1  DDE4AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(0.0, result.get("BBE1AA1  FFR5AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("BBE4AA1  FFR5AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR4AA1  DDE1AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR4AA1  DDE4AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -118,12 +118,12 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
-        assertEquals(15.051, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(14.745, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
-        assertEquals(15.585, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(15.746, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(15.051, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(14.745, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(15.585, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(15.746, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -136,16 +136,16 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(8, result.size());
-        assertEquals(7.294, result.get("BBE1AA1  FFR5AA1  1"), EPSILON);
-        assertEquals(8.300, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(7.294, result.get("BBE4AA1  FFR5AA1  1"), EPSILON);
-        assertEquals(9.536, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
-        assertEquals(157.116, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(15.829, result.get("FFR4AA1  DDE1AA1  1"), EPSILON);
-        assertEquals(-207.855, result.get("FFR4AA1  DDE4AA1  1"), EPSILON);
-        assertEquals(9.797, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(7.294, result.get("BBE1AA1  FFR5AA1  1").getUncertainty(), EPSILON);
+        assertEquals(8.300, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(7.294, result.get("BBE4AA1  FFR5AA1  1").getUncertainty(), EPSILON);
+        assertEquals(9.536, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(157.116, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(15.829, result.get("FFR4AA1  DDE1AA1  1").getUncertainty(), EPSILON);
+        assertEquals(-207.855, result.get("FFR4AA1  DDE4AA1  1").getUncertainty(), EPSILON);
+        assertEquals(9.797, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -157,12 +157,12 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
-        assertEquals(Double.NaN, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(499.779, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
-        assertEquals(499.779, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(499.779, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(Double.NaN, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(499.779, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(499.779, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(499.779, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -174,16 +174,16 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(8, result.size());
-        assertEquals(Double.NaN, result.get("BBE1AA1  FFR5AA1  1"), EPSILON);
-        assertEquals(-68.678, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(-271.286, result.get("BBE4AA1  FFR5AA1  1"), EPSILON);
-        assertEquals(16.027, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
-        assertEquals(17.719, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(12.822, result.get("FFR4AA1  DDE1AA1  1"), EPSILON);
-        assertEquals(7.433, result.get("FFR4AA1  DDE4AA1  1"), EPSILON);
-        assertEquals(16.353, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(Double.NaN, result.get("BBE1AA1  FFR5AA1  1").getUncertainty(), EPSILON);
+        assertEquals(-68.678, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(-271.286, result.get("BBE4AA1  FFR5AA1  1").getUncertainty(), EPSILON);
+        assertEquals(16.027, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(17.719, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(12.822, result.get("FFR4AA1  DDE1AA1  1").getUncertainty(), EPSILON);
+        assertEquals(7.433, result.get("FFR4AA1  DDE4AA1  1").getUncertainty(), EPSILON);
+        assertEquals(16.353, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -204,15 +204,15 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(7, result.size());
-        assertEquals(-817.366, result.get("BBE1AA11 FFR5AA11 1"), EPSILON);
-        assertEquals(-817.366, result.get("BBE4AA11 FFR5AA11 1"), EPSILON);
-        assertEquals(267.713, result.get("FFR4AA11 DDE1AA11 1"), EPSILON);
-        assertEquals(318.732, result.get("NNL2AA11 BBE3AA11 1"), EPSILON);
-        assertEquals(368.005, result.get("FFR2AA11 DDE3AA11 1"), EPSILON);
-        assertEquals(316.924, result.get("DDE2AA11 NNL3AA11 1"), EPSILON);
-        assertEquals(155.695, result.get("FFR4AA11 DDE4AA11 1"), EPSILON);
+        assertEquals(-817.366, result.get("BBE1AA11 FFR5AA11 1").getUncertainty(), EPSILON);
+        assertEquals(-817.366, result.get("BBE4AA11 FFR5AA11 1").getUncertainty(), EPSILON);
+        assertEquals(267.713, result.get("FFR4AA11 DDE1AA11 1").getUncertainty(), EPSILON);
+        assertEquals(318.732, result.get("NNL2AA11 BBE3AA11 1").getUncertainty(), EPSILON);
+        assertEquals(368.005, result.get("FFR2AA11 DDE3AA11 1").getUncertainty(), EPSILON);
+        assertEquals(316.924, result.get("DDE2AA11 NNL3AA11 1").getUncertainty(), EPSILON);
+        assertEquals(155.695, result.get("FFR4AA11 DDE4AA11 1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -226,16 +226,16 @@ class TrmAlgorithmTest {
         Crac crac = TestUtils.getIdealTopologicalAlignerCrac(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(8, result.size());
-        assertEquals(Double.NaN, result.get("BBE1AA1  FFR5AA1  1"), EPSILON); // This line is still open
-        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("BBE4AA1  FFR5AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("FFR4AA1  DDE1AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("FFR4AA1  DDE4AA1  1"), EPSILON);
-        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
+        assertEquals(Double.NaN, result.get("BBE1AA1  FFR5AA1  1").getUncertainty(), EPSILON); // This line is still open
+        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("BBE4AA1  FFR5AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR4AA1  DDE1AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR4AA1  DDE4AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -250,12 +250,12 @@ class TrmAlgorithmTest {
         crac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
-        assertEquals(-1383.344, result.get("BBE2AA1  FFR3AA1  1"), EPSILON);
-        assertEquals(-1383.344, result.get("FFR2AA1  DDE3AA1  1"), EPSILON);
-        assertEquals(Double.NaN, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
-        assertEquals(-1383.344, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
+        assertEquals(-1383.344, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(-1383.344, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(Double.NaN, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(-1383.344, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
     }
 
     @Test
@@ -278,9 +278,9 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
-        Map<String, Double> result = trmResults.getUncertaintiesMap();
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(2, result.size());
-        assertEquals(1260.669, result.get("NNL2AA1  BBE3AA1  1"), EPSILON);
-        assertEquals(1260.669, result.get("DDE2AA1  NNL3AA1  1"), EPSILON);
+        assertEquals(1260.669, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(1260.669, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
     }
 }

@@ -72,12 +72,6 @@ public class TrmAlgorithm {
         return extraNetworkElementIds;
     }
 
-    private static double computeUncertainty(Branch branch, Double marketBasedFlow, double referenceFlow, double refereneZonalPtdf) {
-        double uncertainty = (marketBasedFlow - referenceFlow) / refereneZonalPtdf;
-        LOGGER.info("Uncertainty of branch id:'{}', name '{}' = {} with market-based flow: {}, reference flow: {}, reference zonal Ptdf: {}", branch.getId(), branch.getNameOrId(), uncertainty, marketBasedFlow, referenceFlow, refereneZonalPtdf);
-        return uncertainty;
-    }
-
     public TrmResults computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, ZonalData<SensitivityVariableSet> referenceZonalGlsks, Crac crac, ZonalData<Scalable> marketZonalScalable) {
         TrmResults.Builder builder = TrmResults.getBuilder();
 
@@ -90,9 +84,15 @@ public class TrmAlgorithm {
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork, crac, marketZonalScalable, builder);
         Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, marketBasedNetworkElements);
         Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElements, referenceZonalGlsks);
-        Map<String, Double> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
+        Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                entry -> computeUncertainty(referenceNetwork.getBranch(entry.getKey()), marketBasedFlows.get(entry.getKey()), entry.getValue().getFlow(), entry.getValue().getZonalPtdf())
+                entry -> {
+                    Branch branch = referenceNetwork.getBranch(entry.getKey());
+                    Double marketBasedFlow = marketBasedFlows.get(entry.getKey());
+                    double referenceFlow = entry.getValue().getFlow();
+                    double referenceZonalPtdf = entry.getValue().getZonalPtdf();
+                    return new UncertaintyResult(branch, marketBasedFlow, referenceFlow, referenceZonalPtdf);
+                }
         ));
 
         builder.addUncertainties(uncertaintiesMap);

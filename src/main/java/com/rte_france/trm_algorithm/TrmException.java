@@ -16,4 +16,8 @@ public class TrmException extends RuntimeException {
     public TrmException(String message) {
         super(message);
     }
+
+    public TrmException(Exception e) {
+        super(e);
+    }
 }

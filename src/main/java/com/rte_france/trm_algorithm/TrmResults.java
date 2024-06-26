@@ -18,12 +18,12 @@ import java.util.Objects;
  */
 public final class TrmResults {
 
-    private final Map<String, Double> uncertaintiesMap;
+    private final Map<String, UncertaintyResult> uncertaintiesMap;
     private final Map<String, Boolean> cracAlignmentResults;
     private final Map<String, Boolean> pstAlignmentResults;
     private final ExchangeAligner.Result exchangeAlignerResult;
 
-    private TrmResults(Map<String, Double> uncertaintiesMap,
+    private TrmResults(Map<String, UncertaintyResult> uncertaintiesMap,
                        Map<String, Boolean> cracAlignmentResults,
                        Map<String, Boolean> pstAlignmentResults,
                        ExchangeAligner.Result exchangeAlignerResult) {
@@ -37,7 +37,7 @@ public final class TrmResults {
         return new Builder();
     }
 
-    public Map<String, Double> getUncertaintiesMap() {
+    public Map<String, UncertaintyResult> getUncertaintiesMap() {
         return uncertaintiesMap;
     }
 
@@ -54,7 +54,7 @@ public final class TrmResults {
     }
 
     public static final class Builder {
-        private Map<String, Double> uncertaintiesMap;
+        private Map<String, UncertaintyResult> uncertaintiesMap;
         private Map<String, Boolean> cracAlignmentResults;
         private Map<String, Boolean> pstAlignmentResults;
         private ExchangeAligner.Result exchangeAlignerResult;
@@ -63,7 +63,7 @@ public final class TrmResults {
             // Builder pattern
         }
 
-        public Builder addUncertainties(Map<String, Double> uncertaintiesMap) {
+        public Builder addUncertainties(Map<String, UncertaintyResult> uncertaintiesMap) {
             this.uncertaintiesMap = uncertaintiesMap;
             return this;
         }
