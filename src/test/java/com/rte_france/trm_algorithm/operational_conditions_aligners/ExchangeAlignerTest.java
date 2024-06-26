@@ -75,7 +75,21 @@ class ExchangeAlignerTest {
 
         ZonalData<Scalable> marketZonalScalable = new ZonalDataImpl<>(scalableZonalData);
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
-        assertEquals(ExchangeAligner.Status.FAILED, exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable));
+        ExchangeAligner.Result result = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
+        assertEquals(ExchangeAligner.Status.FAILED, result.getStatus());
+        assertEquals(BalanceComputationResult.Status.FAILED, result.getBalanceComputationResult().getStatus());
+        Map<Country, Double> referenceNetPositions = result.getReferenceNetPositions();
+        assertEquals(-983.684, referenceNetPositions.get(Country.ES), EPSILON);
+        assertEquals(0.205, referenceNetPositions.get(Country.FR), EPSILON);
+        assertEquals(983.4790208818534, referenceNetPositions.get(Country.PT), EPSILON);
+        Map<Country, Double> initialMarketBasedNetPositions = result.getInitialMarketBasedNetPositions();
+        assertEquals(-0.411, initialMarketBasedNetPositions.get(Country.ES), EPSILON);
+        assertEquals(0.205, initialMarketBasedNetPositions.get(Country.FR), EPSILON);
+        assertEquals(0.205, initialMarketBasedNetPositions.get(Country.PT), EPSILON);
+        Map<Country, Double> newMarketBasedNetPositions = result.getNewMarketBasedNetPositions();
+        assertEquals(-0.411, newMarketBasedNetPositions.get(Country.ES), EPSILON);
+        assertEquals(0.205, newMarketBasedNetPositions.get(Country.FR), EPSILON);
+        assertEquals(0.205, newMarketBasedNetPositions.get(Country.PT), EPSILON);
     }
 
     @Test
@@ -84,20 +98,24 @@ class ExchangeAlignerTest {
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/shift/TestCase_with_transformers.xiidm");
         ZonalData<Scalable> marketZonalScalable = new ZonalDataImpl<>(Collections.emptyMap());
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
-        assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable));
+        ExchangeAligner.Result result = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
+        assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, result.getStatus());
+        assertNull(result.getBalanceComputationResult());
+        Map<Country, Double> referenceNetPositions = result.getReferenceNetPositions();
+        assertEquals(-0.411, referenceNetPositions.get(Country.ES), EPSILON);
+        assertEquals(0.205, referenceNetPositions.get(Country.FR), EPSILON);
+        assertEquals(0.205, referenceNetPositions.get(Country.PT), EPSILON);
+        Map<Country, Double> initialMarketBasedNetPositions = result.getInitialMarketBasedNetPositions();
+        assertEquals(-0.411, initialMarketBasedNetPositions.get(Country.ES), EPSILON);
+        assertEquals(0.205, initialMarketBasedNetPositions.get(Country.FR), EPSILON);
+        assertEquals(0.205, initialMarketBasedNetPositions.get(Country.PT), EPSILON);
+        assertNull(result.getNewMarketBasedNetPositions());
     }
 
     @Test
     void testWithSwe() {
         Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/shift/TestCase_with_transformers.xiidm");
         LoadFlow.run(referenceNetwork);
-        CountryAreaFactory countryAreaES = new CountryAreaFactory(Country.ES);
-        CountryAreaFactory countryAreaFR = new CountryAreaFactory(Country.FR);
-        CountryAreaFactory countryAreaPT = new CountryAreaFactory(Country.PT);
-
-        assertEquals(-0.4, countryAreaES.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(0.2, countryAreaFR.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(0.2, countryAreaPT.create(referenceNetwork).getNetPosition(), EPSILON);
 
         CimGlskDocument doc = CimGlskDocument.importGlsk(getClass().getResourceAsStream("shift/TestCase_with_transformers_glsk.xml"));
         Instant instant = LocalDateTime.of(2023, 7, 31, 7, 30).toInstant(ZoneOffset.UTC);
@@ -106,102 +124,105 @@ class ExchangeAlignerTest {
         Scalable scalableES = referenceZonalScalable.getData(new EICode(Country.ES).getAreaCode());
         Scalable scalableFR = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.FR);
         Scalable scalablePT = referenceZonalScalable.getData(new EICode(Country.PT).getAreaCode());
-        areas.add(new BalanceComputationArea("ES", countryAreaES, scalableES, -1200.));
-        areas.add(new BalanceComputationArea("FR", countryAreaFR, scalableFR, 500.));
-        areas.add(new BalanceComputationArea("PT", countryAreaPT, scalablePT, 700.));
+        areas.add(new BalanceComputationArea("ES", new CountryAreaFactory(Country.ES), scalableES, -1200.));
+        areas.add(new BalanceComputationArea("FR", new CountryAreaFactory(Country.FR), scalableFR, 500.));
+        areas.add(new BalanceComputationArea("PT", new CountryAreaFactory(Country.PT), scalablePT, 700.));
         BalanceComputationFactory balanceComputationFactory = new BalanceComputationFactoryImpl();
         LoadFlow.Runner loadFlowRunner = LoadFlow.find();
         ComputationManager computationManager = LocalComputationManager.getDefault();
         BalanceComputation balanceComputation = balanceComputationFactory.create(areas, loadFlowRunner, computationManager);
         BalanceComputationParameters parameters = new BalanceComputationParameters().setThresholdNetPosition(1e-2);
-        BalanceComputationResult result = balanceComputation.run(referenceNetwork, referenceNetwork.getVariantManager().getWorkingVariantId(), parameters).join();
-
-        assertEquals(BalanceComputationResult.Status.SUCCESS, result.getStatus());
-        assertEquals(-1200, countryAreaES.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(500, countryAreaFR.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(700, countryAreaPT.create(referenceNetwork).getNetPosition(), EPSILON);
+        BalanceComputationResult balanceComputationResult = balanceComputation.run(referenceNetwork, referenceNetwork.getVariantManager().getWorkingVariantId(), parameters).join();
+        assertEquals(BalanceComputationResult.Status.SUCCESS, balanceComputationResult.getStatus());
 
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/shift/TestCase_with_transformers.xiidm");
         ZonalData<Scalable> marketZonalScalable = doc.getZonalScalable(marketBasedNetwork, instant);
         marketZonalScalable.addAll(new ZonalDataImpl<>(Map.of(new EICode(Country.FR).getAreaCode(), getCountryGeneratorsScalable(referenceNetwork, Country.FR))));
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
-        ExchangeAligner.Status status = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
-        assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, status);
-        assertEquals(-1200, countryAreaES.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(500, countryAreaFR.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(700, countryAreaPT.create(referenceNetwork).getNetPosition(), EPSILON);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(parameters, LoadFlow.find(), LocalComputationManager.getDefault());
+        ExchangeAligner.Result result = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
+        assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
+        assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
+        Map<Country, Double> referenceNetPositions = result.getReferenceNetPositions();
+        assertEquals(-1200, referenceNetPositions.get(Country.ES), EPSILON);
+        assertEquals(500, referenceNetPositions.get(Country.FR), EPSILON);
+        assertEquals(700, referenceNetPositions.get(Country.PT), EPSILON);
+        Map<Country, Double> initialMarketBasedNetPositions = result.getInitialMarketBasedNetPositions();
+        assertEquals(-0.411, initialMarketBasedNetPositions.get(Country.ES), EPSILON);
+        assertEquals(0.205, initialMarketBasedNetPositions.get(Country.FR), EPSILON);
+        assertEquals(0.205, initialMarketBasedNetPositions.get(Country.PT), EPSILON);
+        Map<Country, Double> newMarketBasedNetPositions = result.getNewMarketBasedNetPositions();
+        assertEquals(-1200, newMarketBasedNetPositions.get(Country.ES), EPSILON);
+        assertEquals(500, newMarketBasedNetPositions.get(Country.FR), EPSILON);
+        assertEquals(700, newMarketBasedNetPositions.get(Country.PT), EPSILON);
     }
 
     @Test
     void testWith16Nodes() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         LoadFlow.run(referenceNetwork);
-        CountryAreaFactory countryAreaBE = new CountryAreaFactory(Country.BE);
-        CountryAreaFactory countryAreaDE = new CountryAreaFactory(Country.DE);
-        CountryAreaFactory countryAreaFR = new CountryAreaFactory(Country.FR);
-        CountryAreaFactory countryAreaNL = new CountryAreaFactory(Country.NL);
-
-        assertEquals(2500, countryAreaBE.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(-2000, countryAreaDE.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(0, countryAreaFR.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(-500, countryAreaNL.create(referenceNetwork).getNetPosition(), EPSILON);
 
         List<BalanceComputationArea> areas = new ArrayList<>();
         Scalable scalableBE = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.BE);
         Scalable scalableDE = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.DE);
         Scalable scalableFR = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.FR);
         Scalable scalableNL = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.NL);
-        areas.add(new BalanceComputationArea("BE", countryAreaBE, scalableBE, -2500.));
-        areas.add(new BalanceComputationArea("BE", countryAreaDE, scalableDE, -1500.));
-        areas.add(new BalanceComputationArea("FR", countryAreaFR, scalableFR, 3000.));
-        areas.add(new BalanceComputationArea("FR", countryAreaNL, scalableNL, 1000.));
+        areas.add(new BalanceComputationArea("BE", new CountryAreaFactory(Country.BE), scalableBE, -2500.));
+        areas.add(new BalanceComputationArea("BE", new CountryAreaFactory(Country.DE), scalableDE, -1500.));
+        areas.add(new BalanceComputationArea("FR", new CountryAreaFactory(Country.FR), scalableFR, 3000.));
+        areas.add(new BalanceComputationArea("FR", new CountryAreaFactory(Country.NL), scalableNL, 1000.));
         BalanceComputationFactory balanceComputationFactory = new BalanceComputationFactoryImpl();
         LoadFlow.Runner loadFlowRunner = LoadFlow.find();
         ComputationManager computationManager = LocalComputationManager.getDefault();
         BalanceComputation balanceComputation = balanceComputationFactory.create(areas, loadFlowRunner, computationManager);
         BalanceComputationParameters parameters = new BalanceComputationParameters();
-        BalanceComputationResult result = balanceComputation.run(referenceNetwork, referenceNetwork.getVariantManager().getWorkingVariantId(), parameters).join();
-
-        assertEquals(BalanceComputationResult.Status.SUCCESS, result.getStatus());
-        assertEquals(-2500, countryAreaBE.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(-1500, countryAreaDE.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(3000, countryAreaFR.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(1000, countryAreaNL.create(referenceNetwork).getNetPosition(), EPSILON);
+        BalanceComputationResult balanceComputationResult = balanceComputation.run(referenceNetwork, referenceNetwork.getVariantManager().getWorkingVariantId(), parameters).join();
+        assertEquals(BalanceComputationResult.Status.SUCCESS, balanceComputationResult.getStatus());
 
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
-        ExchangeAligner.Status status = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
-        assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, status);
-        assertEquals(-2500, countryAreaBE.create(marketBasedNetwork).getNetPosition(), EPSILON);
-        assertEquals(-1500, countryAreaDE.create(marketBasedNetwork).getNetPosition(), EPSILON);
-        assertEquals(3000, countryAreaFR.create(marketBasedNetwork).getNetPosition(), EPSILON);
-        assertEquals(1000, countryAreaNL.create(marketBasedNetwork).getNetPosition(), EPSILON);
+        ExchangeAligner.Result result = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
+        assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
+        assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
+        Map<Country, Double> referenceNetPositions = result.getReferenceNetPositions();
+        assertEquals(-2500, referenceNetPositions.get(Country.BE), EPSILON);
+        assertEquals(-1500, referenceNetPositions.get(Country.DE), EPSILON);
+        assertEquals(3000, referenceNetPositions.get(Country.FR), EPSILON);
+        assertEquals(1000, referenceNetPositions.get(Country.NL), EPSILON);
+        Map<Country, Double> initialMarketBasedNetPositions = result.getInitialMarketBasedNetPositions();
+        assertEquals(2500, initialMarketBasedNetPositions.get(Country.BE), EPSILON);
+        assertEquals(-2000, initialMarketBasedNetPositions.get(Country.DE), EPSILON);
+        assertEquals(0, initialMarketBasedNetPositions.get(Country.FR), EPSILON);
+        assertEquals(-500, initialMarketBasedNetPositions.get(Country.NL), EPSILON);
+        Map<Country, Double> newMarketBasedNetPositions = result.getNewMarketBasedNetPositions();
+        assertEquals(-2500, newMarketBasedNetPositions.get(Country.BE), EPSILON);
+        assertEquals(-1500, newMarketBasedNetPositions.get(Country.DE), EPSILON);
+        assertEquals(3000, newMarketBasedNetPositions.get(Country.FR), EPSILON);
+        assertEquals(1000, newMarketBasedNetPositions.get(Country.NL), EPSILON);
     }
 
     @Test
     void testSameNetwork16Nodes() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         LoadFlow.run(referenceNetwork);
-        CountryAreaFactory countryAreaBE = new CountryAreaFactory(Country.BE);
-        CountryAreaFactory countryAreaDE = new CountryAreaFactory(Country.DE);
-        CountryAreaFactory countryAreaFR = new CountryAreaFactory(Country.FR);
-        CountryAreaFactory countryAreaNL = new CountryAreaFactory(Country.NL);
-
-        assertEquals(2500, countryAreaBE.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(-2000, countryAreaDE.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(0, countryAreaFR.create(referenceNetwork).getNetPosition(), EPSILON);
-        assertEquals(-500, countryAreaNL.create(referenceNetwork).getNetPosition(), EPSILON);
 
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault());
-        ExchangeAligner.Status status = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
-        assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, status);
-        assertEquals(2500, countryAreaBE.create(marketBasedNetwork).getNetPosition(), EPSILON);
-        assertEquals(-2000, countryAreaDE.create(marketBasedNetwork).getNetPosition(), EPSILON);
-        assertEquals(0, countryAreaFR.create(marketBasedNetwork).getNetPosition(), EPSILON);
-        assertEquals(-500, countryAreaNL.create(marketBasedNetwork).getNetPosition(), EPSILON);
+        ExchangeAligner.Result result = exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
+        assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, result.getStatus());
+        assertNull(result.getBalanceComputationResult());
+        Map<Country, Double> referenceNetPositions = result.getReferenceNetPositions();
+        assertEquals(2500, referenceNetPositions.get(Country.BE), EPSILON);
+        assertEquals(-2000, referenceNetPositions.get(Country.DE), EPSILON);
+        assertEquals(0, referenceNetPositions.get(Country.FR), EPSILON);
+        assertEquals(-500, referenceNetPositions.get(Country.NL), EPSILON);
+        Map<Country, Double> initialMarketBasedNetPositions = result.getInitialMarketBasedNetPositions();
+        assertEquals(2500, initialMarketBasedNetPositions.get(Country.BE), EPSILON);
+        assertEquals(-2000, initialMarketBasedNetPositions.get(Country.DE), EPSILON);
+        assertEquals(0, initialMarketBasedNetPositions.get(Country.FR), EPSILON);
+        assertEquals(-500, initialMarketBasedNetPositions.get(Country.NL), EPSILON);
+        assertNull(result.getNewMarketBasedNetPositions());
     }
 
     @Test

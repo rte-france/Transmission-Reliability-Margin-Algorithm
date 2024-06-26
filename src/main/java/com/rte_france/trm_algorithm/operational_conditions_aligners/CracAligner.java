@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * SPDX-License-Identifier: MPL-2.0
  */
-
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
 import com.powsybl.iidm.network.Network;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
-
 public final class CracAligner {
     private static final Logger LOGGER = LoggerFactory.getLogger(CracAligner.class);
 

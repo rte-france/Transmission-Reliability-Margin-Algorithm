@@ -73,5 +73,4 @@ public final class ZonalSensitivityComputer {
         return dataPerZone.keySet().stream()
             .map(country -> new SensitivityVariableSet(country, new ArrayList<>(glsk.getData(country).getVariables()))).toList();
     }
-
 }

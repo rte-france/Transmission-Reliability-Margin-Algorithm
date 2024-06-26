@@ -31,10 +31,10 @@ public class OperationalConditionAligner {
         this.exchangeAligner = new ExchangeAligner(balanceComputationParameters, loadFlowRunner, computationManager);
     }
 
-    public void align(Network referenceNetwork, Network marketBasedNetwork, Crac crac, ZonalData<Scalable> marketZonalScalable) {
-        CracAligner.align(referenceNetwork, marketBasedNetwork, crac);
+    public void align(Network referenceNetwork, Network marketBasedNetwork, Crac crac, ZonalData<Scalable> marketZonalScalable, TrmResults.Builder builder) {
+        builder.addCracAlignmentResults(CracAligner.align(referenceNetwork, marketBasedNetwork, crac));
         HvdcAligner.align(referenceNetwork, marketBasedNetwork);
-        PstAligner.align(referenceNetwork, marketBasedNetwork);
-        exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable);
+        builder.addPstAlignmentResults(PstAligner.align(referenceNetwork, marketBasedNetwork));
+        builder.addExchangeAlignerResult(exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable));
     }
 }

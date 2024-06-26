@@ -11,6 +11,7 @@ import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.test.FourSubstationsNodeBreakerFactory;
 import com.powsybl.sensitivity.SensitivityVariableSet;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,8 @@ class TrmUtilsTest {
     @Test
     void testNetworkWithoutCountriesInSubstations() {
         Network network = FourSubstationsNodeBreakerFactory.create();
-        Exception exception = assertThrows(TrmException.class, () -> TrmUtils.getCountry(network.getLine("LINE_S2S3").getTerminal1()));
+        Terminal terminal = network.getLine("LINE_S2S3").getTerminal1();
+        Exception exception = assertThrows(TrmException.class, () -> TrmUtils.getCountry(terminal));
         assertEquals("Optional country of substation 'S2' is empty", exception.getMessage());
     }
 

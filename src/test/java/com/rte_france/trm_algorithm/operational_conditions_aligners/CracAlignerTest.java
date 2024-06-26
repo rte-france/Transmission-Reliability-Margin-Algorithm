@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * SPDX-License-Identifier: MPL-2.0
  */
-
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
 import com.powsybl.iidm.network.Network;
@@ -29,9 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
-
 class CracAlignerTest {
-
     @Test
     void testOneNetworkActionWithTwoTopologicalActions() {
         Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");

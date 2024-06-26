@@ -22,7 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
@@ -42,6 +45,99 @@ public class ExchangeAligner {
         FAILED,
     }
 
+    public static final class Result {
+        private final Map<Country, Double> referenceNetPositions;
+        private final Map<Country, Double> initialMarketBasedNetPositions;
+        private final Map<Country, Double> newMarketBasedNetPositions;
+        private final BalanceComputationResult balanceComputationResult;
+        private final Status status;
+
+        private Result(Map<Country, Double> referenceNetPositions,
+                       Map<Country, Double> initialMarketBasedNetPositions,
+                       Map<Country, Double> newMarketBasedNetPositions,
+                       BalanceComputationResult balanceComputationResult,
+                       Status status) {
+            this.referenceNetPositions = referenceNetPositions;
+            this.initialMarketBasedNetPositions = initialMarketBasedNetPositions;
+            this.newMarketBasedNetPositions = newMarketBasedNetPositions;
+            this.balanceComputationResult = balanceComputationResult;
+            this.status = status;
+        }
+
+        public static Builder getBuilder() {
+            return new Builder();
+        }
+
+        public Map<Country, Double> getReferenceNetPositions() {
+            return referenceNetPositions;
+        }
+
+        public Map<Country, Double> getInitialMarketBasedNetPositions() {
+            return initialMarketBasedNetPositions;
+        }
+
+        public Map<Country, Double> getNewMarketBasedNetPositions() {
+            return newMarketBasedNetPositions;
+        }
+
+        public BalanceComputationResult getBalanceComputationResult() {
+            return balanceComputationResult;
+        }
+
+        public Status getStatus() {
+            return status;
+        }
+
+        public static final class Builder {
+            private Map<Country, Double> initialMarketBasedNetPositions;
+            private Map<Country, Double> referenceNetPositions;
+            private Map<Country, Double> newMarketBasedNetPositions;
+            private BalanceComputationResult balanceComputationResult;
+            private Status status;
+
+            private Builder() {
+                // Builder pattern
+            }
+
+            public Builder addReferenceNetPositions(Map<Country, Double> referenceNetPositions) {
+                this.referenceNetPositions = referenceNetPositions;
+                return this;
+            }
+
+            public Builder addInitialMarketBasedNetPositions(Map<Country, Double> initialMarketBasedNetPositions) {
+                this.initialMarketBasedNetPositions = initialMarketBasedNetPositions;
+                return this;
+            }
+
+            public Builder addNewMarketBasedNetPositions(Map<Country, Double> newMarketBasedNetPositions) {
+                this.newMarketBasedNetPositions = newMarketBasedNetPositions;
+                return this;
+            }
+
+            public Builder addBalanceComputationResult(BalanceComputationResult balanceComputationResult) {
+                this.balanceComputationResult = balanceComputationResult;
+                return this;
+            }
+
+            public Builder addExchangeAlignerStatus(Status status) {
+                this.status = status;
+                return this;
+            }
+
+            public Result build() {
+                Objects.requireNonNull(initialMarketBasedNetPositions, "initialMarketBasedNetPositions must not be null");
+                Objects.requireNonNull(referenceNetPositions, "referenceNetPositions must not be null");
+                Objects.requireNonNull(status, "status must not be null");
+                return new Result(referenceNetPositions,
+                    initialMarketBasedNetPositions,
+                    newMarketBasedNetPositions,
+                    balanceComputationResult,
+                    status);
+            }
+        }
+
+    }
+
     public ExchangeAligner(BalanceComputationParameters balanceComputationParameters, LoadFlow.Runner loadFlowRunner, ComputationManager computationManager) {
         this.balanceComputationParameters = balanceComputationParameters;
         this.loadFlowRunner = loadFlowRunner;
@@ -49,29 +145,42 @@ public class ExchangeAligner {
         this.balanceComputationFactory = new BalanceComputationFactoryImpl();
     }
 
-    public Status align(Network referenceNetwork, Network marketBasedNetwork, ZonalData<Scalable> marketZonalScalable) {
+    public Result align(Network referenceNetwork, Network marketBasedNetwork, ZonalData<Scalable> marketZonalScalable) {
+        Result.Builder builder = Result.getBuilder();
         LoadFlow.run(referenceNetwork, balanceComputationParameters.getLoadFlowParameters());
         LoadFlow.run(marketBasedNetwork, balanceComputationParameters.getLoadFlowParameters());
+        Map<Country, Double> initialMarketBasedNetPositions = getNetPositions(marketBasedNetwork);
+        Map<Country, Double> referenceNetPositions = getNetPositions(referenceNetwork);
+        builder.addInitialMarketBasedNetPositions(initialMarketBasedNetPositions)
+            .addReferenceNetPositions(referenceNetPositions);
 
-        if (referenceNetwork.getCountries().stream().noneMatch(country -> hasDifferentNetPosition(referenceNetwork, marketBasedNetwork, country))) {
+        if (referenceNetPositions.keySet().stream().noneMatch(country -> hasDifferentNetPosition(country, referenceNetPositions, initialMarketBasedNetPositions))) {
             LOGGER.info("No significant net position difference. Exchange alignment ignored !");
-            return Status.ALREADY_ALIGNED;
+            return builder.addExchangeAlignerStatus(Status.ALREADY_ALIGNED).build();
         }
 
         List<BalanceComputationArea> areas = createBalanceComputationAreas(referenceNetwork, marketZonalScalable);
         BalanceComputation balanceComputation = balanceComputationFactory.create(areas, loadFlowRunner, computationManager);
         String variantId = marketBasedNetwork.getVariantManager().getWorkingVariantId();
         BalanceComputationResult result = balanceComputation.run(marketBasedNetwork, variantId, balanceComputationParameters).join();
+        builder.addNewMarketBasedNetPositions(getNetPositions(marketBasedNetwork))
+            .addBalanceComputationResult(result);
         if (result.getStatus().equals(BalanceComputationResult.Status.FAILED)) {
             LOGGER.error("Balance computation failed");
-            return Status.FAILED;
+            return builder.addExchangeAlignerStatus(Status.FAILED).build();
         }
-        return Status.ALIGNED_WITH_BALANCE_ADJUSTMENT;
+        return builder.addExchangeAlignerStatus(Status.ALIGNED_WITH_BALANCE_ADJUSTMENT).build();
     }
 
-    private static boolean hasDifferentNetPosition(Network referenceNetwork, Network marketBasedNetwork, Country country) {
-        CountryAreaFactory countryAreaFactory = new CountryAreaFactory(country);
-        return Math.abs(countryAreaFactory.create(referenceNetwork).getNetPosition() - countryAreaFactory.create(marketBasedNetwork).getNetPosition()) > NET_POSITION_EPSILON;
+    private static Map<Country, Double> getNetPositions(Network network) {
+        return network.getCountries().stream()
+            .collect(Collectors.toMap(
+                Function.identity(),
+                country -> new CountryAreaFactory(country).create(network).getNetPosition()));
+    }
+
+    private static boolean hasDifferentNetPosition(Country country, Map<Country, Double> referenceNetPositions, Map<Country, Double> initialMarketBasedNetPositions) {
+        return !initialMarketBasedNetPositions.containsKey(country) || Math.abs(referenceNetPositions.get(country) - initialMarketBasedNetPositions.get(country)) > NET_POSITION_EPSILON;
     }
 
     private static List<BalanceComputationArea> createBalanceComputationAreas(Network referenceNetwork, ZonalData<Scalable> zonalData) {
