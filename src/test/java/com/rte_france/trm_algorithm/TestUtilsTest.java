@@ -9,6 +9,7 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,5 +30,17 @@ class TestUtilsTest {
         assertEquals(1, crac.getNetworkAction("Topological action with branch:\"BLOAD 11 BGEN2 11 1\", actionType:OPEN").getElementaryActions().size());
         assertEquals(1, crac.getNetworkAction("Topological action with branch:\"FGEN1 11 BLOAD 11 1\", actionType:CLOSE").getElementaryActions().size());
         assertEquals(1, crac.getNetworkAction("Topological action with branch:\"FGEN1 11 BLOAD 11 1\", actionType:OPEN").getElementaryActions().size());
+    }
+
+    @Test
+    void testBuildEmptyResults() {
+        TrmResults trmResults = TestUtils.mockTrmResults().build();
+        assertTrue(trmResults.getUncertaintiesMap().isEmpty());
+        assertTrue(trmResults.getCracAlignmentResults().isEmpty());
+        assertTrue(trmResults.getPstAlignmentResults().getPhaseTapChangerResults().isEmpty());
+        assertTrue(trmResults.getPstAlignmentResults().getRatioTapChangerResults().isEmpty());
+        assertEquals(ExchangeAligner.Status.FAILED, trmResults.getExchangeAlignerResult().getStatus());
+        assertTrue(trmResults.getExchangeAlignerResult().getInitialMarketBasedNetPositions().isEmpty());
+        assertTrue(trmResults.getExchangeAlignerResult().getReferenceNetPositions().isEmpty());
     }
 }

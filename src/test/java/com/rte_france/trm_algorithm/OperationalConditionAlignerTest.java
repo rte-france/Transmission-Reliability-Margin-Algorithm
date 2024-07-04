@@ -17,6 +17,7 @@ import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.CracFactory;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -44,7 +45,7 @@ class OperationalConditionAlignerTest {
         referenceNetwork.getTwoWindingsTransformer(pstId).getPhaseTapChanger().setTapPosition(-5);
         assertEquals(-5, referenceNetwork.getTwoWindingsTransformer(pstId).getPhaseTapChanger().getTapPosition());
         ZonalDataImpl<Scalable> marketZonalScalable = new ZonalDataImpl<>(Collections.emptyMap());
-        TrmResults.Builder builder = TrmResults.getBuilder();
+        TrmResults.Builder builder = TrmResults.builder();
         new OperationalConditionAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault()).align(referenceNetwork, marketBasedNetwork, crac, marketZonalScalable, builder);
         assertEquals(100, marketBasedNetwork.getHvdcLine(hvdcId).getActivePowerSetpoint());
         assertEquals(-5, marketBasedNetwork.getTwoWindingsTransformer(pstId).getPhaseTapChanger().getTapPosition());
@@ -53,9 +54,10 @@ class OperationalConditionAlignerTest {
         TrmResults trmResults = builder.build();
         Map<String, Boolean> cracAlignmentResults = trmResults.getCracAlignmentResults();
         assertTrue(cracAlignmentResults.isEmpty());
-        Map<String, Boolean> pstAlignmentResults = trmResults.getPstAlignmentResults();
-        assertTrue(pstAlignmentResults.get("BBE2AA11 BBE3AA11 1"));
-        assertTrue(pstAlignmentResults.get("FFR2AA11 FFR4AA11 1"));
+        PstAligner.Result pstAlignmentResults = trmResults.getPstAlignmentResults();
+        assertTrue(pstAlignmentResults.getPhaseTapChangerResults().get("BBE2AA11 BBE3AA11 1"));
+        assertTrue(pstAlignmentResults.getPhaseTapChangerResults().get("FFR2AA11 FFR4AA11 1"));
+        assertTrue(pstAlignmentResults.getRatioTapChangerResults().isEmpty());
         ExchangeAligner.Result exchangeAlignerResult = trmResults.getExchangeAlignerResult();
         assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, exchangeAlignerResult.getStatus());
         assertNull(exchangeAlignerResult.getBalanceComputationResult());

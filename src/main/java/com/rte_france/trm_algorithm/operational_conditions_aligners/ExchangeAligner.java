@@ -64,7 +64,7 @@ public class ExchangeAligner {
             this.status = status;
         }
 
-        public static Builder getBuilder() {
+        public static Builder builder() {
             return new Builder();
         }
 
@@ -147,7 +147,7 @@ public class ExchangeAligner {
 
     public Result align(Network referenceNetwork, Network marketBasedNetwork, ZonalData<Scalable> marketZonalScalable) {
         LOGGER.info("Aligning exchanges");
-        Result.Builder builder = Result.getBuilder();
+        Result.Builder builder = Result.builder();
         LoadFlow.run(referenceNetwork, balanceComputationParameters.getLoadFlowParameters());
         LoadFlow.run(marketBasedNetwork, balanceComputationParameters.getLoadFlowParameters());
         Map<Country, Double> initialMarketBasedNetPositions = getNetPositions(marketBasedNetwork);

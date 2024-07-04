@@ -61,7 +61,7 @@ public class TrmAlgorithm {
     }
 
     public TrmResults computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, XnecProvider xnecProvider, ZonalData<SensitivityVariableSet> referenceZonalGlsks, Crac crac, ZonalData<Scalable> marketZonalScalable) {
-        TrmResults.Builder builder = TrmResults.getBuilder();
+        TrmResults.Builder builder = TrmResults.builder();
 
         LOGGER.info("Selecting Critical network elements");
         List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().toList();

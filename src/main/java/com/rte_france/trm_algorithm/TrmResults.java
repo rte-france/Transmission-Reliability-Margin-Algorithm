@@ -8,6 +8,7 @@
 package com.rte_france.trm_algorithm;
 
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
 
 import java.util.Map;
 import java.util.Objects;
@@ -20,12 +21,12 @@ public final class TrmResults {
 
     private final Map<String, UncertaintyResult> uncertaintiesMap;
     private final Map<String, Boolean> cracAlignmentResults;
-    private final Map<String, Boolean> pstAlignmentResults;
+    private final PstAligner.Result pstAlignmentResults;
     private final ExchangeAligner.Result exchangeAlignerResult;
 
     private TrmResults(Map<String, UncertaintyResult> uncertaintiesMap,
                        Map<String, Boolean> cracAlignmentResults,
-                       Map<String, Boolean> pstAlignmentResults,
+                       PstAligner.Result pstAlignmentResults,
                        ExchangeAligner.Result exchangeAlignerResult) {
         this.uncertaintiesMap = uncertaintiesMap;
         this.cracAlignmentResults = cracAlignmentResults;
@@ -33,7 +34,7 @@ public final class TrmResults {
         this.exchangeAlignerResult = exchangeAlignerResult;
     }
 
-    public static TrmResults.Builder getBuilder() {
+    public static TrmResults.Builder builder() {
         return new Builder();
     }
 
@@ -45,7 +46,7 @@ public final class TrmResults {
         return cracAlignmentResults;
     }
 
-    public Map<String, Boolean> getPstAlignmentResults() {
+    public PstAligner.Result getPstAlignmentResults() {
         return pstAlignmentResults;
     }
 
@@ -56,7 +57,7 @@ public final class TrmResults {
     public static final class Builder {
         private Map<String, UncertaintyResult> uncertaintiesMap;
         private Map<String, Boolean> cracAlignmentResults;
-        private Map<String, Boolean> pstAlignmentResults;
+        private PstAligner.Result pstAlignmentResults;
         private ExchangeAligner.Result exchangeAlignerResult;
 
         private Builder() {
@@ -73,7 +74,7 @@ public final class TrmResults {
             return this;
         }
 
-        public Builder addPstAlignmentResults(Map<String, Boolean> pstAlignmentResults) {
+        public Builder addPstAlignmentResults(PstAligner.Result pstAlignmentResults) {
             this.pstAlignmentResults = pstAlignmentResults;
             return this;
         }

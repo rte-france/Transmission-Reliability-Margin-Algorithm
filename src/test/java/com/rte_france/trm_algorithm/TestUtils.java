@@ -11,8 +11,11 @@ import com.powsybl.iidm.network.*;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.CracFactory;
 import com.powsybl.openrao.data.cracapi.networkaction.ActionType;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
 
 import java.nio.file.Paths;
+import java.util.Collections;
 
 /**
  * This class contains helper functions for tests.
@@ -46,5 +49,29 @@ public final class TestUtils {
         crac.newNetworkAction().withId(String.format("Topological action with branch:\"%s\", actionType:%s", branch.getId(), actionType))
             .newTopologicalAction().withNetworkElement(branch.getId()).withActionType(actionType).add()
             .add();
+    }
+
+    static PstAligner.Result mockPstAlignerResult() {
+        return PstAligner.Result.builder()
+            .addPhaseTapChangerResults(Collections.emptyMap())
+            .addRatioTapChangerResults(Collections.emptyMap())
+            .build();
+
+    }
+
+    static ExchangeAligner.Result mockExchangeAlignerResult() {
+        return ExchangeAligner.Result.builder()
+            .addExchangeAlignerStatus(ExchangeAligner.Status.FAILED)
+            .addInitialMarketBasedNetPositions(Collections.emptyMap())
+            .addReferenceNetPositions(Collections.emptyMap())
+            .build();
+    }
+
+    static TrmResults.Builder mockTrmResults() {
+        return TrmResults.builder()
+            .addUncertainties(Collections.emptyMap())
+            .addCracAlignmentResults(Collections.emptyMap())
+            .addPstAlignmentResults(mockPstAlignerResult())
+            .addExchangeAlignerResult(mockExchangeAlignerResult());
     }
 }
