@@ -39,7 +39,7 @@ class TestUtilsTest {
         assertTrue(trmResults.getCracAlignmentResults().isEmpty());
         assertTrue(trmResults.getPstAlignmentResults().getPhaseTapChangerResults().isEmpty());
         assertTrue(trmResults.getPstAlignmentResults().getRatioTapChangerResults().isEmpty());
-        assertEquals(ExchangeAligner.Status.FAILED, trmResults.getExchangeAlignerResult().getStatus());
+        assertEquals(ExchangeAligner.Status.NOT_ALIGNED, trmResults.getExchangeAlignerResult().getStatus());
         assertTrue(trmResults.getExchangeAlignerResult().getInitialMarketBasedNetPositions().isEmpty());
         assertTrue(trmResults.getExchangeAlignerResult().getReferenceNetPositions().isEmpty());
     }

@@ -37,8 +37,8 @@ class TrmUtilsTest {
     void testGetCountryGeneratorsScalable() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Scalable scalableFR = TrmUtils.getCountryGeneratorsScalable(referenceNetwork, Country.FR);
-        assertEquals(45000, scalableFR.maximumValue(referenceNetwork), EPSILON);
-        assertEquals(-45000, scalableFR.minimumValue(referenceNetwork), EPSILON);
+        assertEquals(25000, scalableFR.maximumValue(referenceNetwork), EPSILON);
+        assertEquals(-25000, scalableFR.minimumValue(referenceNetwork), EPSILON);
     }
 
     @Test

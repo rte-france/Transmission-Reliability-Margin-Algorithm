@@ -17,6 +17,7 @@ import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.CracFactory;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerResult;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +59,7 @@ class OperationalConditionAlignerTest {
         assertTrue(pstAlignmentResults.getPhaseTapChangerResults().get("BBE2AA11 BBE3AA11 1"));
         assertTrue(pstAlignmentResults.getPhaseTapChangerResults().get("FFR2AA11 FFR4AA11 1"));
         assertTrue(pstAlignmentResults.getRatioTapChangerResults().isEmpty());
-        ExchangeAligner.Result exchangeAlignerResult = trmResults.getExchangeAlignerResult();
+        ExchangeAlignerResult exchangeAlignerResult = trmResults.getExchangeAlignerResult();
         assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, exchangeAlignerResult.getStatus());
         assertNull(exchangeAlignerResult.getBalanceComputationResult());
         Map<Country, Double> referenceNetPositions = exchangeAlignerResult.getReferenceNetPositions();

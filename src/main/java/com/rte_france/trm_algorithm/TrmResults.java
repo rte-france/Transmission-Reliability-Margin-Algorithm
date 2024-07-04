@@ -7,7 +7,7 @@
  */
 package com.rte_france.trm_algorithm;
 
-import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerResult;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
 
 import java.util.Map;
@@ -22,12 +22,12 @@ public final class TrmResults {
     private final Map<String, UncertaintyResult> uncertaintiesMap;
     private final Map<String, Boolean> cracAlignmentResults;
     private final PstAligner.Result pstAlignmentResults;
-    private final ExchangeAligner.Result exchangeAlignerResult;
+    private final ExchangeAlignerResult exchangeAlignerResult;
 
     private TrmResults(Map<String, UncertaintyResult> uncertaintiesMap,
                        Map<String, Boolean> cracAlignmentResults,
                        PstAligner.Result pstAlignmentResults,
-                       ExchangeAligner.Result exchangeAlignerResult) {
+                       ExchangeAlignerResult exchangeAlignerResult) {
         this.uncertaintiesMap = uncertaintiesMap;
         this.cracAlignmentResults = cracAlignmentResults;
         this.pstAlignmentResults = pstAlignmentResults;
@@ -50,7 +50,7 @@ public final class TrmResults {
         return pstAlignmentResults;
     }
 
-    public ExchangeAligner.Result getExchangeAlignerResult() {
+    public ExchangeAlignerResult getExchangeAlignerResult() {
         return exchangeAlignerResult;
     }
 
@@ -58,7 +58,7 @@ public final class TrmResults {
         private Map<String, UncertaintyResult> uncertaintiesMap;
         private Map<String, Boolean> cracAlignmentResults;
         private PstAligner.Result pstAlignmentResults;
-        private ExchangeAligner.Result exchangeAlignerResult;
+        private ExchangeAlignerResult exchangeAlignerResult;
 
         private Builder() {
             // Builder pattern
@@ -79,7 +79,7 @@ public final class TrmResults {
             return this;
         }
 
-        public Builder addExchangeAlignerResult(ExchangeAligner.Result exchangeAlignerResult) {
+        public Builder addExchangeAlignerResult(ExchangeAlignerResult exchangeAlignerResult) {
             this.exchangeAlignerResult = exchangeAlignerResult;
             return this;
         }

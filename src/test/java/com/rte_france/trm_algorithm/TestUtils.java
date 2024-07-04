@@ -7,11 +7,13 @@
  */
 package com.rte_france.trm_algorithm;
 
+import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
 import com.powsybl.iidm.network.*;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.CracFactory;
 import com.powsybl.openrao.data.cracapi.networkaction.ActionType;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerResult;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
 
 import java.nio.file.Paths;
@@ -56,14 +58,21 @@ public final class TestUtils {
             .addPhaseTapChangerResults(Collections.emptyMap())
             .addRatioTapChangerResults(Collections.emptyMap())
             .build();
-
     }
 
-    static ExchangeAligner.Result mockExchangeAlignerResult() {
-        return ExchangeAligner.Result.builder()
-            .addExchangeAlignerStatus(ExchangeAligner.Status.FAILED)
-            .addInitialMarketBasedNetPositions(Collections.emptyMap())
+    static ExchangeAlignerResult mockExchangeAlignerResult() {
+        return ExchangeAlignerResult.builder()
             .addReferenceNetPositions(Collections.emptyMap())
+            .addInitialMarketBasedNetPositions(Collections.emptyMap())
+            .addReferenceExchange(Collections.emptyMap())
+            .addInitialMarketBasedExchanges(Collections.emptyMap())
+            .addInitialMaxAbsoluteExchangeDifference(0)
+            .addTargetNetPosition(Collections.emptyMap())
+            .addBalanceComputationResult(new BalanceComputationResult(BalanceComputationResult.Status.FAILED))
+            .addNewMarketBasedNetPositions(Collections.emptyMap())
+            .addNewMarketBasedExchanges(Collections.emptyMap())
+            .addNewMaxAbsoluteExchangeDifference(0)
+            .addExchangeAlignerStatus(ExchangeAligner.Status.NOT_ALIGNED)
             .build();
     }
 

@@ -49,9 +49,25 @@ A warning is issued when some HVDC lines do not have any corresponding HVDC line
 
 #### Align exchanges
 
-The goal is to align the net positions of the market-based network on the net positions of the real time snapshot.  
+The goal is to align the exchanges of market-based network on the exchanges of the real time snapshot for each boundary 
+of the real time snapshot.  
 The alignement is done with balances adjustment.  
-The alignment is ignored if the net positions are the same.  
+The alignment is ignored if the exchanges are already the same.  
+
+$`c`$ is a country in the market-based network.  
+$`NP_{target}(c)`$ is the target net position of a country $`c`$.  
+This net position will be the goal of the balance adjustment.  
+$`exchange_{networkN}(countryA, countryB)`$ defines the leaving flow from country $`countryA`$ to country $`countryB`$ 
+in the network $`networkN`$.  
+If the country is not present in the real-time snapshot, the net position remains the same.  
+Otherwise, $`NP_{target}(c) = NP_{market} + \sum_{otherCountry!=c}exchange_{real-time}(c, otherCountry) - \sum_{otherCountry!=c}exchange_{market-based}(c, otherCountry)`$
+
+This formula allows the alignement to be valid even with a real time network that might be a subpart of the market-based 
+network.  
+If the networks have the same countries, this is equivalent to setting the target net positions to the real-time net 
+positions.  
+If the network is not for a NTC process and if a smaller network is used, the alignement might fail with a status `TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED`.  
+> This simple bahavior might be changed in the futur is required. But it does not make sens from a métier point of view as the afrr concept exists. 
 
 ### Flow extraction
 
