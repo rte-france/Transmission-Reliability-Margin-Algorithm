@@ -30,6 +30,7 @@ public final class PstAligner {
     }
 
     public static Map<String, Boolean> align(Network referenceNetwork, Network marketBasedNetwork) {
+        LOGGER.info("Aligning PSTs tap positions");
         return referenceNetwork.getTwoWindingsTransformerStream()
             .filter(PhaseTapChangerHolder::hasPhaseTapChanger)
             .collect(Collectors.toMap(

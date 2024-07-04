@@ -10,6 +10,11 @@ package com.rte_france.trm_algorithm;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
 import com.powsybl.computation.ComputationManager;
 import com.powsybl.computation.local.LocalComputationManager;
+import com.powsybl.flow_decomposition.XnecProvider;
+import com.powsybl.flow_decomposition.xnec_provider.XnecProvider5percPtdf;
+import com.powsybl.flow_decomposition.xnec_provider.XnecProviderByIds;
+import com.powsybl.flow_decomposition.xnec_provider.XnecProviderInterconnection;
+import com.powsybl.flow_decomposition.xnec_provider.XnecProviderUnion;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.commons.ZonalDataImpl;
 import com.powsybl.glsk.ucte.UcteGlskDocument;
@@ -28,11 +33,10 @@ import org.junit.jupiter.api.Test;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
@@ -62,8 +66,9 @@ class TrmAlgorithmTest {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
         assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
@@ -73,13 +78,42 @@ class TrmAlgorithmTest {
     }
 
     @Test
+    void testSameNetwork12NodesAutoGlskAndZonalPtdfSelection() {
+        Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProvider5percPtdf();
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
+        assertEquals(16, result.size());
+        assertEquals(0.0, result.get("BBE1AA1  BBE2AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("BBE1AA1  BBE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("BBE2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE1AA1  DDE2AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE1AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR1AA1  FFR2AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR1AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL1AA1  NNL2AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL1AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+    }
+
+    @Test
     void testSameNetwork12Nodes() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"));
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
         assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
@@ -94,8 +128,9 @@ class TrmAlgorithmTest {
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(8, result.size());
         assertEquals(0.0, result.get("BBE1AA1  FFR5AA1  1").getUncertainty(), EPSILON);
@@ -116,8 +151,9 @@ class TrmAlgorithmTest {
         referenceNetwork.getGenerator("DDE2AA1 _generator").setTargetP(2500);
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"));
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
         assertEquals(15.051, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
@@ -134,8 +170,9 @@ class TrmAlgorithmTest {
         referenceNetwork.getLoad("NNL2AA1 _load").setP0(1500);
         referenceNetwork.getGenerator("DDE2AA1 _generator").setTargetP(2500);
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(8, result.size());
         assertEquals(7.294, result.get("BBE1AA1  FFR5AA1  1").getUncertainty(), EPSILON);
@@ -155,8 +192,12 @@ class TrmAlgorithmTest {
         referenceNetwork.getLine("BBE2AA1  FFR3AA1  1").disconnect();
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"));
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
+            .addNetworkElementsOnBasecase(Set.of("BBE2AA1  FFR3AA1  1"))
+            .build();
+        XnecProvider xnecProvider = new XnecProviderUnion(List.of(xnecProviderByIds, new XnecProviderInterconnection()));
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
         assertEquals(Double.NaN, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
@@ -172,8 +213,12 @@ class TrmAlgorithmTest {
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
         referenceNetwork.getLine("BBE1AA1  FFR5AA1  1").disconnect();
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
+            .addNetworkElementsOnBasecase(Set.of("BBE1AA1  FFR5AA1  1"))
+            .build();
+        XnecProvider xnecProvider = new XnecProviderUnion(List.of(xnecProviderByIds, new XnecProviderInterconnection()));
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(8, result.size());
         assertEquals(Double.NaN, result.get("BBE1AA1  FFR5AA1  1").getUncertainty(), EPSILON);
@@ -190,9 +235,20 @@ class TrmAlgorithmTest {
     void testDifferentNetwork() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
-        ZonalData<SensitivityVariableSet> zonalGlsks = null;
-        TrmException exception = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable));
-        assertTrue(exception.getMessage().contains("Market-based critical network elements doesn't contain the following elements: ["));
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmException exception = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, null, crac, marketZonalScalable));
+        assertEquals("Market-based network doesn't contain the following network elements: [BBE1AA1  FFR5AA1  1, BBE2AA1  FFR3AA1  1, BBE4AA1  FFR5AA1  1, DDE2AA1  NNL3AA1  1, FFR2AA1  DDE3AA1  1, FFR4AA1  DDE1AA1  1, FFR4AA1  DDE4AA1  1, NNL2AA1  BBE3AA1  1].", exception.getMessage());
+    }
+
+    @Test
+    void testSameNetwork16NodesWithHvdcSelected() {
+        Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWith2Hvdc.xiidm");
+        Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWith2Hvdc.xiidm");
+        ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = XnecProviderByIds.builder().addNetworkElementsOnBasecase(Set.of("BBE2BB11 FFR3AA11 1")).build();
+        TrmException exception = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable));
+        assertEquals("Reference critical network elements are empty", exception.getMessage());
     }
 
     @Test
@@ -202,8 +258,9 @@ class TrmAlgorithmTest {
         referenceNetwork.getHvdcLine("BBE2BB11 FFR3AA11 1").getConverterStation1().disconnect();
         referenceNetwork.getHvdcLine("BBE2BB11 FFR3AA11 1").getConverterStation2().disconnect();
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(7, result.size());
         assertEquals(-817.366, result.get("BBE1AA11 FFR5AA11 1").getUncertainty(), EPSILON);
@@ -223,9 +280,13 @@ class TrmAlgorithmTest {
         referenceNetwork.getLine("BBE1AA1  FFR5AA1  1").disconnect();
         marketBasedNetwork.getLine("BBE4AA1  FFR5AA1  1").disconnect(); // This line will be reconnected
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        Crac crac = TestUtils.getIdealTopologicalAlignerCrac(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        Crac localCrac = TestUtils.getIdealTopologicalAlignerCrac(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
+            .addNetworkElementsOnBasecase(Set.of("BBE1AA1  FFR5AA1  1"))
+            .build();
+        XnecProvider xnecProvider = new XnecProviderUnion(List.of(xnecProviderByIds, new XnecProviderInterconnection()));
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, localCrac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(8, result.size());
         assertEquals(Double.NaN, result.get("BBE1AA1  FFR5AA1  1").getUncertainty(), EPSILON); // This line is still open
@@ -246,10 +307,14 @@ class TrmAlgorithmTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
         String cracFilePath = "TestCase12Nodes/cbcora_ep10us2case1.xml";
         NativeCrac nativeCrac = NativeCracImporters.importData(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)));
-        Crac crac = CracCreators.createCrac(nativeCrac, referenceNetwork, OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC)).getCrac();
-        crac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        Crac localCrac = CracCreators.createCrac(nativeCrac, referenceNetwork, OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC)).getCrac();
+        localCrac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
+            .addNetworkElementsOnBasecase(Set.of("NNL2AA1  BBE3AA1  1"))
+            .build();
+        XnecProvider xnecProvider = new XnecProviderUnion(List.of(xnecProviderByIds, new XnecProviderInterconnection()));
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, localCrac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(4, result.size());
         assertEquals(-1383.344, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
@@ -264,8 +329,9 @@ class TrmAlgorithmTest {
         referenceNetwork.getLine("FGEN1 11 BLOAD 11 1").remove();
         Network marketBasedNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        TrmException trmException = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable));
+        ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmException trmException = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable));
         assertEquals("Reference critical network elements are empty", trmException.getMessage());
     }
 
@@ -276,8 +342,9 @@ class TrmAlgorithmTest {
         referenceNetwork.getLine("BBE2AA1  FFR3AA1  1").remove();
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
-        ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, zonalGlsks, crac, marketZonalScalable);
+        ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks, crac, localMarketZonalScalable);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(2, result.size());
         assertEquals(1260.669, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);

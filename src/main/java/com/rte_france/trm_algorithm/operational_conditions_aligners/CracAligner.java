@@ -32,6 +32,7 @@ public final class CracAligner {
         if (crac.getNetworkActions().isEmpty()) {
             LOGGER.error("Crac does not have any network actions");
         }
+        LOGGER.info("Aligning CRAC network actions");
         return crac.getNetworkActions().stream()
             .collect(Collectors.toMap(
                 Identifiable::getId,

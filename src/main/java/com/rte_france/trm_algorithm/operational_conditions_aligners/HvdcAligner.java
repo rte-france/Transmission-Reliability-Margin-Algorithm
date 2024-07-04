@@ -12,6 +12,8 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControl;
 import com.powsybl.iidm.network.extensions.HvdcAngleDroopActivePowerControlAdder;
 import com.rte_france.trm_algorithm.TrmException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -20,10 +22,12 @@ import java.util.Objects;
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
 public final class HvdcAligner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HvdcAligner.class);
 
     private HvdcAligner() { } // utility class
 
     public static void align(Network referenceNetwork, Network marketBasedNetwork) {
+        LOGGER.info("Aligning HVDC power set points and angle droop active power mode");
         referenceNetwork.getHvdcLineStream().forEach(referenceHvdcLine -> {
             String id = referenceHvdcLine.getId();
             HvdcLine hvdcLine = marketBasedNetwork.getHvdcLine(id);

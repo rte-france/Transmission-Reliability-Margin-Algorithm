@@ -22,7 +22,7 @@ public class UncertaintyResult {
     private final double referenceZonalPtdf;
     private final double uncertainty;
 
-    public UncertaintyResult(Branch branch, double marketBasedFlow, double referenceFlow, double referenceZonalPtdf) {
+    public UncertaintyResult(Branch<?> branch, double marketBasedFlow, double referenceFlow, double referenceZonalPtdf) {
         this.marketBasedFlow = marketBasedFlow;
         this.referenceFlow = referenceFlow;
         this.referenceZonalPtdf = referenceZonalPtdf;

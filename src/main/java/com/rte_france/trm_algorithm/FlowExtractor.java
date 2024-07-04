@@ -7,14 +7,13 @@
  */
 package com.rte_france.trm_algorithm;
 
-import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -28,8 +27,8 @@ public class FlowExtractor {
         this.loadFlowParameters = loadFlowParameters.copy().setDc(false);
     }
 
-    public Map<String, Double> extract(Network network, Set<Branch> branchSet) {
+    public Map<String, Double> extract(Network network, List<String> branchIds) {
         LoadFlow.run(network, loadFlowParameters);
-        return branchSet.stream().collect(Collectors.toMap(Identifiable::getId, branch -> branch.getTerminal1().getP()));
+        return branchIds.stream().collect(Collectors.toMap(Function.identity(), branchId -> network.getBranch(branchId).getTerminal1().getP()));
     }
 }

@@ -18,12 +18,15 @@ import com.rte_france.trm_algorithm.operational_conditions_aligners.CracAligner;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.HvdcAligner;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
 public class OperationalConditionAligner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OperationalConditionAligner.class);
 
     private final ExchangeAligner exchangeAligner;
 
@@ -32,6 +35,7 @@ public class OperationalConditionAligner {
     }
 
     public void align(Network referenceNetwork, Network marketBasedNetwork, Crac crac, ZonalData<Scalable> marketZonalScalable, TrmResults.Builder builder) {
+        LOGGER.info("Aligning operational conditions of market-based network on reference network");
         builder.addCracAlignmentResults(CracAligner.align(referenceNetwork, marketBasedNetwork, crac));
         HvdcAligner.align(referenceNetwork, marketBasedNetwork);
         builder.addPstAlignmentResults(PstAligner.align(referenceNetwork, marketBasedNetwork));

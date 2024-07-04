@@ -7,15 +7,14 @@
  */
 package com.rte_france.trm_algorithm;
 
-import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
@@ -31,8 +30,8 @@ class FlowExtractorTest {
         LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
         FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
 
-        Set<Branch> branchSet = Set.of(network.getBranch("FGEN1 11 BLOAD 11 1"), network.getBranch("BLOAD 11 BGEN2 11 1"));
-        Map<String, Double> result = flowExtractor.extract(network, branchSet);
+        List<String> branchIds = List.of("FGEN1 11 BLOAD 11 1", "BLOAD 11 BGEN2 11 1");
+        Map<String, Double> result = flowExtractor.extract(network, branchIds);
         assertEquals(100.125, result.get("FGEN1 11 BLOAD 11 1"), EPSILON);
         assertEquals(-99.937, result.get("BLOAD 11 BGEN2 11 1"), EPSILON);
     }
@@ -45,8 +44,8 @@ class FlowExtractorTest {
             .setDc(true);
         FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
 
-        Set<Branch> branchSet = Set.of(network.getBranch("FGEN1 11 BLOAD 11 1"));
-        Map<String, Double> result = flowExtractor.extract(network, branchSet);
+        List<String> branchIds = List.of("FGEN1 11 BLOAD 11 1");
+        Map<String, Double> result = flowExtractor.extract(network, branchIds);
         assertEquals(100.125, result.get("FGEN1 11 BLOAD 11 1"), EPSILON);
     }
 }

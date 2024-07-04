@@ -4,15 +4,22 @@ This document describes the current state of the algorithm.
 
 ## Algorithm steps
 
-### Critical Network Element (CNE) selection and filtering
+### Critical Network Element (CNE) selection
 
 #### CNE selection
 
-All the interconnections are considered to be CNEs.
-> This simple behavior might change later.  
-> Hvdc lines are not selected because we cannot compute their sensitivity
+The CNE are selected using the `XnecProvider` interface.  
+This means that you can provide your own list of branches or automatically select interconnections or branches with more than 5% zonal PTDF.  
+You can also do the union or the intersection of such providers.  
+You can also implement your own provider.  
+Note that in the TRM algorithm, the contingencies are not used.  
+> We do not use the CNE available in the CRAC
 
-The branches selected on the reference network have to be available in the market-based network.  
+Hvdc lines cannot not be selected because they are not branches, and we cannot compute their sensitivity.  
+
+The CNE are selected by running the provider on the reference network.  
+The selected CNE have to be available in the market-based network.  
+This means that the reference network can be a geographical subnetwork (Spain and France for example) of the market-based network (SWE).
 
 ### Operational condition alignment
 
@@ -32,6 +39,7 @@ We apply each network action that has been applied to the real time snapshot to 
 
 For each PST on the market-based network, their tap is aligned with their corresponding PST on the real time snapshot.  
 A warning is issued when some PSTs do not have any corresponding PST on the other network.
+> We do not align ratios tap changers
 
 #### Matching HVDC mode and power
 

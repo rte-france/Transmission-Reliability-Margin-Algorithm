@@ -146,6 +146,7 @@ public class ExchangeAligner {
     }
 
     public Result align(Network referenceNetwork, Network marketBasedNetwork, ZonalData<Scalable> marketZonalScalable) {
+        LOGGER.info("Aligning exchanges");
         Result.Builder builder = Result.getBuilder();
         LoadFlow.run(referenceNetwork, balanceComputationParameters.getLoadFlowParameters());
         LoadFlow.run(marketBasedNetwork, balanceComputationParameters.getLoadFlowParameters());

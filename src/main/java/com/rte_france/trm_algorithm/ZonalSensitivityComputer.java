@@ -9,13 +9,14 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.contingency.ContingencyContext;
 import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.sensitivity.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,22 +35,14 @@ public final class ZonalSensitivityComputer {
             .setLoadFlowParameters(loadFlowParameters.copy().setDc(false));
     }
 
-    public Map<String, ZonalPtdfAndFlow> run(Network network, Set<Branch> branches, ZonalData<SensitivityVariableSet> glsk) {
-        Map<String, SensitivityVariableSet> dataPerZone = glsk.getDataPerZone();
-        List<SensitivityVariableSet> variableSets = getSensitivityVariableSets(glsk, dataPerZone);
-        List<SensitivityFactor> factors = getSensitivityFactors(branches, dataPerZone);
-        SensitivityAnalysisResult sensitivityAnalysisResult = SensitivityAnalysis.run(network, factors, Collections.emptyList(), variableSets, sensitivityAnalysisParameters);
-        return extractZonalPtdfs(branches, sensitivityAnalysisResult, factors);
-    }
-
-    private static Map<String, ZonalPtdfAndFlow> extractZonalPtdfs(Set<Branch> branches, SensitivityAnalysisResult sensitivityAnalysisResult, List<SensitivityFactor> factors) {
-        return branches.stream().map(Identifiable::getId).collect(Collectors.toMap(Function.identity(), branchId -> computeZonalPtdf(sensitivityAnalysisResult, factors, branchId)));
+    private static Map<String, ZonalPtdfAndFlow> extractZonalPtdfs(List<String> branchIds, SensitivityAnalysisResult sensitivityAnalysisResult, List<SensitivityFactor> factors) {
+        return branchIds.stream().collect(Collectors.toMap(Function.identity(), branchId -> computeZonalPtdf(sensitivityAnalysisResult, factors, branchId)));
     }
 
     private static ZonalPtdfAndFlow computeZonalPtdf(SensitivityAnalysisResult sensitivityAnalysisResult, List<SensitivityFactor> factors, String branchId) {
         List<Double> sensitivityValues = sensitivityAnalysisResult.getValues().stream()
-                .filter(value -> factors.get(value.getFactorIndex()).getFunctionId().equals(branchId))
-                .map(SensitivityValue::getValue).toList();
+            .filter(value -> factors.get(value.getFactorIndex()).getFunctionId().equals(branchId))
+            .map(SensitivityValue::getValue).toList();
         List<Double> flowValues = sensitivityAnalysisResult.getValues().stream()
             .filter(value -> factors.get(value.getFactorIndex()).getFunctionId().equals(branchId))
             .map(SensitivityValue::getFunctionReference).distinct().toList();
@@ -62,15 +55,23 @@ public final class ZonalSensitivityComputer {
         return new ZonalPtdfAndFlow(Collections.max(sensitivityValues) - Collections.min(sensitivityValues), flowValues.get(0));
     }
 
-    private static List<SensitivityFactor> getSensitivityFactors(Set<Branch> branches, Map<String, SensitivityVariableSet> dataPerZone) {
+    private static List<SensitivityFactor> getSensitivityFactors(List<String> branchIds, Map<String, SensitivityVariableSet> dataPerZone) {
         List<SensitivityFactor> factors = new ArrayList<>();
-        branches.forEach(branch -> dataPerZone.keySet().forEach(country -> factors.add(
-            new SensitivityFactor(BRANCH_ACTIVE_POWER_1, branch.getId(), INJECTION_ACTIVE_POWER, country, true, ContingencyContext.none()))));
+        branchIds.forEach(branchId -> dataPerZone.keySet().forEach(country -> factors.add(
+            new SensitivityFactor(BRANCH_ACTIVE_POWER_1, branchId, INJECTION_ACTIVE_POWER, country, true, ContingencyContext.none()))));
         return factors;
     }
 
     private static List<SensitivityVariableSet> getSensitivityVariableSets(ZonalData<SensitivityVariableSet> glsk, Map<String, SensitivityVariableSet> dataPerZone) {
         return dataPerZone.keySet().stream()
             .map(country -> new SensitivityVariableSet(country, new ArrayList<>(glsk.getData(country).getVariables()))).toList();
+    }
+
+    public Map<String, ZonalPtdfAndFlow> run(Network network, List<String> branchIds, ZonalData<SensitivityVariableSet> glsk) {
+        Map<String, SensitivityVariableSet> dataPerZone = glsk.getDataPerZone();
+        List<SensitivityVariableSet> variableSets = getSensitivityVariableSets(glsk, dataPerZone);
+        List<SensitivityFactor> factors = getSensitivityFactors(branchIds, dataPerZone);
+        SensitivityAnalysisResult sensitivityAnalysisResult = SensitivityAnalysis.run(network, factors, Collections.emptyList(), variableSets, sensitivityAnalysisParameters);
+        return extractZonalPtdfs(branchIds, sensitivityAnalysisResult, factors);
     }
 }
