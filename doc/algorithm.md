@@ -110,4 +110,14 @@ The real time GLSK are required to compute the zonal PTDF.
 
 The CRAC contains the network actions. 
 
+## Outputs
+
+### Export results to CSV
+
+The results can be exported to a CSV.
+
+Here is the format :
+
+    Case date;Branch ID;Branch name;Country Side 1;Country Side 2;Uncertainty;Market-based flow;Reference flow;Zonal PTDF
+    2024-07-15T13:14:12Z[UTC];toto;FGEN1 11 BLOAD 11 1;FR;BE;12.0;100.0;112.0;-1.0
 

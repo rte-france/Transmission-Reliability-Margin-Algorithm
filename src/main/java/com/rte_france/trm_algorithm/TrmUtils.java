@@ -35,7 +35,7 @@ public final class TrmUtils {
         List<Scalable> scalables = new ArrayList<>();
         List<Double> percentages = new ArrayList<>();
         List<Generator> generators = network.getGeneratorStream()
-            .filter(generator -> country.equals(generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)))
+            .filter(generator -> TrmUtils.getCountry(generator.getTerminal()).equals(country))
             .filter(TrmUtils::isCorrect)
             .toList();
         double totalAbsoluteCountryP = generators.stream().mapToDouble(TrmUtils::absoluteTargetP).sum();

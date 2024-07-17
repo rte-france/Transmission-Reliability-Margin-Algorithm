@@ -75,11 +75,11 @@ public class TrmAlgorithm {
         Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
             entry -> {
-                Branch<?> branch = referenceNetwork.getBranch(entry.getKey());
+                Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
                 Double marketBasedFlow = marketBasedFlows.get(entry.getKey());
                 double referenceFlow = entry.getValue().getFlow();
                 double referenceZonalPtdf = entry.getValue().getZonalPtdf();
-                return new UncertaintyResult(branch, marketBasedFlow, referenceFlow, referenceZonalPtdf);
+                return new UncertaintyResult(referenceBranch, marketBasedFlow, referenceFlow, referenceZonalPtdf);
             }
         ));
 

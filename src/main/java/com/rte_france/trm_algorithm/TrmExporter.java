@@ -7,8 +7,11 @@
  */
 package com.rte_france.trm_algorithm;
 
+import com.powsybl.iidm.network.TwoSides;
+
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
+import java.time.ZonedDateTime;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
@@ -20,15 +23,43 @@ public final class TrmExporter {
         // utility class
     }
 
-    public static void export(OutputStream outputStream, TrmResults trmResult) throws IOException {
-        outputStream.write("Branch ID;Uncertainty;Market-based flow;Reference flow;Zonal PTDF".getBytes());
+    public static void export(Writer writer, TrmResults trmResult, ZonedDateTime caseDate) throws IOException {
+        for (var entry : trmResult.getUncertaintiesMap().entrySet()) {
+            export(writer, caseDate, entry.getKey(), entry.getValue());
+        }
+    }
 
-        trmResult.getUncertaintiesMap().forEach((key, value) -> {
-            try {
-                outputStream.write(String.format("%n%s;%s;%s;%s;%s", key, value.getUncertainty(), value.getMarketBasedFlow(), value.getReferenceFlow(), value.getReferenceZonalPtdf()).getBytes());
-            } catch (IOException e) {
-                throw new TrmException(e);
-            }
-        });
+    private static void export(Writer writer, ZonedDateTime caseDate, String branchId, UncertaintyResult uncertaintyResult) throws IOException {
+        writer.write(String.valueOf(caseDate));
+        writer.write(";");
+        writer.write(branchId);
+        writer.write(";");
+        writer.write(uncertaintyResult.getReferenceBranchName());
+        writer.write(";");
+        writer.write(String.valueOf(uncertaintyResult.getReferenceCountry(TwoSides.ONE)));
+        writer.write(";");
+        writer.write(String.valueOf(uncertaintyResult.getReferenceCountry(TwoSides.TWO)));
+        writer.write(";");
+        writer.write(String.valueOf(uncertaintyResult.getUncertainty()));
+        writer.write(";");
+        writer.write(String.valueOf(uncertaintyResult.getMarketBasedFlow()));
+        writer.write(";");
+        writer.write(String.valueOf(uncertaintyResult.getReferenceFlow()));
+        writer.write(";");
+        writer.write(String.valueOf(uncertaintyResult.getReferenceZonalPtdf()));
+        writer.write(System.lineSeparator());
+    }
+
+    public static void exportHeader(Writer writer) throws IOException {
+        writer.write("Case date;");
+        writer.write("Branch ID;");
+        writer.write("Branch name;");
+        writer.write("Country Side 1;");
+        writer.write("Country Side 2;");
+        writer.write("Uncertainty;");
+        writer.write("Market-based flow;");
+        writer.write("Reference flow;");
+        writer.write("Zonal PTDF");
+        writer.write(System.lineSeparator());
     }
 }

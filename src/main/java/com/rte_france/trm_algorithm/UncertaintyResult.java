@@ -8,6 +8,8 @@
 package com.rte_france.trm_algorithm;
 
 import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.TwoSides;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,17 +19,19 @@ import org.slf4j.LoggerFactory;
  */
 public class UncertaintyResult {
     private static final Logger LOGGER = LoggerFactory.getLogger(UncertaintyResult.class);
+    private final Branch<?> referenceBranch;
     private final double marketBasedFlow;
     private final double referenceFlow;
     private final double referenceZonalPtdf;
     private final double uncertainty;
 
-    public UncertaintyResult(Branch<?> branch, double marketBasedFlow, double referenceFlow, double referenceZonalPtdf) {
+    public UncertaintyResult(Branch<?> referenceBranch, double marketBasedFlow, double referenceFlow, double referenceZonalPtdf) {
+        this.referenceBranch = referenceBranch;
         this.marketBasedFlow = marketBasedFlow;
         this.referenceFlow = referenceFlow;
         this.referenceZonalPtdf = referenceZonalPtdf;
         this.uncertainty = (marketBasedFlow - referenceFlow) / referenceZonalPtdf;
-        LOGGER.info("Uncertainty of branch id:'{}', name '{}' = {} with market-based flow: {}, reference flow: {}, reference zonal Ptdf: {}", branch.getId(), branch.getNameOrId(), uncertainty, marketBasedFlow, referenceFlow, referenceZonalPtdf);
+        LOGGER.info("Uncertainty of branch id:'{}', name '{}' = {} with market-based flow: {}, reference flow: {}, reference zonal Ptdf: {}", referenceBranch.getId(), referenceBranch.getNameOrId(), uncertainty, marketBasedFlow, referenceFlow, referenceZonalPtdf);
     }
 
     public double getMarketBasedFlow() {
@@ -44,5 +48,13 @@ public class UncertaintyResult {
 
     public double getUncertainty() {
         return uncertainty;
+    }
+
+    public String getReferenceBranchName() {
+        return referenceBranch.getNameOrId();
+    }
+
+    public Country getReferenceCountry(TwoSides side) {
+        return TrmUtils.getCountry(referenceBranch.getTerminal(side));
     }
 }

@@ -7,7 +7,9 @@
  */
 package com.rte_france.trm_algorithm;
 
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.TwoSides;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +25,12 @@ class UncertaintyResultTest {
         Network network = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
         UncertaintyResult uncertaintyResult = new UncertaintyResult(network.getBranch("FGEN1 11 BLOAD 11 1"), 100., 112., -1.);
         assertEquals(12., uncertaintyResult.getUncertainty());
+        assertEquals(100., uncertaintyResult.getMarketBasedFlow());
+        assertEquals(112., uncertaintyResult.getReferenceFlow());
+        assertEquals(-1., uncertaintyResult.getReferenceZonalPtdf());
+        assertEquals("FGEN1 11 BLOAD 11 1", uncertaintyResult.getReferenceBranchName());
+        assertEquals(Country.FR, uncertaintyResult.getReferenceCountry(TwoSides.ONE));
+        assertEquals(Country.BE, uncertaintyResult.getReferenceCountry(TwoSides.TWO));
     }
 
     @Test
