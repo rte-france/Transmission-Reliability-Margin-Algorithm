@@ -14,10 +14,7 @@ import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.openrao.data.cracapi.Crac;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.CracAligner;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.HvdcAligner;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +32,13 @@ public class OperationalConditionAligner {
     }
 
     public void align(Network referenceNetwork, Network marketBasedNetwork, Crac crac, ZonalData<Scalable> marketZonalScalable, TrmResults.Builder builder) {
+        // TODO extract a chain of responsability pattern :) (in another PR)
         LOGGER.info("Aligning operational conditions of market-based network on reference network");
         builder.addCracAlignmentResults(CracAligner.align(referenceNetwork, marketBasedNetwork, crac));
         HvdcAligner.align(referenceNetwork, marketBasedNetwork);
         builder.addPstAlignmentResults(PstAligner.align(referenceNetwork, marketBasedNetwork));
+        builder.addDanglingLineAlignerResults(DanglingLineAligner.align(referenceNetwork, marketBasedNetwork));
         builder.addExchangeAlignerResult(exchangeAligner.align(referenceNetwork, marketBasedNetwork, marketZonalScalable));
     }
+
 }

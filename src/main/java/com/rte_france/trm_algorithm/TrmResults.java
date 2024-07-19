@@ -7,6 +7,7 @@
  */
 package com.rte_france.trm_algorithm;
 
+import com.rte_france.trm_algorithm.operational_conditions_aligners.DanglingLineAligner;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerResult;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
 
@@ -22,15 +23,18 @@ public final class TrmResults {
     private final Map<String, UncertaintyResult> uncertaintiesMap;
     private final Map<String, Boolean> cracAlignmentResults;
     private final PstAligner.Result pstAlignmentResults;
+    private final Map<String, DanglingLineAligner.Status> danglingLineAlignementResults;
     private final ExchangeAlignerResult exchangeAlignerResult;
 
     private TrmResults(Map<String, UncertaintyResult> uncertaintiesMap,
                        Map<String, Boolean> cracAlignmentResults,
                        PstAligner.Result pstAlignmentResults,
+                       Map<String, DanglingLineAligner.Status> danglingLineAlignementResults,
                        ExchangeAlignerResult exchangeAlignerResult) {
         this.uncertaintiesMap = uncertaintiesMap;
         this.cracAlignmentResults = cracAlignmentResults;
         this.pstAlignmentResults = pstAlignmentResults;
+        this.danglingLineAlignementResults = danglingLineAlignementResults;
         this.exchangeAlignerResult = exchangeAlignerResult;
     }
 
@@ -50,6 +54,10 @@ public final class TrmResults {
         return pstAlignmentResults;
     }
 
+    public Map<String, DanglingLineAligner.Status> getDanglingLineAlignementResults() {
+        return danglingLineAlignementResults;
+    }
+
     public ExchangeAlignerResult getExchangeAlignerResult() {
         return exchangeAlignerResult;
     }
@@ -58,6 +66,7 @@ public final class TrmResults {
         private Map<String, UncertaintyResult> uncertaintiesMap;
         private Map<String, Boolean> cracAlignmentResults;
         private PstAligner.Result pstAlignmentResults;
+        private Map<String, DanglingLineAligner.Status> danglingLineAlignementResults;
         private ExchangeAlignerResult exchangeAlignerResult;
 
         private Builder() {
@@ -79,6 +88,11 @@ public final class TrmResults {
             return this;
         }
 
+        public Builder addDanglingLineAlignerResults(Map<String, DanglingLineAligner.Status> danglingLineAlignementResults) {
+            this.danglingLineAlignementResults = danglingLineAlignementResults;
+            return this;
+        }
+
         public Builder addExchangeAlignerResult(ExchangeAlignerResult exchangeAlignerResult) {
             this.exchangeAlignerResult = exchangeAlignerResult;
             return this;
@@ -88,10 +102,12 @@ public final class TrmResults {
             Objects.requireNonNull(uncertaintiesMap);
             Objects.requireNonNull(cracAlignmentResults);
             Objects.requireNonNull(pstAlignmentResults);
+            Objects.requireNonNull(danglingLineAlignementResults);
             Objects.requireNonNull(exchangeAlignerResult);
             return new TrmResults(uncertaintiesMap,
                 cracAlignmentResults,
                 pstAlignmentResults,
+                danglingLineAlignementResults,
                 exchangeAlignerResult);
         }
     }

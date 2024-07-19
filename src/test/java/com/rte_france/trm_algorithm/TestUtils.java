@@ -8,7 +8,9 @@
 package com.rte_france.trm_algorithm;
 
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
-import com.powsybl.iidm.network.*;
+import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.openrao.data.cracapi.CracFactory;
 import com.powsybl.openrao.data.cracapi.networkaction.ActionType;
@@ -18,6 +20,9 @@ import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
 
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This class contains helper functions for tests.
@@ -26,9 +31,26 @@ import java.util.Collections;
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
 public final class TestUtils {
+    public static final double EPSILON = 1e-1;
 
     private TestUtils() {
         // utility class
+    }
+
+    public static void assertNetPositions(Map<Country, Double> expectedNetPositions, Map<Country, Double> actualNetPositions) {
+        expectedNetPositions.keySet()
+            .forEach(c -> assertEquals(expectedNetPositions.get(c), actualNetPositions.get(c), EPSILON));
+    }
+
+    public static void assertExchanges(Map<Country, Map<Country, Double>> expectedExchanges, Map<Country, Map<Country, Double>> actualExchanges) {
+        expectedExchanges.keySet()
+            .forEach(country1 -> expectedExchanges.get(country1).keySet()
+                .forEach(country2 -> {
+                    Double expected = expectedExchanges.get(country1).get(country2);
+                    Double actual = actualExchanges.get(country1).get(country2);
+                    assertEquals(expected, actual, EPSILON);
+                })
+            );
     }
 
     public static Network importNetwork(String networkResourcePath) {
@@ -81,6 +103,7 @@ public final class TestUtils {
             .addUncertainties(Collections.emptyMap())
             .addCracAlignmentResults(Collections.emptyMap())
             .addPstAlignmentResults(mockPstAlignerResult())
+            .addDanglingLineAlignerResults(Collections.emptyMap())
             .addExchangeAlignerResult(mockExchangeAlignerResult());
     }
 }

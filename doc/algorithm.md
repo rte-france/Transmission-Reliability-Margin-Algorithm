@@ -35,19 +35,31 @@ We assume that the IDs of each network element remains the same between the mark
 We apply each network action that has been applied to the real time snapshot to the market-based network.
 > We ignore the usage rules of the network actions. This means that not only preventive network actions will be used, but also curative ones
 
-#### PST alignment
-
-For each PST on the market-based network, their tap is aligned with their corresponding PST on the real time snapshot.  
-A warning is issued when some PSTs do not have any corresponding PST on the other network.
-> We do not align ratios tap changers
-
 #### Matching HVDC mode and power
 
 For each HVDC line on the market-based network, their mode and power are aligned with their corresponding HVDC line on 
 the real time snapshot.  
-A warning is issued when some HVDC lines do not have any corresponding HVDC line on the other line.
+A warning is issued when some HVDC lines do not have any corresponding HVDC line on the other line.  
+> An HVDC modeled with its AC representation (two generators and loads) will not be aligned.  
 
-#### Align exchanges
+#### PST alignment
+
+For each PST on the market-based network, their tap is aligned with their corresponding PST on the real time snapshot.  
+A warning is issued when some PSTs do not have any corresponding PST on the other network.  
+Ratio tap PST and phase tap PST are aligned.
+
+#### Dangling line aligner
+
+We want to align exchanges with countries that are not included in the reference network.  
+- Given an unpaired reference dangling line,
+  - If the market-based dangling line is also not paired, we align the market-based dangling line target P.
+  - If the market-based dangling line has been paired, the market-based tie line will be unpaired, and we align the 
+  corresponding unpaired market-based dangling line target P.
+- Given a paired reference dangling line,
+  - If the market-based dangling line is also paired, we ignore this dangling line.
+  - If the market-based dangling line is not paired, we throw an issue.
+
+#### Align inner exchanges
 
 The goal is to align the exchanges of market-based network on the exchanges of the real time snapshot for each boundary 
 of the real time snapshot.  
