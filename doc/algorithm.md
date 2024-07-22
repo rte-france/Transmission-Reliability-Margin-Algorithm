@@ -27,8 +27,10 @@ The operational conditions of the market-based network are aligned with those of
 The preventive range actions of these operations are not respected.
 > This simple behavior might change later.  
 
-We assume that the IDs of each network element remains the same between the market-based network and the real time snapshot.
-> This simple behavior might change later.
+We assume that the IDs of each network element remains the same between the market-based network and the real time snapshot.  
+
+We create a pipeline with desired operational condition aligner.  
+Here are the available operational condition aligners:
 
 #### Crac alignment
 

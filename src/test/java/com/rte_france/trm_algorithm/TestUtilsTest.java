@@ -9,10 +9,10 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
@@ -36,12 +36,5 @@ class TestUtilsTest {
     void testBuildEmptyResults() {
         TrmResults trmResults = TestUtils.mockTrmResults().build();
         assertTrue(trmResults.getUncertaintiesMap().isEmpty());
-        assertTrue(trmResults.getCracAlignmentResults().isEmpty());
-        assertTrue(trmResults.getPstAlignmentResults().getPhaseTapChangerResults().isEmpty());
-        assertTrue(trmResults.getPstAlignmentResults().getRatioTapChangerResults().isEmpty());
-        assertTrue(trmResults.getDanglingLineAlignementResults().isEmpty());
-        assertEquals(ExchangeAligner.Status.NOT_ALIGNED, trmResults.getExchangeAlignerResult().getStatus());
-        assertTrue(trmResults.getExchangeAlignerResult().getInitialMarketBasedNetPositions().isEmpty());
-        assertTrue(trmResults.getExchangeAlignerResult().getReferenceNetPositions().isEmpty());
     }
 }

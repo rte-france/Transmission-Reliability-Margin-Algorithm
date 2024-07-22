@@ -19,20 +19,9 @@ import java.util.stream.Collectors;
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
-public final class PstAligner {
+public class PstAligner implements OperationalConditionAligner {
     private static final Logger LOGGER = LoggerFactory.getLogger(PstAligner.class);
-
-    private PstAligner() {
-        // Utility class
-    }
-
-    public static Result align(Network referenceNetwork, Network marketBasedNetwork) {
-        LOGGER.info("Aligning PSTs tap positions");
-        return Result.builder()
-            .addRatioTapChangerResults(alignRatioTapChanger(referenceNetwork, marketBasedNetwork))
-            .addPhaseTapChangerResults(alignPhaseTapChanger(referenceNetwork, marketBasedNetwork))
-            .build();
-    }
+    private Result result = null;
 
     private static Map<String, Boolean> alignRatioTapChanger(Network referenceNetwork, Network marketBasedNetwork) {
         return referenceNetwork.getTwoWindingsTransformerStream()
@@ -82,6 +71,19 @@ public final class PstAligner {
         }
         twoWindingsTransformer.getPhaseTapChanger().setTapPosition(referenceTapPosition);
         return true;
+    }
+
+    public Result getResult() {
+        return result;
+    }
+
+    @Override
+    public void align(Network referenceNetwork, Network marketBasedNetwork) {
+        LOGGER.info("Aligning PSTs tap positions");
+        result = Result.builder()
+            .addRatioTapChangerResults(alignRatioTapChanger(referenceNetwork, marketBasedNetwork))
+            .addPhaseTapChangerResults(alignPhaseTapChanger(referenceNetwork, marketBasedNetwork))
+            .build();
     }
 
     public static final class Result {

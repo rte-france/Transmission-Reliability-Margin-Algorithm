@@ -36,12 +36,14 @@ class CracAlignerTest {
 
         Crac crac = CracFactory.findDefault().create("crac");
         crac.newNetworkAction().withId("topo-action")
-                .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 11 1").withActionType(ActionType.OPEN).add()
-                .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 12 1").withActionType(ActionType.OPEN).add()
-                .add();
+            .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 11 1").withActionType(ActionType.OPEN).add()
+            .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 12 1").withActionType(ActionType.OPEN).add()
+            .add();
 
         referenceNetwork.getLine("FGEN  11 BLOAD 12 1").disconnect();
-        Map<String, Boolean> results = CracAligner.align(referenceNetwork, marketBasedNetwork, crac);
+        CracAligner cracAligner = new CracAligner(crac);
+        cracAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, Boolean> results = cracAligner.getResult();
         assertTrue(marketBasedNetwork.getLine("FGEN  11 BLOAD 11 1").getTerminal1().isConnected());
         assertTrue(marketBasedNetwork.getLine("FGEN  11 BLOAD 11 1").getTerminal2().isConnected());
         assertTrue(marketBasedNetwork.getLine("FGEN  11 BLOAD 12 1").getTerminal1().isConnected());
@@ -57,12 +59,14 @@ class CracAlignerTest {
 
         Crac crac = CracFactory.findDefault().create("crac");
         crac.newNetworkAction().withId("topo-action")
-                .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 12 1").withActionType(ActionType.OPEN).add().add();
+            .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 12 1").withActionType(ActionType.OPEN).add().add();
         crac.newNetworkAction().withId("topo-action-2")
-                .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 11 1").withActionType(ActionType.OPEN).add().add();
+            .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 11 1").withActionType(ActionType.OPEN).add().add();
 
         crac.getNetworkAction("topo-action").apply(referenceNetwork);
-        Map<String, Boolean> results = CracAligner.align(referenceNetwork, marketBasedNetwork, crac);
+        CracAligner cracAligner = new CracAligner(crac);
+        cracAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, Boolean> results = cracAligner.getResult();
         assertTrue(marketBasedNetwork.getLine("FGEN  11 BLOAD 11 1").getTerminal1().isConnected());
         assertTrue(marketBasedNetwork.getLine("FGEN  11 BLOAD 11 1").getTerminal2().isConnected());
         assertFalse(marketBasedNetwork.getLine("FGEN  11 BLOAD 12 1").getTerminal1().isConnected());
@@ -78,10 +82,12 @@ class CracAlignerTest {
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12NodesHvdc.uct");
         String cracFilePath = "../TestCase12Nodes/cbcora_ep10us2case1.xml";
         NativeCrac nativeCrac = NativeCracImporters.importData(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)));
-        Crac referenceCrac = CracCreators.createCrac(nativeCrac, referenceNetwork, OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC)).getCrac();
-        referenceCrac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
+        Crac crac = CracCreators.createCrac(nativeCrac, referenceNetwork, OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC)).getCrac();
+        crac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
 
-        Map<String, Boolean> results = CracAligner.align(referenceNetwork, marketBasedNetwork, referenceCrac);
+        CracAligner cracAligner = new CracAligner(crac);
+        cracAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, Boolean> results = cracAligner.getResult();
         assertFalse(marketBasedNetwork.getLine("FFR1AA1  FFR2AA1  1").getTerminal1().isConnected());
         assertFalse(marketBasedNetwork.getLine("FFR1AA1  FFR2AA1  1").getTerminal2().isConnected());
         assertEquals(1, results.size());
@@ -93,7 +99,9 @@ class CracAlignerTest {
         Crac crac = CracFactory.findDefault().create("crac");
         Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
-        Map<String, Boolean> results = CracAligner.align(referenceNetwork, marketBasedNetwork, crac);
+        CracAligner cracAligner = new CracAligner(crac);
+        cracAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, Boolean> results = cracAligner.getResult();
         assertTrue(results.isEmpty());
     }
 }

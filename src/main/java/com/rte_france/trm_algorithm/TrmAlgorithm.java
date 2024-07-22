@@ -7,18 +7,14 @@
  */
 package com.rte_france.trm_algorithm;
 
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
-import com.powsybl.computation.ComputationManager;
 import com.powsybl.flow_decomposition.XnecProvider;
 import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
-import com.powsybl.openrao.data.cracapi.Crac;
 import com.powsybl.sensitivity.SensitivityVariableSet;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.OperationalConditionAligner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +34,8 @@ public class TrmAlgorithm {
     private final ZonalSensitivityComputer zonalSensitivityComputer;
     private final FlowExtractor flowExtractor;
 
-    public TrmAlgorithm(LoadFlowParameters loadFlowParameters, BalanceComputationParameters balanceComputationParameters, LoadFlow.Runner loadFlowRunner, ComputationManager computationManager) {
-        this.operationalConditionAligner = new OperationalConditionAligner(balanceComputationParameters, loadFlowRunner, computationManager);
+    public TrmAlgorithm(LoadFlowParameters loadFlowParameters, OperationalConditionAligner operationalConditionAligner) {
+        this.operationalConditionAligner = operationalConditionAligner;
         this.flowExtractor = new FlowExtractor(loadFlowParameters);
         this.zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
     }
@@ -60,7 +56,7 @@ public class TrmAlgorithm {
         }
     }
 
-    public TrmResults computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, XnecProvider xnecProvider, ZonalData<SensitivityVariableSet> referenceZonalGlsks, Crac crac, ZonalData<Scalable> marketZonalScalable) {
+    public TrmResults computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, XnecProvider xnecProvider, ZonalData<SensitivityVariableSet> referenceZonalGlsks) {
         TrmResults.Builder builder = TrmResults.builder();
 
         LOGGER.info("Selecting Critical network elements");
@@ -68,7 +64,7 @@ public class TrmAlgorithm {
         checkReferenceElementNotEmpty(referenceNetworkElementIds);
         checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
 
-        operationalConditionAligner.align(referenceNetwork, marketBasedNetwork, crac, marketZonalScalable, builder);
+        operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
         Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, referenceNetworkElementIds);
         Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElementIds, referenceZonalGlsks);
         LOGGER.info("Computing uncertainties");

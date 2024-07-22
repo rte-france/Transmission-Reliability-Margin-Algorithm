@@ -15,6 +15,7 @@ import com.rte_france.trm_algorithm.TrmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,19 +24,9 @@ import java.util.stream.Collectors;
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  */
-public final class DanglingLineAligner {
+public class DanglingLineAligner implements OperationalConditionAligner {
     private static final Logger LOGGER = LoggerFactory.getLogger(DanglingLineAligner.class);
-
-    private DanglingLineAligner() {
-        // Utility class
-    }
-
-    public static Map<String, Status> align(Network referenceNetwork, Network marketBasedNetwork) {
-        return referenceNetwork.getDanglingLineStream().collect(Collectors.toMap(
-            Identifiable::getId,
-            referenceDanglingLine -> align(referenceDanglingLine, marketBasedNetwork.getDanglingLine(referenceDanglingLine.getId()))
-        ));
-    }
+    private Map<String, Status> result = new HashMap<>();
 
     private static Status align(DanglingLine referenceDanglingLine, DanglingLine marketBasedDanglingLine) {
         if (Objects.isNull(marketBasedDanglingLine)) {
@@ -80,6 +71,18 @@ public final class DanglingLineAligner {
         marketBasedDanglingLine.setP0(referenceDanglingLine.getP0());
         marketBasedDanglingLine.setQ0(referenceDanglingLine.getQ0());
         LOGGER.trace("Aligned market-based dangling line \"{}\" (\"{}\") at P0={} and Q0={}", marketBasedDanglingLine.getId(), marketBasedDanglingLine.getNameOrId(), marketBasedDanglingLine.getP0(), marketBasedDanglingLine.getQ0());
+    }
+
+    public Map<String, Status> getResult() {
+        return result;
+    }
+
+    @Override
+    public void align(Network referenceNetwork, Network marketBasedNetwork) {
+        result = referenceNetwork.getDanglingLineStream().collect(Collectors.toMap(
+            Identifiable::getId,
+            referenceDanglingLine -> align(referenceDanglingLine, marketBasedNetwork.getDanglingLine(referenceDanglingLine.getId()))
+        ));
     }
 
     public enum Status {

@@ -100,10 +100,6 @@ public final class TestUtils {
 
     static TrmResults.Builder mockTrmResults() {
         return TrmResults.builder()
-            .addUncertainties(Collections.emptyMap())
-            .addCracAlignmentResults(Collections.emptyMap())
-            .addPstAlignmentResults(mockPstAlignerResult())
-            .addDanglingLineAlignerResults(Collections.emptyMap())
-            .addExchangeAlignerResult(mockExchangeAlignerResult());
+            .addUncertainties(Collections.emptyMap());
     }
 }

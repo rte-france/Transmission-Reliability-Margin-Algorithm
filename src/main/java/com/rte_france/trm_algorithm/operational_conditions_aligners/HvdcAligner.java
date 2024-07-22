@@ -21,23 +21,8 @@ import java.util.Objects;
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
-public final class HvdcAligner {
+public class HvdcAligner implements OperationalConditionAligner {
     private static final Logger LOGGER = LoggerFactory.getLogger(HvdcAligner.class);
-
-    private HvdcAligner() { } // utility class
-
-    public static void align(Network referenceNetwork, Network marketBasedNetwork) {
-        LOGGER.info("Aligning HVDC power set points and angle droop active power mode");
-        referenceNetwork.getHvdcLineStream().forEach(referenceHvdcLine -> {
-            String id = referenceHvdcLine.getId();
-            HvdcLine hvdcLine = marketBasedNetwork.getHvdcLine(id);
-            if (Objects.isNull(hvdcLine)) {
-                throw new TrmException("HvdcLine with id " + id + " not found");
-            }
-            alignActivePowerSetpoints(referenceHvdcLine, hvdcLine);
-            alignAngleDroopActivePowerExtension(referenceHvdcLine, hvdcLine);
-        });
-    }
 
     private static void alignAngleDroopActivePowerExtension(HvdcLine referenceHvdcLine, HvdcLine hvdcLine) {
         HvdcAngleDroopActivePowerControl extension = referenceHvdcLine.getExtension(HvdcAngleDroopActivePowerControl.class);
@@ -54,5 +39,19 @@ public final class HvdcAligner {
 
     private static void alignActivePowerSetpoints(HvdcLine referenceHvdcLine, HvdcLine hvdcLine) {
         hvdcLine.setActivePowerSetpoint(referenceHvdcLine.getActivePowerSetpoint());
+    }
+
+    @Override
+    public void align(Network referenceNetwork, Network marketBasedNetwork) {
+        LOGGER.info("Aligning HVDC power set points and angle droop active power mode");
+        referenceNetwork.getHvdcLineStream().forEach(referenceHvdcLine -> {
+            String id = referenceHvdcLine.getId();
+            HvdcLine hvdcLine = marketBasedNetwork.getHvdcLine(id);
+            if (Objects.isNull(hvdcLine)) {
+                throw new TrmException("HvdcLine with id " + id + " not found");
+            }
+            alignActivePowerSetpoints(referenceHvdcLine, hvdcLine);
+            alignAngleDroopActivePowerExtension(referenceHvdcLine, hvdcLine);
+        });
     }
 }

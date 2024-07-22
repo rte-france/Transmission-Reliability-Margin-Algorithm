@@ -37,7 +37,9 @@ class DanglingLineAlignerTest {
         danglingLine.setP0(-50);
         assertEquals(-50, danglingLine.getP0());
 
-        Map<String, DanglingLineAligner.Status> results = DanglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
+        danglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, DanglingLineAligner.Status> results = danglingLineAligner.getResult();
         assertEquals(1, results.size());
         assertEquals(DanglingLineAligner.Status.ALIGNED, results.get(danglingLineId));
         assertEquals(100, danglingLine.getP0());
@@ -49,7 +51,9 @@ class DanglingLineAlignerTest {
         Network marketBasedNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
         String danglingLineId = "BLOAD 11 X     11 1";
 
-        Map<String, DanglingLineAligner.Status> results = DanglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
+        danglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, DanglingLineAligner.Status> results = danglingLineAligner.getResult();
         assertEquals(1, results.size());
         assertEquals(DanglingLineAligner.Status.NOT_FOUND_IN_MARKET_BASED_NETWORK, results.get(danglingLineId));
     }
@@ -80,7 +84,9 @@ class DanglingLineAlignerTest {
         assertEquals(0, marketBasedDanglingLine2.getP0(), EPSILON);
         assertEquals(-120, marketBasedDanglingLine2.getTerminal().getP(), EPSILON);
 
-        Map<String, DanglingLineAligner.Status> results = DanglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
+        danglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, DanglingLineAligner.Status> results = danglingLineAligner.getResult();
         assertEquals(1, results.size());
         assertEquals(DanglingLineAligner.Status.DANGLING_LINE_MERGED_IN_MARKET_BASED_NETWORK, results.get(danglingLineId));
         LoadFlow.run(marketBasedNetwork);
@@ -112,7 +118,9 @@ class DanglingLineAlignerTest {
         referenceNetwork.getDanglingLine(danglingLine2Id).setP0(-50);
         assertEquals(0, marketBasedNetwork.getDanglingLine(danglingLine2Id).getP0(), EPSILON);
 
-        Map<String, DanglingLineAligner.Status> results = DanglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
+        danglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, DanglingLineAligner.Status> results = danglingLineAligner.getResult();
         assertEquals(1, results.size());
         assertEquals(DanglingLineAligner.Status.DANGLING_LINE_MERGED_IN_MARKET_BASED_NETWORK, results.get(danglingLine2Id));
         assertEquals(-50, marketBasedNetwork.getDanglingLine(danglingLine2Id).getP0(), EPSILON);
@@ -123,7 +131,8 @@ class DanglingLineAlignerTest {
         Network referenceNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_UNBOUNDED_XNODE.uct");
 
-        TrmException trmException = assertThrows(TrmException.class, () -> DanglingLineAligner.align(referenceNetwork, marketBasedNetwork));
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
+        TrmException trmException = assertThrows(TrmException.class, () -> danglingLineAligner.align(referenceNetwork, marketBasedNetwork));
         assertEquals("Reference dangling line \"BLOAD 11 X     11 1\" (\"XNODE\") has been paired \"BLOAD 11 X     11 1 + X     11 DLOAD 11 1\" (\"BLOAD 11 X     11 1 + X     11 DLOAD 11 1\") but market-based dangling line \"BLOAD 11 X     11 1\" (\"XNODE\") has not been paired", trmException.getMessage());
     }
 
@@ -132,7 +141,9 @@ class DanglingLineAlignerTest {
         Network referenceNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE.uct");
 
-        Map<String, DanglingLineAligner.Status> results = DanglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
+        danglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, DanglingLineAligner.Status> results = danglingLineAligner.getResult();
         assertEquals(2, results.size());
         assertEquals(DanglingLineAligner.Status.PAIRED_DANGLING_LINE_IN_BOTH_NETWORKS, results.get("BLOAD 11 X     11 1"));
         assertEquals(DanglingLineAligner.Status.PAIRED_DANGLING_LINE_IN_BOTH_NETWORKS, results.get("X     11 DLOAD 11 1"));

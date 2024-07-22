@@ -28,7 +28,8 @@ class HvdcAlignerTest {
         String hvdcId = "BBE2AA11 FFR3AA11 1";
         referenceNetwork.getHvdcLine(hvdcId).setActivePowerSetpoint(100);
         assertEquals(100, referenceNetwork.getHvdcLine(hvdcId).getActivePowerSetpoint());
-        HvdcAligner.align(referenceNetwork, marketBasedNetwork);
+        HvdcAligner hvdcAligner = new HvdcAligner();
+        hvdcAligner.align(referenceNetwork, marketBasedNetwork);
         assertEquals(100, marketBasedNetwork.getHvdcLine(hvdcId).getActivePowerSetpoint());
     }
 
@@ -39,12 +40,13 @@ class HvdcAlignerTest {
         String hvdcId = "BBE2AA11 FFR3AA11 1";
         assertNull(referenceNetwork.getHvdcLine(hvdcId).getExtension(HvdcAngleDroopActivePowerControl.class));
         referenceNetwork.getHvdcLine(hvdcId).newExtension(HvdcAngleDroopActivePowerControlAdder.class)
-                .withP0(200)
-                .withDroop(0.3f)
-                .withEnabled(true)
-                .add();
+            .withP0(200)
+            .withDroop(0.3f)
+            .withEnabled(true)
+            .add();
         assertEquals(200, referenceNetwork.getHvdcLine(hvdcId).getExtension(HvdcAngleDroopActivePowerControl.class).getP0());
-        HvdcAligner.align(referenceNetwork, marketBasedNetwork);
+        HvdcAligner hvdcAligner = new HvdcAligner();
+        hvdcAligner.align(referenceNetwork, marketBasedNetwork);
         assertEquals(200, marketBasedNetwork.getHvdcLine(hvdcId).getExtension(HvdcAngleDroopActivePowerControl.class).getP0());
     }
 
@@ -60,7 +62,8 @@ class HvdcAlignerTest {
             .withEnabled(true)
             .add();
         assertEquals(200, marketBasedNetwork.getHvdcLine(hvdcId).getExtension(HvdcAngleDroopActivePowerControl.class).getP0());
-        HvdcAligner.align(referenceNetwork, marketBasedNetwork);
+        HvdcAligner hvdcAligner = new HvdcAligner();
+        hvdcAligner.align(referenceNetwork, marketBasedNetwork);
         assertNull(marketBasedNetwork.getHvdcLine(hvdcId).getExtension(HvdcAngleDroopActivePowerControl.class));
     }
 
@@ -68,7 +71,8 @@ class HvdcAlignerTest {
     void testTwoHvdcAlignment() {
         Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWith2Hvdc.xiidm");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWithHvdc.xiidm");
-        TrmException exception = assertThrows(TrmException.class, () -> HvdcAligner.align(referenceNetwork, marketBasedNetwork));
+        HvdcAligner hvdcAligner = new HvdcAligner();
+        TrmException exception = assertThrows(TrmException.class, () -> hvdcAligner.align(referenceNetwork, marketBasedNetwork));
         assertEquals("HvdcLine with id BBE2BB11 FFR3AA11 1 not found", exception.getMessage());
     }
 }

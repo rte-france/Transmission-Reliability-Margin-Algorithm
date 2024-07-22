@@ -32,20 +32,26 @@ import java.util.stream.Collectors;
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
-public class ExchangeAligner {
+public class ExchangeAligner implements OperationalConditionAligner {
+    public static final double DEFAULT_EXCHANGE_FLOW = 0.;
     private static final double EXCHANGE_EPSILON = 1e-1;
     private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeAligner.class);
-    public static final double DEFAULT_EXCHANGE_FLOW = 0.;
-
     private final BalanceComputationParameters balanceComputationParameters;
-    private final ComputationManager computationManager;
     private final LoadFlow.Runner loadFlowRunner;
+    private final ComputationManager computationManager;
+    private final ZonalData<Scalable> marketZonalScalable;
     private final BalanceComputationFactory balanceComputationFactory;
+    private ExchangeAlignerResult result = null;
 
-    public ExchangeAligner(BalanceComputationParameters balanceComputationParameters, LoadFlow.Runner loadFlowRunner, ComputationManager computationManager) {
+    public ExchangeAligner(BalanceComputationParameters balanceComputationParameters, LoadFlow.Runner loadFlowRunner, ComputationManager computationManager, ZonalData<Scalable> marketZonalScalable) {
+        Objects.requireNonNull(balanceComputationParameters);
+        Objects.requireNonNull(loadFlowRunner);
+        Objects.requireNonNull(computationManager);
+        Objects.requireNonNull(marketZonalScalable);
         this.balanceComputationParameters = balanceComputationParameters;
         this.loadFlowRunner = loadFlowRunner;
         this.computationManager = computationManager;
+        this.marketZonalScalable = marketZonalScalable;
         this.balanceComputationFactory = new BalanceComputationFactoryImpl();
     }
 
@@ -54,19 +60,6 @@ public class ExchangeAligner {
             .collect(Collectors.toMap(
                 Function.identity(),
                 country -> new CountryAreaFactory(country).create(network).getNetPosition()));
-    }
-
-    private static List<BalanceComputationArea> createBalanceComputationAreas(Network marketBasedNetwork, ZonalData<Scalable> zonalData, Map<Country, Double> targetNetPositions) {
-        return marketBasedNetwork.getCountries().stream().map(country -> {
-            String name = country.getName();
-            NetworkAreaFactory networkAreaFactory = new CountryAreaFactory(country);
-            String areaCode = new EICode(country).getAreaCode();
-            Scalable scalable = zonalData.getData(areaCode);
-            if (Objects.isNull(scalable)) {
-                throw new TrmException("Scalable not found: " + areaCode);
-            }
-            return new BalanceComputationArea(name, networkAreaFactory, scalable, targetNetPositions.get(country));
-        }).toList();
     }
 
     private static Map<Country, CountryArea> createCountryAreas(Network network) {
@@ -106,7 +99,25 @@ public class ExchangeAligner {
         return referenceExchanges.get(country1).keySet().stream().mapToDouble(country2 -> Math.abs(referenceExchanges.get(country1).get(country2) - newMarketBasedExchanges.get(country1).get(country2))).max().orElse(DEFAULT_EXCHANGE_FLOW);
     }
 
-    public ExchangeAlignerResult align(Network referenceNetwork, Network marketBasedNetwork, ZonalData<Scalable> marketZonalScalable) {
+    private List<BalanceComputationArea> createBalanceComputationAreas(Network marketBasedNetwork, Map<Country, Double> targetNetPositions) {
+        return marketBasedNetwork.getCountries().stream().map(country -> {
+            String name = country.getName();
+            NetworkAreaFactory networkAreaFactory = new CountryAreaFactory(country);
+            String areaCode = new EICode(country).getAreaCode();
+            Scalable scalable = marketZonalScalable.getData(areaCode);
+            if (Objects.isNull(scalable)) {
+                throw new TrmException("Scalable not found: " + areaCode);
+            }
+            return new BalanceComputationArea(name, networkAreaFactory, scalable, targetNetPositions.get(country));
+        }).toList();
+    }
+
+    public ExchangeAlignerResult getResult() {
+        return result;
+    }
+
+    @Override
+    public void align(Network referenceNetwork, Network marketBasedNetwork) {
         LOGGER.info("Aligning exchanges");
 
         if (!marketBasedNetwork.getCountries().containsAll(referenceNetwork.getCountries())) {
@@ -137,30 +148,33 @@ public class ExchangeAligner {
 
         if (initialMaxAbsoluteExchangeDifference < EXCHANGE_EPSILON) {
             LOGGER.info("No significant exchange difference. Exchange alignment ignored !");
-            return builder.addExchangeAlignerStatus(Status.ALREADY_ALIGNED).build();
+            result = builder.addExchangeAlignerStatus(Status.ALREADY_ALIGNED).build();
+            return;
         }
 
-        List<BalanceComputationArea> areas = createBalanceComputationAreas(marketBasedNetwork, marketZonalScalable, targetNetPositions);
+        List<BalanceComputationArea> areas = createBalanceComputationAreas(marketBasedNetwork, targetNetPositions);
         BalanceComputation balanceComputation = balanceComputationFactory.create(areas, loadFlowRunner, computationManager);
         String variantId = marketBasedNetwork.getVariantManager().getWorkingVariantId();
-        BalanceComputationResult result = balanceComputation.run(marketBasedNetwork, variantId, balanceComputationParameters).join();
+        BalanceComputationResult balanceComputationResult = balanceComputation.run(marketBasedNetwork, variantId, balanceComputationParameters).join();
         Map<Country, Map<Country, Double>> newMarketBasedExchanges = computeExchanges(marketBasedCountryAreas);
         double newMaxAbsoluteExchangeDifference = getMaxAbsoluteExchangeDifference(referenceExchanges, newMarketBasedExchanges);
 
         builder.addNewMarketBasedNetPositions(getNetPositions(marketBasedNetwork))
             .addNewMarketBasedExchanges(newMarketBasedExchanges)
             .addNewMaxAbsoluteExchangeDifference(newMaxAbsoluteExchangeDifference)
-            .addBalanceComputationResult(result);
+            .addBalanceComputationResult(balanceComputationResult);
 
-        if (result.getStatus().equals(BalanceComputationResult.Status.FAILED)) {
+        if (balanceComputationResult.getStatus().equals(BalanceComputationResult.Status.FAILED)) {
             LOGGER.error("Balance computation failed");
-            return builder.addExchangeAlignerStatus(Status.NOT_ALIGNED).build();
+            result = builder.addExchangeAlignerStatus(Status.NOT_ALIGNED).build();
+            return;
         }
         if (newMaxAbsoluteExchangeDifference > EXCHANGE_EPSILON) {
             LOGGER.error("Net positions have reached their targets but exchange are not aligned. This may be explained by the NTC hypothesis");
-            return builder.addExchangeAlignerStatus(Status.TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED).build();
+            result = builder.addExchangeAlignerStatus(Status.TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED).build();
+            return;
         }
-        return builder.addExchangeAlignerStatus(Status.ALIGNED_WITH_BALANCE_ADJUSTMENT).build();
+        result = builder.addExchangeAlignerStatus(Status.ALIGNED_WITH_BALANCE_ADJUSTMENT).build();
     }
 
     public enum Status {
