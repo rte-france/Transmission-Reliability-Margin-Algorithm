@@ -24,21 +24,25 @@ import java.util.Objects;
 public class HvdcAligner implements OperationalConditionAligner {
     private static final Logger LOGGER = LoggerFactory.getLogger(HvdcAligner.class);
 
-    private static void alignAngleDroopActivePowerExtension(HvdcLine referenceHvdcLine, HvdcLine hvdcLine) {
-        HvdcAngleDroopActivePowerControl extension = referenceHvdcLine.getExtension(HvdcAngleDroopActivePowerControl.class);
-        if (Objects.isNull(extension)) {
-            hvdcLine.removeExtension(HvdcAngleDroopActivePowerControl.class);
-        } else {
-            hvdcLine.newExtension(HvdcAngleDroopActivePowerControlAdder.class)
-                .withDroop(extension.getDroop())
-                .withP0(extension.getP0())
-                .withEnabled(extension.isEnabled())
+    private static void alignAngleDroopActivePowerExtension(HvdcLine referenceHvdcLine, HvdcLine marketBasedHvdcLine) {
+        HvdcAngleDroopActivePowerControl referenceExtension = referenceHvdcLine.getExtension(HvdcAngleDroopActivePowerControl.class);
+        if (Objects.nonNull(marketBasedHvdcLine.getExtension(HvdcAngleDroopActivePowerControl.class))) {
+            marketBasedHvdcLine.removeExtension(HvdcAngleDroopActivePowerControl.class);
+            LOGGER.debug("Removed angle droop active power extension from market-based HVDC \"{}\"", marketBasedHvdcLine.getId());
+        }
+        if (Objects.nonNull(referenceExtension)) {
+            marketBasedHvdcLine.newExtension(HvdcAngleDroopActivePowerControlAdder.class)
+                .withDroop(referenceExtension.getDroop())
+                .withP0(referenceExtension.getP0())
+                .withEnabled(referenceExtension.isEnabled())
                 .add();
+            LOGGER.debug("Copied angle droop active power extension from reference HVDC to market-based HVDC \"{}\"", marketBasedHvdcLine.getId());
         }
     }
 
-    private static void alignActivePowerSetpoints(HvdcLine referenceHvdcLine, HvdcLine hvdcLine) {
-        hvdcLine.setActivePowerSetpoint(referenceHvdcLine.getActivePowerSetpoint());
+    private static void alignActivePowerSetpoints(HvdcLine referenceHvdcLine, HvdcLine marketBasedHvdcLine) {
+        marketBasedHvdcLine.setActivePowerSetpoint(referenceHvdcLine.getActivePowerSetpoint());
+        LOGGER.debug("Aligned market-based HVDC \"{}\" power set point at {} MW", marketBasedHvdcLine.getId(), marketBasedHvdcLine.getActivePowerSetpoint());
     }
 
     @Override
@@ -46,12 +50,12 @@ public class HvdcAligner implements OperationalConditionAligner {
         LOGGER.info("Aligning HVDC power set points and angle droop active power mode");
         referenceNetwork.getHvdcLineStream().forEach(referenceHvdcLine -> {
             String id = referenceHvdcLine.getId();
-            HvdcLine hvdcLine = marketBasedNetwork.getHvdcLine(id);
-            if (Objects.isNull(hvdcLine)) {
+            HvdcLine marketBasedHvdcLine = marketBasedNetwork.getHvdcLine(id);
+            if (Objects.isNull(marketBasedHvdcLine)) {
                 throw new TrmException("HvdcLine with id " + id + " not found");
             }
-            alignActivePowerSetpoints(referenceHvdcLine, hvdcLine);
-            alignAngleDroopActivePowerExtension(referenceHvdcLine, hvdcLine);
+            alignActivePowerSetpoints(referenceHvdcLine, marketBasedHvdcLine);
+            alignAngleDroopActivePowerExtension(referenceHvdcLine, marketBasedHvdcLine);
         });
     }
 }

@@ -6,8 +6,8 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="com.rte_france.algoleague" level="TRACE"/>
+    <logger name="com.rte_france.trm_algorithm" level="TRACE"/>
 </configuration>

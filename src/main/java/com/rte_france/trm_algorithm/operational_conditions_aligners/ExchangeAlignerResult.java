@@ -8,9 +8,10 @@
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
-import com.powsybl.iidm.network.Country;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.EmptyExchangeAndNetPosition;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPositionInterface;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.NetPositionInterface;
 
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -18,67 +19,35 @@ import java.util.Objects;
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
 public final class ExchangeAlignerResult {
-    private final Map<Country, Double> referenceNetPositions;
-    private final Map<Country, Double> initialMarketBasedNetPositions;
-    private final Map<Country, Map<Country, Double>> referenceExchanges;
-    private final Map<Country, Map<Country, Double>> initialMarketBasedExchanges;
-    private final Double initialMaxAbsoluteExchangeDifference;
-    private final Map<Country, Double> targetNetPositions;
+    private final ExchangeAndNetPositionInterface referenceExchangeAndNetPosition;
+    private final ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition;
+    private final NetPositionInterface targetNetPositions;
     private final BalanceComputationResult balanceComputationResult;
-    private final Map<Country, Double> newMarketBasedNetPositions;
-    private final Map<Country, Map<Country, Double>> newMarketBasedExchanges;
-    private final Double newMaxAbsoluteExchangeDifference;
+    private final ExchangeAndNetPositionInterface newMarketBasedExchangeAndNetPosition;
     private final ExchangeAligner.Status status;
 
-    private ExchangeAlignerResult(Map<Country, Double> referenceNetPositions,
-                                  Map<Country, Double> initialMarketBasedNetPositions,
-                                  Map<Country, Map<Country, Double>> referenceExchanges,
-                                  Map<Country, Map<Country, Double>> initialMarketBasedExchanges,
-                                  Double initialMaxAbsoluteExchangeDifference,
-                                  Map<Country, Double> targetNetPositions,
-                                  BalanceComputationResult balanceComputationResult,
-                                  Map<Country, Double> newMarketBasedNetPositions,
-                                  Map<Country, Map<Country, Double>> newMarketBasedExchanges,
-                                  Double newMaxAbsoluteExchangeDifference,
-                                  ExchangeAligner.Status status) {
-        this.referenceNetPositions = referenceNetPositions;
-        this.initialMarketBasedNetPositions = initialMarketBasedNetPositions;
-        this.referenceExchanges = referenceExchanges;
-        this.initialMarketBasedExchanges = initialMarketBasedExchanges;
-        this.initialMaxAbsoluteExchangeDifference = initialMaxAbsoluteExchangeDifference;
-        this.targetNetPositions = targetNetPositions;
-        this.balanceComputationResult = balanceComputationResult;
-        this.newMarketBasedNetPositions = newMarketBasedNetPositions;
-        this.newMarketBasedExchanges = newMarketBasedExchanges;
-        this.newMaxAbsoluteExchangeDifference = newMaxAbsoluteExchangeDifference;
-        this.status = status;
+    public ExchangeAlignerResult(Builder builder) {
+        referenceExchangeAndNetPosition = builder.referenceExchangeAndNetPosition;
+        initialMarketBasedExchangeAndNetPosition = builder.initialMarketBasedExchangeAndNetPosition;
+        targetNetPositions = builder.targetNetPositions;
+        balanceComputationResult = builder.balanceComputationResult;
+        newMarketBasedExchangeAndNetPosition = builder.newMarketBasedExchangeAndNetPosition;
+        status = builder.status;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public Map<Country, Double> getReferenceNetPositions() {
-        return referenceNetPositions;
+    public ExchangeAndNetPositionInterface getReferenceExchangeAndNetPosition() {
+        return referenceExchangeAndNetPosition;
     }
 
-    public Map<Country, Double> getInitialMarketBasedNetPositions() {
-        return initialMarketBasedNetPositions;
+    public ExchangeAndNetPositionInterface getInitialMarketBasedExchangeAndNetPosition() {
+        return initialMarketBasedExchangeAndNetPosition;
     }
 
-    public Map<Country, Map<Country, Double>> getReferenceExchanges() {
-        return referenceExchanges;
-    }
-
-    public Double getInitialMaxAbsoluteExchangeDifference() {
-        return initialMaxAbsoluteExchangeDifference;
-    }
-
-    public Map<Country, Map<Country, Double>> getInitialMarketBasedExchanges() {
-        return initialMarketBasedExchanges;
-    }
-
-    public Map<Country, Double> getTargetNetPositions() {
+    public NetPositionInterface getTargetNetPositions() {
         return targetNetPositions;
     }
 
@@ -86,65 +55,45 @@ public final class ExchangeAlignerResult {
         return balanceComputationResult;
     }
 
-    public Map<Country, Double> getNewMarketBasedNetPositions() {
-        return newMarketBasedNetPositions;
-    }
-
-    public Map<Country, Map<Country, Double>> getNewMarketBasedExchanges() {
-        return newMarketBasedExchanges;
-    }
-
-    public Double getNewMaxAbsoluteExchangeDifference() {
-        return newMaxAbsoluteExchangeDifference;
+    public ExchangeAndNetPositionInterface getNewMarketBasedExchangeAndNetPosition() {
+        return newMarketBasedExchangeAndNetPosition;
     }
 
     public ExchangeAligner.Status getStatus() {
         return status;
     }
 
+    public double getInitialMaxAbsoluteExchangeDifference() {
+        return referenceExchangeAndNetPosition.getMaxAbsoluteExchangeDifference(initialMarketBasedExchangeAndNetPosition);
+    }
+
+    public double getNewMaxAbsoluteExchangeDifference() {
+        return referenceExchangeAndNetPosition.getMaxAbsoluteExchangeDifference(newMarketBasedExchangeAndNetPosition);
+    }
+
     public static final class Builder {
-        private Map<Country, Double> referenceNetPositions;
-        private Map<Country, Double> initialMarketBasedNetPositions;
-        private Map<Country, Map<Country, Double>> referenceExchanges;
-        private Map<Country, Map<Country, Double>> initialMarketBasedExchanges;
-        private Double initialMaxAbsoluteExchangeDifference;
-        private Map<Country, Double> targetNetPositions;
+        private ExchangeAndNetPositionInterface referenceExchangeAndNetPosition;
+        private ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition;
+        private NetPositionInterface targetNetPositions;
         private BalanceComputationResult balanceComputationResult;
-        private Map<Country, Double> newMarketBasedNetPositions;
-        private Map<Country, Map<Country, Double>> newMarketBasedExchanges;
-        private Double newMaxAbsoluteExchangeDifference;
+        private ExchangeAndNetPositionInterface newMarketBasedExchangeAndNetPosition = new EmptyExchangeAndNetPosition();
         private ExchangeAligner.Status status;
 
         private Builder() {
             // Builder pattern
         }
 
-        public Builder addReferenceNetPositions(Map<Country, Double> referenceNetPositions) {
-            this.referenceNetPositions = referenceNetPositions;
+        public Builder addReferenceExchangeAndNetPosition(ExchangeAndNetPositionInterface referenceExchangeAndNetPosition) {
+            this.referenceExchangeAndNetPosition = referenceExchangeAndNetPosition;
             return this;
         }
 
-        public Builder addInitialMarketBasedNetPositions(Map<Country, Double> initialMarketBasedNetPositions) {
-            this.initialMarketBasedNetPositions = initialMarketBasedNetPositions;
+        public Builder addInitialMarketBasedExchangeAndNetPositions(ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition) {
+            this.initialMarketBasedExchangeAndNetPosition = initialMarketBasedExchangeAndNetPosition;
             return this;
         }
 
-        public Builder addReferenceExchange(Map<Country, Map<Country, Double>> referenceExchanges) {
-            this.referenceExchanges = referenceExchanges;
-            return this;
-        }
-
-        public Builder addInitialMarketBasedExchanges(Map<Country, Map<Country, Double>> initialMarketBasedExchanges) {
-            this.initialMarketBasedExchanges = initialMarketBasedExchanges;
-            return this;
-        }
-
-        public Builder addInitialMaxAbsoluteExchangeDifference(double initialMaxAbsoluteExchangeDifference) {
-            this.initialMaxAbsoluteExchangeDifference = initialMaxAbsoluteExchangeDifference;
-            return this;
-        }
-
-        public Builder addTargetNetPosition(Map<Country, Double> targetNetPositions) {
+        public Builder addTargetNetPosition(NetPositionInterface targetNetPositions) {
             this.targetNetPositions = targetNetPositions;
             return this;
         }
@@ -154,18 +103,8 @@ public final class ExchangeAlignerResult {
             return this;
         }
 
-        public Builder addNewMarketBasedNetPositions(Map<Country, Double> newMarketBasedNetPositions) {
-            this.newMarketBasedNetPositions = newMarketBasedNetPositions;
-            return this;
-        }
-
-        public Builder addNewMarketBasedExchanges(Map<Country, Map<Country, Double>> newMarketBasedExchanges) {
-            this.newMarketBasedExchanges = newMarketBasedExchanges;
-            return this;
-        }
-
-        public Builder addNewMaxAbsoluteExchangeDifference(double newMaxAbsoluteExchangeDifference) {
-            this.newMaxAbsoluteExchangeDifference = newMaxAbsoluteExchangeDifference;
+        public Builder addNewMarketBasedExchangeAndNetPositions(ExchangeAndNetPositionInterface newMarketBasedExchangeAndNetPosition) {
+            this.newMarketBasedExchangeAndNetPosition = newMarketBasedExchangeAndNetPosition;
             return this;
         }
 
@@ -175,25 +114,11 @@ public final class ExchangeAlignerResult {
         }
 
         public ExchangeAlignerResult build() {
-            Objects.requireNonNull(referenceNetPositions, "referenceNetPositions must not be null");
-            Objects.requireNonNull(initialMarketBasedNetPositions, "initialMarketBasedNetPositions must not be null");
-            Objects.requireNonNull(referenceExchanges, "referenceExchanges must not be null");
-            Objects.requireNonNull(initialMarketBasedExchanges, "initialMarketBasedExchanges must not be null");
-            Objects.requireNonNull(initialMaxAbsoluteExchangeDifference, "initialMaxAbsoluteExchangeDifference must not be null");
+            Objects.requireNonNull(referenceExchangeAndNetPosition, "referenceExchangeAndNetPosition must not be null");
+            Objects.requireNonNull(initialMarketBasedExchangeAndNetPosition, "initialMarketBasedExchangeAndNetPosition must not be null");
             Objects.requireNonNull(targetNetPositions, "targetNetPositions must not be null");
             Objects.requireNonNull(status, "status must not be null");
-            return new ExchangeAlignerResult(referenceNetPositions,
-                initialMarketBasedNetPositions,
-                referenceExchanges,
-                initialMarketBasedExchanges,
-                initialMaxAbsoluteExchangeDifference,
-                targetNetPositions,
-                balanceComputationResult,
-                newMarketBasedNetPositions,
-                newMarketBasedExchanges,
-                newMaxAbsoluteExchangeDifference,
-                status
-            );
+            return new ExchangeAlignerResult(this);
         }
     }
 

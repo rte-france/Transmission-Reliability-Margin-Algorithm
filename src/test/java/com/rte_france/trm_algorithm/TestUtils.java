@@ -16,7 +16,10 @@ import com.powsybl.openrao.data.cracapi.CracFactory;
 import com.powsybl.openrao.data.cracapi.networkaction.ActionType;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerResult;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.PstAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.EmptyExchangeAndNetPosition;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.EmptyNetPosition;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPositionInterface;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.NetPositionInterface;
 
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -37,17 +40,17 @@ public final class TestUtils {
         // utility class
     }
 
-    public static void assertNetPositions(Map<Country, Double> expectedNetPositions, Map<Country, Double> actualNetPositions) {
+    public static void assertNetPositions(Map<Country, Double> expectedNetPositions, NetPositionInterface actualNetPositions) {
         expectedNetPositions.keySet()
-            .forEach(c -> assertEquals(expectedNetPositions.get(c), actualNetPositions.get(c), EPSILON));
+            .forEach(country -> assertEquals(expectedNetPositions.get(country), actualNetPositions.getNetPosition(country), EPSILON));
     }
 
-    public static void assertExchanges(Map<Country, Map<Country, Double>> expectedExchanges, Map<Country, Map<Country, Double>> actualExchanges) {
+    public static void assertExchanges(Map<Country, Map<Country, Double>> expectedExchanges, ExchangeAndNetPositionInterface actualExchanges) {
         expectedExchanges.keySet()
-            .forEach(country1 -> expectedExchanges.get(country1).keySet()
-                .forEach(country2 -> {
-                    Double expected = expectedExchanges.get(country1).get(country2);
-                    Double actual = actualExchanges.get(country1).get(country2);
+            .forEach(countrySource -> expectedExchanges.get(countrySource).keySet()
+                .forEach(countrySink -> {
+                    double expected = expectedExchanges.get(countrySource).get(countrySink);
+                    double actual = actualExchanges.getExchange(countrySource, countrySink);
                     assertEquals(expected, actual, EPSILON);
                 })
             );
@@ -75,25 +78,13 @@ public final class TestUtils {
             .add();
     }
 
-    static PstAligner.Result mockPstAlignerResult() {
-        return PstAligner.Result.builder()
-            .addPhaseTapChangerResults(Collections.emptyMap())
-            .addRatioTapChangerResults(Collections.emptyMap())
-            .build();
-    }
-
     static ExchangeAlignerResult mockExchangeAlignerResult() {
         return ExchangeAlignerResult.builder()
-            .addReferenceNetPositions(Collections.emptyMap())
-            .addInitialMarketBasedNetPositions(Collections.emptyMap())
-            .addReferenceExchange(Collections.emptyMap())
-            .addInitialMarketBasedExchanges(Collections.emptyMap())
-            .addInitialMaxAbsoluteExchangeDifference(0)
-            .addTargetNetPosition(Collections.emptyMap())
+            .addReferenceExchangeAndNetPosition(new EmptyExchangeAndNetPosition())
+            .addInitialMarketBasedExchangeAndNetPositions(new EmptyExchangeAndNetPosition())
+            .addTargetNetPosition(new EmptyNetPosition())
             .addBalanceComputationResult(new BalanceComputationResult(BalanceComputationResult.Status.FAILED))
-            .addNewMarketBasedNetPositions(Collections.emptyMap())
-            .addNewMarketBasedExchanges(Collections.emptyMap())
-            .addNewMaxAbsoluteExchangeDifference(0)
+            .addNewMarketBasedExchangeAndNetPositions(new EmptyExchangeAndNetPosition())
             .addExchangeAlignerStatus(ExchangeAligner.Status.NOT_ALIGNED)
             .build();
     }

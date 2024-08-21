@@ -72,7 +72,7 @@ public class TrmAlgorithm {
             Map.Entry::getKey,
             entry -> {
                 Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
-                Double marketBasedFlow = marketBasedFlows.get(entry.getKey());
+                double marketBasedFlow = marketBasedFlows.get(entry.getKey());
                 double referenceFlow = entry.getValue().getFlow();
                 double referenceZonalPtdf = entry.getValue().getZonalPtdf();
                 return new UncertaintyResult(referenceBranch, marketBasedFlow, referenceFlow, referenceZonalPtdf);

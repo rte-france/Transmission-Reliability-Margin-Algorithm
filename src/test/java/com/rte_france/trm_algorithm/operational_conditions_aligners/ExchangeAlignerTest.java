@@ -79,14 +79,14 @@ class ExchangeAlignerTest {
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ExchangeAligner.Status.NOT_ALIGNED, result.getStatus());
         assertEquals(BalanceComputationResult.Status.FAILED, result.getBalanceComputationResult().getStatus());
-        TestUtils.assertNetPositions(Map.of(Country.ES, -983.6, Country.FR, 0.2, Country.PT, 983.4), result.getReferenceNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 983.4)), result.getReferenceExchanges());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getInitialMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.ES, -983.6, Country.FR, 0.2, Country.PT, 983.4), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 983.4)), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getInitialMarketBasedExchangeAndNetPosition());
         assertEquals(983.2, result.getInitialMaxAbsoluteExchangeDifference(), EPSILON);
         TestUtils.assertNetPositions(Map.of(Country.ES, -983.6, Country.FR, 0.2, Country.PT, 983.4), result.getTargetNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getNewMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getNewMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getNewMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getNewMarketBasedExchangeAndNetPosition());
         assertEquals(983.2, result.getNewMaxAbsoluteExchangeDifference(), EPSILON);
     }
 
@@ -100,15 +100,14 @@ class ExchangeAlignerTest {
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, result.getStatus());
         assertNull(result.getBalanceComputationResult());
-        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getReferenceNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getReferenceExchanges());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getInitialMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getInitialMarketBasedExchangeAndNetPosition());
         assertEquals(0, result.getInitialMaxAbsoluteExchangeDifference(), EPSILON);
         TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getTargetNetPositions());
-        assertNull(result.getNewMarketBasedNetPositions());
-        assertNull(result.getNewMarketBasedExchanges());
-        assertNull(result.getNewMaxAbsoluteExchangeDifference());
+        assertTrue(result.getNewMarketBasedExchangeAndNetPosition().getCountries().isEmpty());
+        assertEquals(Double.NaN, result.getNewMaxAbsoluteExchangeDifference());
     }
 
     @Test
@@ -140,14 +139,14 @@ class ExchangeAlignerTest {
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
         assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
-        TestUtils.assertNetPositions(Map.of(Country.ES, -1200., Country.FR, 500., Country.PT, 700.), result.getReferenceNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 500.), Country.PT, Map.of(Country.ES, 700.)), result.getReferenceExchanges());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getInitialMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.ES, -1200., Country.FR, 500., Country.PT, 700.), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 500.), Country.PT, Map.of(Country.ES, 700.)), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 0.2), Country.PT, Map.of(Country.ES, 0.2)), result.getInitialMarketBasedExchangeAndNetPosition());
         assertEquals(699.8, result.getInitialMaxAbsoluteExchangeDifference(), EPSILON);
         TestUtils.assertNetPositions(Map.of(Country.ES, -1200., Country.FR, 500., Country.PT, 700.), result.getTargetNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.ES, -1200., Country.FR, 500., Country.PT, 700.), result.getNewMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 500.), Country.PT, Map.of(Country.ES, 700.)), result.getNewMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.ES, -1200., Country.FR, 500., Country.PT, 700.), result.getNewMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.ES, 500.), Country.PT, Map.of(Country.ES, 700.)), result.getNewMarketBasedExchangeAndNetPosition());
         assertEquals(0, result.getNewMaxAbsoluteExchangeDifference(), EPSILON);
     }
 
@@ -178,14 +177,14 @@ class ExchangeAlignerTest {
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
         assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
-        TestUtils.assertNetPositions(Map.of(Country.BE, -2500., Country.DE, -1500., Country.FR, 3000., Country.NL, 1000.), result.getReferenceNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getInitialMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.BE, 2090.9, Country.DE, 909.), Country.NL, Map.of(Country.BE, 409., Country.DE, 590.9)), result.getReferenceExchanges());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1243.), Country.NL, Map.of(Country.DE, 756.9), Country.BE, Map.of(Country.FR, 1243., Country.NL, 1256.9)), result.getInitialMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.BE, -2500., Country.DE, -1500., Country.FR, 3000., Country.NL, 1000.), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getInitialMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.BE, 2090.9, Country.DE, 909.), Country.NL, Map.of(Country.BE, 409., Country.DE, 590.9)), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1243.), Country.NL, Map.of(Country.DE, 756.9), Country.BE, Map.of(Country.FR, 1243., Country.NL, 1256.9)), result.getInitialMarketBasedExchangeAndNetPosition());
         assertEquals(3333.9, result.getInitialMaxAbsoluteExchangeDifference(), EPSILON);
         TestUtils.assertNetPositions(Map.of(Country.BE, -2500., Country.DE, -1500., Country.FR, 3000., Country.NL, 1000.), result.getTargetNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.BE, -2500., Country.DE, -1500., Country.FR, 3000., Country.NL, 1000.), result.getNewMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.BE, 2090.9, Country.DE, 909.), Country.NL, Map.of(Country.BE, 409., Country.DE, 590.9)), result.getNewMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.BE, -2500., Country.DE, -1500., Country.FR, 3000., Country.NL, 1000.), result.getNewMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.BE, 2090.9, Country.DE, 909.), Country.NL, Map.of(Country.BE, 409., Country.DE, 590.9)), result.getNewMarketBasedExchangeAndNetPosition());
         assertEquals(0, result.getNewMaxAbsoluteExchangeDifference(), EPSILON);
     }
 
@@ -199,15 +198,14 @@ class ExchangeAlignerTest {
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, result.getStatus());
         assertNull(result.getBalanceComputationResult());
-        TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getReferenceNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getInitialMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1243.), Country.NL, Map.of(Country.DE, 756.9), Country.BE, Map.of(Country.FR, 1243., Country.NL, 1256.9)), result.getReferenceExchanges());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1243.), Country.NL, Map.of(Country.DE, 756.9), Country.BE, Map.of(Country.FR, 1243., Country.NL, 1256.9)), result.getInitialMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getInitialMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1243.), Country.NL, Map.of(Country.DE, 756.9), Country.BE, Map.of(Country.FR, 1243., Country.NL, 1256.9)), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1243.), Country.NL, Map.of(Country.DE, 756.9), Country.BE, Map.of(Country.FR, 1243., Country.NL, 1256.9)), result.getInitialMarketBasedExchangeAndNetPosition());
         assertEquals(0, result.getInitialMaxAbsoluteExchangeDifference(), EPSILON);
         TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getTargetNetPositions());
-        assertNull(result.getNewMarketBasedNetPositions());
-        assertNull(result.getNewMarketBasedExchanges());
-        assertNull(result.getNewMaxAbsoluteExchangeDifference());
+        assertTrue(result.getNewMarketBasedExchangeAndNetPosition().getCountries().isEmpty());
+        assertEquals(Double.NaN, result.getNewMaxAbsoluteExchangeDifference());
     }
 
     @Test
@@ -234,14 +232,14 @@ class ExchangeAlignerTest {
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
         assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
-        TestUtils.assertNetPositions(Map.of(Country.DE, -1111.1, Country.FR, 1111.1), result.getReferenceNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -1653.8, Country.FR, -692.3), result.getInitialMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1111.1)), result.getReferenceExchanges());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1653.8), Country.BE, Map.of(Country.FR, 2346.1)), result.getInitialMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.DE, -1111.1, Country.FR, 1111.1), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -1653.8, Country.FR, -692.3), result.getInitialMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1111.1)), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1653.8), Country.BE, Map.of(Country.FR, 2346.1)), result.getInitialMarketBasedExchangeAndNetPosition());
         assertEquals(542.7, result.getInitialMaxAbsoluteExchangeDifference(), EPSILON);
         TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -1111.1, Country.FR, -1235.), result.getTargetNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -1111.1, Country.FR, -1235.), result.getNewMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1111.1), Country.BE, Map.of(Country.FR, 2346.1)), result.getNewMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -1111.1, Country.FR, -1235.), result.getNewMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1111.1), Country.BE, Map.of(Country.FR, 2346.1)), result.getNewMarketBasedExchangeAndNetPosition());
         assertEquals(0, result.getNewMaxAbsoluteExchangeDifference(), EPSILON);
     }
 
@@ -259,14 +257,14 @@ class ExchangeAlignerTest {
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ExchangeAligner.Status.TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED, result.getStatus());
         assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
-        TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -2153.8, Country.FR, -192.3), result.getReferenceNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -1500., Country.FR, -500., Country.NL, -500.), result.getInitialMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 2153.8), Country.BE, Map.of(Country.FR, 2346.1)), result.getReferenceExchanges());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 785.9), Country.NL, Map.of(Country.DE, 714.), Country.BE, Map.of(Country.FR, 1285.9, Country.NL, 1214.)), result.getInitialMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -2153.8, Country.FR, -192.3), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -1500., Country.FR, -500., Country.NL, -500.), result.getInitialMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 2153.8), Country.BE, Map.of(Country.FR, 2346.1)), result.getReferenceExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 785.9), Country.NL, Map.of(Country.DE, 714.), Country.BE, Map.of(Country.FR, 1285.9, Country.NL, 1214.)), result.getInitialMarketBasedExchangeAndNetPosition());
         assertEquals(1367.8, result.getInitialMaxAbsoluteExchangeDifference(), EPSILON);
         TestUtils.assertNetPositions(Map.of(Country.BE, 3560.1, Country.DE, -2867.8, Country.FR, -192.3, Country.NL, -500.), result.getTargetNetPositions());
-        TestUtils.assertNetPositions(Map.of(Country.BE, 3560.1, Country.DE, -2867.8, Country.FR, -192.3, Country.NL, -500.), result.getNewMarketBasedNetPositions());
-        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1739.8), Country.BE, Map.of(Country.FR, 1932.1, Country.NL, 1628.), Country.NL, Map.of(Country.DE, 1128.)), result.getNewMarketBasedExchanges());
+        TestUtils.assertNetPositions(Map.of(Country.BE, 3560.1, Country.DE, -2867.8, Country.FR, -192.3, Country.NL, -500.), result.getNewMarketBasedExchangeAndNetPosition());
+        TestUtils.assertExchanges(Map.of(Country.FR, Map.of(Country.DE, 1739.8), Country.BE, Map.of(Country.FR, 1932.1, Country.NL, 1628.), Country.NL, Map.of(Country.DE, 1128.)), result.getNewMarketBasedExchangeAndNetPosition());
         assertEquals(413.9, result.getNewMaxAbsoluteExchangeDifference(), EPSILON);
     }
 }

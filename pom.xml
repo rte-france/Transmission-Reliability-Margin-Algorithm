@@ -42,6 +42,7 @@
         </sonar.jacoco.reportPath>
 
         <!-- Dependencies versions -->
+        <gridcapa-swe.version>1.20.1</gridcapa-swe.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <logback.version>1.5.6</logback.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
@@ -56,6 +57,18 @@
 
     <dependencies>
         <!-- Compile dependencies -->
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>gridcapa-swe-commons</artifactId>
+            <version>${gridcapa-swe.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.powsybl</groupId>
+                    <artifactId>powsybl-config-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-commons</artifactId>

@@ -7,8 +7,12 @@
  */
 package com.rte_france.trm_algorithm;
 
+import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.cracapi.Crac;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerResult;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,5 +40,22 @@ class TestUtilsTest {
     void testBuildEmptyResults() {
         TrmResults trmResults = TestUtils.mockTrmResults().build();
         assertTrue(trmResults.getUncertaintiesMap().isEmpty());
+    }
+
+    @Test
+    void testMockExchangeAlignerResult() {
+        ExchangeAlignerResult exchangeAlignerResult = TestUtils.mockExchangeAlignerResult();
+        assertTrue(exchangeAlignerResult.getReferenceExchangeAndNetPosition().getCountries().isEmpty());
+        assertEquals(Double.NaN, exchangeAlignerResult.getReferenceExchangeAndNetPosition().getNetPosition(Country.FR));
+        assertEquals(Double.NaN, exchangeAlignerResult.getReferenceExchangeAndNetPosition().getExchange(Country.FR, Country.BE));
+        assertEquals(Double.NaN, exchangeAlignerResult.getReferenceExchangeAndNetPosition().getExchangeToExterior(Country.FR));
+        assertTrue(exchangeAlignerResult.getInitialMarketBasedExchangeAndNetPosition().getCountries().isEmpty());
+        assertTrue(exchangeAlignerResult.getTargetNetPositions().getCountries().isEmpty());
+        assertEquals(Double.NaN, exchangeAlignerResult.getTargetNetPositions().getNetPosition(Country.FR));
+        assertEquals(BalanceComputationResult.Status.FAILED, exchangeAlignerResult.getBalanceComputationResult().getStatus());
+        assertTrue(exchangeAlignerResult.getNewMarketBasedExchangeAndNetPosition().getCountries().isEmpty());
+        assertEquals(ExchangeAligner.Status.NOT_ALIGNED, exchangeAlignerResult.getStatus());
+        assertEquals(Double.NaN, exchangeAlignerResult.getInitialMaxAbsoluteExchangeDifference());
+        assertEquals(Double.NaN, exchangeAlignerResult.getNewMaxAbsoluteExchangeDifference());
     }
 }

@@ -83,6 +83,33 @@ positions.
 If the network is not for a NTC process and if a smaller network is used, the alignement might fail with a status `TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED`.  
 > This simple bahavior might be changed in the futur is required. But it does not make sens from a métier point of view as the afrr concept exists. 
 
+#### HVDC AC modeling environment
+
+If you need to transform your HVDC equivalent model to HVDC, we provide an environment.  
+When we enter the environment, the HVDC equivalent models are turned into HVDC.  
+Then a specified aligner is called (for example aligning exchanges).  
+Then the HVDC are turned into their equivalent models.  
+We do not keep HVDC in the network to be able to compute their PTDF.  
+> Warning, if you have HVDC in DC mode, this environment might reset their set point !
+
+#### Pipeline example
+
+Here is an example of a pipeline 
+
+```java
+CracAligner cracAligner = new CracAligner(crac);
+HvdcAligner hvdcAligner = new HvdcAligner();
+PstAligner pstAligner = new PstAligner();
+DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
+ExchangeAligner exchangeAligner = new ExchangeAligner(balanceComputationParameters, loadFlowRunner, computationManager, marketBasedScalable);
+HvdcAcModelingEnvironment hvdcAcModelingEnvironment = new HvdcAcModelingEnvironment(creationParametersSet, exchangeAligner);
+OperationalConditionAligner operationalConditionAligner = new OperationalConditionAlignerPipeline(cracAligner,
+        hvdcAligner,
+        pstAligner,
+        danglingLineAligner,
+        hvdcAcModelingEnvironment);
+```
+
 ### Flow extraction
 
 For all selected lines, we can extract:
@@ -95,6 +122,9 @@ For all selected lines, we can extract:
 For all selected lines, we can compute $`PTDF(i)`$ the zonal PTDF in the real time snapshot network with an AC 
 sensitivity computation.  
 > By default, we use the terminal 1 during the sensitivity analysis.
+
+The HVDC are modeled with their equivalent model to be able to compute their zonal PTDF.  
+> Therefore, HVDC saturations are ignored. 
 
 ### Uncertainties computation
 
