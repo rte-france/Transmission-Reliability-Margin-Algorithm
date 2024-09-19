@@ -2,6 +2,44 @@
 
 This document describes the current state of the algorithm.
 
+To compute the TRM, you will need **uncertainties** and **unintended deviations**.
+
+> We focus on the uncertainties.  
+> Unintended deviations computation is easy.   
+> It does not require to manipulate networks.  
+> We ignore this computation for now. 
+
+## Inputs
+
+### Market-based network
+
+The market-based network is either a D2CF network or a DACF network.  
+This network models what the network is expected to be at a future timestamp from a market point of view.  
+It does not take into account the last minute operations on the network.
+
+### Real time snapshot network
+
+The real time snapshot represents what has really happened on the network.
+
+### Real time GLSK
+
+The real time GLSK are required to compute the zonal PTDF.
+
+### Real time CRAC
+
+The CRAC contains the network actions.
+
+## Outputs
+
+### Export results to CSV
+
+The results can be exported to a CSV.
+
+Here is the format :
+
+    Case date;Branch ID;Branch name;Country Side 1;Country Side 2;Uncertainty;Market-based flow;Reference flow;Zonal PTDF
+    2024-07-15T13:14:12Z[UTC];toto;FGEN1 11 BLOAD 11 1;FR;BE;12.0;100.0;112.0;-1.0
+
 ## Algorithm steps
 
 ### Critical Network Element (CNE) selection
@@ -74,7 +112,7 @@ This net position will be the goal of the balance adjustment.
 $`exchange_{networkN}(countryA, countryB)`$ defines the leaving flow from country $`countryA`$ to country $`countryB`$ 
 in the network $`networkN`$.  
 If the country is not present in the real-time snapshot, the net position remains the same.  
-Otherwise, $`NP_{target}(c) = NP_{market} + \sum_{otherCountry!=c}exchange_{real-time}(c, otherCountry) - \sum_{otherCountry!=c}exchange_{market-based}(c, otherCountry)`$
+Otherwise, $$`NP_{target}(c) = NP_{market} + \sum_{otherCountry!=c}exchange_{real-time}(c, otherCountry) - \sum_{otherCountry!=c}exchange_{market-based}(c, otherCountry)`$$
 
 This formula allows the alignement to be valid even with a real time network that might be a subpart of the market-based 
 network.  
@@ -130,38 +168,5 @@ The HVDC are modeled with their equivalent model to be able to compute their zon
 
 The uncertainty of a given line $`i`$ is 
 
-$`UN(i)=\frac{P_{A,CC}(i)-P_{RT}(i)}{PTDF(i)}`$
-
-## Inputs
-
-### Market-based network
-
-The market-based network is either a D2CF network or a DACF network.  
-This network models what the network is expected to be at a future timestamp from a market point of view.  
-It does not take into account the last minute operations on the network.
-> TODO: validate this description
-
-### Real time snapshot network
-
-The real time snapshot represents what has really happened on the network.
-> TODO: validate this description
-
-### Real time GLSK
-
-The real time GLSK are required to compute the zonal PTDF.
-
-### Real time CRAC
-
-The CRAC contains the network actions. 
-
-## Outputs
-
-### Export results to CSV
-
-The results can be exported to a CSV.
-
-Here is the format :
-
-    Case date;Branch ID;Branch name;Country Side 1;Country Side 2;Uncertainty;Market-based flow;Reference flow;Zonal PTDF
-    2024-07-15T13:14:12Z[UTC];toto;FGEN1 11 BLOAD 11 1;FR;BE;12.0;100.0;112.0;-1.0
+$$`UN(i)=\frac{P_{A,CC}(i)-P_{RT}(i)}{PTDF(i)}`$$
 
