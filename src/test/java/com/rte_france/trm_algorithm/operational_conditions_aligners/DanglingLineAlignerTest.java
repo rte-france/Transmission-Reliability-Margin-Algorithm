@@ -149,4 +149,52 @@ class DanglingLineAlignerTest {
         assertEquals(DanglingLineAligner.Status.PAIRED_DANGLING_LINE_IN_BOTH_NETWORKS, results.get("X     11 DLOAD 11 1"));
     }
 
+    @Test
+    void testAlignOnlyProvidedDanglingLines() {
+        Network referenceNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_MULTIPLE_UNBOUNDED_XNODES.uct");
+        Network marketBasedNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_MULTIPLE_UNBOUNDED_XNODES.uct");
+        String danglingLineId = "BLOAD 11 XB    11 1";
+        DanglingLine danglingLine = marketBasedNetwork.getDanglingLine(danglingLineId);
+        danglingLine.setP0(-50);
+        assertEquals(-50, danglingLine.getP0());
+
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner(danglingLineId);
+        danglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, DanglingLineAligner.Status> results = danglingLineAligner.getResult();
+        assertEquals(100, danglingLine.getP0());
+        assertEquals(1, results.size());
+        assertEquals(DanglingLineAligner.Status.ALIGNED, results.get(danglingLineId));
+
+        String otherDanglingLineId = "FGEN1 11 XF    11 1";
+        DanglingLine otherDanglingLine = marketBasedNetwork.getDanglingLine(otherDanglingLineId);
+        otherDanglingLine.setP0(-200);
+        danglingLine.setP0(-60);
+        assertEquals(-60, danglingLine.getP0());
+        assertEquals(-200, otherDanglingLine.getP0());
+
+        danglingLineAligner = new DanglingLineAligner(danglingLineId, otherDanglingLineId);
+        danglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        results = danglingLineAligner.getResult();
+        assertEquals(100, danglingLine.getP0());
+        assertEquals(100, otherDanglingLine.getP0());
+        assertEquals(2, results.size());
+        assertEquals(DanglingLineAligner.Status.ALIGNED, results.get(danglingLineId));
+        assertEquals(DanglingLineAligner.Status.ALIGNED, results.get(otherDanglingLineId));
+    }
+
+    @Test
+    void testAlignOnlyProvidedDanglingLineNonExistingId() {
+        Network referenceNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_MULTIPLE_UNBOUNDED_XNODES.uct");
+        Network marketBasedNetwork = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_MULTIPLE_UNBOUNDED_XNODES.uct");
+        String danglingLineId = "BLOAD 11 XB    11 1";
+        DanglingLine danglingLine = marketBasedNetwork.getDanglingLine(danglingLineId);
+        danglingLine.setP0(-50);
+        assertEquals(-50, danglingLine.getP0());
+
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner("non existing id");
+        danglingLineAligner.align(referenceNetwork, marketBasedNetwork);
+        Map<String, DanglingLineAligner.Status> results = danglingLineAligner.getResult();
+        assertEquals(-50, danglingLine.getP0());
+        assertTrue(results.isEmpty());
+    }
 }

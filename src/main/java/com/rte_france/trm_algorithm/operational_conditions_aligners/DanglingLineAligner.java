@@ -15,10 +15,8 @@ import com.rte_france.trm_algorithm.TrmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +25,19 @@ import java.util.stream.Collectors;
 public class DanglingLineAligner implements OperationalConditionAligner {
     private static final Logger LOGGER = LoggerFactory.getLogger(DanglingLineAligner.class);
     private Map<String, Status> result = new HashMap<>();
+    private final Predicate<DanglingLine> danglingLineFilteringPredicate;
+
+    public DanglingLineAligner() {
+        danglingLineFilteringPredicate = dl -> true;
+    }
+
+    public DanglingLineAligner(String... manyDanglingLineIds) {
+        this(Set.of(manyDanglingLineIds));
+    }
+
+    public DanglingLineAligner(Set<String> danglingLineIds) {
+        danglingLineFilteringPredicate = dl -> danglingLineIds.contains(dl.getId());
+    }
 
     private static Status align(DanglingLine referenceDanglingLine, DanglingLine marketBasedDanglingLine) {
         if (Objects.isNull(marketBasedDanglingLine)) {
@@ -79,9 +90,12 @@ public class DanglingLineAligner implements OperationalConditionAligner {
 
     @Override
     public void align(Network referenceNetwork, Network marketBasedNetwork) {
-        result = referenceNetwork.getDanglingLineStream().collect(Collectors.toMap(
-            Identifiable::getId,
-            referenceDanglingLine -> align(referenceDanglingLine, marketBasedNetwork.getDanglingLine(referenceDanglingLine.getId()))
+        LOGGER.info("Aligning dangling lines");
+        result = referenceNetwork.getDanglingLineStream()
+                .filter(danglingLineFilteringPredicate)
+                .collect(Collectors.toMap(
+                    Identifiable::getId,
+                    referenceDanglingLine -> align(referenceDanglingLine, marketBasedNetwork.getDanglingLine(referenceDanglingLine.getId()))
         ));
     }
 
