@@ -35,8 +35,8 @@ class CracAlignerTest {
 
         Crac crac = CracFactory.findDefault().create("crac");
         crac.newNetworkAction().withId("topo-action")
-            .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 11 1").withActionType(ActionType.OPEN).add()
-            .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 12 1").withActionType(ActionType.OPEN).add()
+            .newTerminalsConnectionAction().withNetworkElement("FGEN  11 BLOAD 11 1").withActionType(ActionType.OPEN).add()
+            .newTerminalsConnectionAction().withNetworkElement("FGEN  11 BLOAD 12 1").withActionType(ActionType.OPEN).add()
             .add();
 
         referenceNetwork.getLine("FGEN  11 BLOAD 12 1").disconnect();
@@ -58,9 +58,9 @@ class CracAlignerTest {
 
         Crac crac = CracFactory.findDefault().create("crac");
         crac.newNetworkAction().withId("topo-action")
-            .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 12 1").withActionType(ActionType.OPEN).add().add();
+            .newTerminalsConnectionAction().withNetworkElement("FGEN  11 BLOAD 12 1").withActionType(ActionType.OPEN).add().add();
         crac.newNetworkAction().withId("topo-action-2")
-            .newTopologicalAction().withNetworkElement("FGEN  11 BLOAD 11 1").withActionType(ActionType.OPEN).add().add();
+            .newTerminalsConnectionAction().withNetworkElement("FGEN  11 BLOAD 11 1").withActionType(ActionType.OPEN).add().add();
 
         crac.getNetworkAction("topo-action").apply(referenceNetwork);
         CracAligner cracAligner = new CracAligner(crac);

@@ -272,13 +272,13 @@ class TrmAlgorithmTest {
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
         assertEquals(7, result.size());
-        assertEquals(-817.366, result.get("BBE1AA11 FFR5AA11 1").getUncertainty(), EPSILON);
-        assertEquals(-817.366, result.get("BBE4AA11 FFR5AA11 1").getUncertainty(), EPSILON);
-        assertEquals(267.713, result.get("FFR4AA11 DDE1AA11 1").getUncertainty(), EPSILON);
-        assertEquals(318.732, result.get("NNL2AA11 BBE3AA11 1").getUncertainty(), EPSILON);
-        assertEquals(368.005, result.get("FFR2AA11 DDE3AA11 1").getUncertainty(), EPSILON);
-        assertEquals(316.924, result.get("DDE2AA11 NNL3AA11 1").getUncertainty(), EPSILON);
-        assertEquals(155.695, result.get("FFR4AA11 DDE4AA11 1").getUncertainty(), EPSILON);
+        assertEquals(-817.306, result.get("BBE1AA11 FFR5AA11 1").getUncertainty(), EPSILON);
+        assertEquals(-817.306, result.get("BBE4AA11 FFR5AA11 1").getUncertainty(), EPSILON);
+        assertEquals(267.703, result.get("FFR4AA11 DDE1AA11 1").getUncertainty(), EPSILON);
+        assertEquals(318.717, result.get("NNL2AA11 BBE3AA11 1").getUncertainty(), EPSILON);
+        assertEquals(367.983, result.get("FFR2AA11 DDE3AA11 1").getUncertainty(), EPSILON);
+        assertEquals(316.909, result.get("DDE2AA11 NNL3AA11 1").getUncertainty(), EPSILON);
+        assertEquals(155.689, result.get("FFR4AA11 DDE4AA11 1").getUncertainty(), EPSILON);
     }
 
     @Test

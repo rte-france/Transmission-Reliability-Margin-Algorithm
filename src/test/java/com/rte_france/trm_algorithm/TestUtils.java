@@ -74,7 +74,7 @@ public final class TestUtils {
 
     private static void addNetworkAction(Crac crac, Branch<?> branch, ActionType actionType) {
         crac.newNetworkAction().withId(String.format("Topological action with branch:\"%s\", actionType:%s", branch.getId(), actionType))
-            .newTopologicalAction().withNetworkElement(branch.getId()).withActionType(actionType).add()
+            .newTerminalsConnectionAction().withNetworkElement(branch.getId()).withActionType(actionType).add()
             .add();
     }
 
