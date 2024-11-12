@@ -88,6 +88,12 @@ For each PST on the market-based network, their tap is aligned with their corres
 A warning is issued when some PSTs do not have any corresponding PST on the other network.  
 Ratio tap PST and phase tap PST are aligned.
 
+#### Branch connection state aligner
+
+For each branch from the market-based network, the connection states of both terminals are aligned with the ones from 
+the reference network. The algorithm checks if both terminals (through the voltage level ids) are the same in both 
+networks (possibly mismatched).
+
 #### Dangling line aligner
 
 We want to align exchanges with countries that are not included in the reference network.  
