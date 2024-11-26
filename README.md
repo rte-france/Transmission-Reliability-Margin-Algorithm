@@ -14,7 +14,7 @@ This API allows for flexibility of usage and partition between algorithm and sen
 
 ## License
 
-This project is licensed under the Mozilla Public License 2.0 - see the [LICENSE.txt](LICENSE.txt) file for details.
+This project is licensed under the Mozilla Public License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
