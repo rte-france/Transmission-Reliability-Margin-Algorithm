@@ -1,4 +1,4 @@
-# Transfer Reliability Margin algorithm
+# Transmission Reliability Margin algorithm
 
 This project is an open-souce Java package to compute the Transfer Reliability Margin.
 
