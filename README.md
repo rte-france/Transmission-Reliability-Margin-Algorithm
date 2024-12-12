@@ -4,7 +4,7 @@ This project is an open-souce Java package to compute the Transmission Reliabili
 
 This project aims to be a translation in Java code of the [article 22 of the CACM regulation 2015/1222](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32015R1222#d1e2148-24-1).
 
-For more details about the algorithm, please refer to the [detailed documentation](doc/algorithm.md)
+For more details about the algorithm, please refer to the [detailed documentation](doc/algorithm.md).
 
 This project relies heavily on the [PowSybl environment](https://www.powsybl.org/index.html).
 
