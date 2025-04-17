@@ -7,18 +7,10 @@
  */
 package com.rte_france.trm_algorithm;
 
-import com.powsybl.iidm.network.Line;
-import com.powsybl.iidm.network.Network;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
+
 public record MappingResults(String lineFromMarketBasedNetwork, String lineFromReferenceNetwork, boolean mappingFound) {
 
 }

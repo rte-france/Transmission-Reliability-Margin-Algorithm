@@ -22,9 +22,9 @@ public class UcteMappingTest {
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Line line = networkMarketBased.getLine("BBE1AA1  BBE2AA1  1");
-        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased, line.getId());
+        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line.getId());
         String lineId = mappingResults.lineFromReferenceNetwork();
-        assertEquals("BBE1AA1  BBE2AA1  1",lineId);
+        assertEquals("BBE1AA1  BBE2AA1  1", lineId);
     }
 
     @Test
@@ -32,8 +32,8 @@ public class UcteMappingTest {
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Line line = networkMarketBased.getLine("BBE1AA1  BBE2AA1  1");
-        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased, line.getId());
+        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line.getId());
         String lineId = mappingResults.lineFromReferenceNetwork();
-        assertEquals("BBE1AA12 BBE2AA11 1",lineId);
+        assertEquals("BBE1AA12 BBE2AA11 1", lineId);
     }
 }

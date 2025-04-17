@@ -18,7 +18,7 @@ import java.util.List;
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
 
-public class UcteMapping {
+public final class UcteMapping {
     private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
 
     public static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, String marketBasedId) {
@@ -31,25 +31,23 @@ public class UcteMapping {
 
         List<Line> matchLine = new ArrayList<>();
         networkReference.getLines().forEach(line -> {
-            String IdLine = line.getId();
+            String idLine = line.getId();
 
-            if (getVoltageLevelSide1(IdLine).equals(voltageLevelSide1) && getVoltageLevelSide2(IdLine).equals(voltageLevelSide2) && getOrderCode(IdLine).equals(orderCode)){
+            if (getVoltageLevelSide1(idLine).equals(voltageLevelSide1) && getVoltageLevelSide2(idLine).equals(voltageLevelSide2) && getOrderCode(idLine).equals(orderCode)) {
                 matchLine.add(line);
             }
 
         });
         int nombreLines = matchLine.size();
 
-        if (nombreLines>1){
+        if (nombreLines > 1) {
             LOGGER.error("Several matching lines found for: {}", marketBasedId);
-        }
-        else if (nombreLines==0){
+        } else if (nombreLines == 0) {
             LOGGER.error("No matching line found for: {}", marketBasedId);
+        } else {
+            return new MappingResults(marketBasedId, matchLine.get(0).getId(), true);
         }
-        else {
-            return new MappingResults(marketBasedId,matchLine.get(0).getId(),true);
-        }
-        return new MappingResults(marketBasedId,"",false);
+        return new MappingResults(marketBasedId, "", false);
     }
 
     private static String getOrderCode(String id) {
@@ -63,4 +61,8 @@ public class UcteMapping {
     private static String getVoltageLevelSide1(String id) {
         return id.substring(0, 7);
     }
+
+    private UcteMapping() {
+    }
+
 }
