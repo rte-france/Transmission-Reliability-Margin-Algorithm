@@ -9,24 +9,21 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.loadflow.LoadFlowParameters;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
+
 public class UcteMappingTest {
     @Test
     void testMapIdenticalLine() {
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Line line = networkMarketBased.getLine("BBE1AA1  BBE2AA1  1");
-        String lineId=UcteMapping.mapNetworks(networkReference,networkMarketBased, line.getId());
+        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased, line.getId());
+        String lineId = mappingResults.lineFromReferenceNetwork();
         assertEquals("BBE1AA1  BBE2AA1  1",lineId);
     }
 
@@ -35,7 +32,8 @@ public class UcteMappingTest {
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Line line = networkMarketBased.getLine("BBE1AA1  BBE2AA1  1");
-        String lineId=UcteMapping.mapNetworks(networkReference,networkMarketBased, line.getId());
+        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased, line.getId());
+        String lineId = mappingResults.lineFromReferenceNetwork();
         assertEquals("BBE1AA12 BBE2AA11 1",lineId);
     }
 }

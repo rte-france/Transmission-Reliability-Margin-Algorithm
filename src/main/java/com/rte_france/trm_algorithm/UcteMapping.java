@@ -9,20 +9,19 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
+
 public class UcteMapping {
     private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
 
-    public static String mapNetworks(Network networkReference, Network networkMarketBased, String marketBasedId) {
+    public static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, String marketBasedId) {
 
         String id = networkMarketBased.getLine(marketBasedId).getId();
 
@@ -48,10 +47,9 @@ public class UcteMapping {
             LOGGER.error("No matching line found for: {}", marketBasedId);
         }
         else {
-            return matchLine.get(0).getId();
+            return new MappingResults(marketBasedId,matchLine.get(0).getId(),true);
         }
-
-        return "";
+        return new MappingResults(marketBasedId,"",false);
     }
 
     private static String getOrderCode(String id) {
