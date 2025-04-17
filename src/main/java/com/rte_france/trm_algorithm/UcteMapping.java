@@ -23,11 +23,9 @@ public final class UcteMapping {
 
     public static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, String marketBasedId) {
 
-        String id = networkMarketBased.getLine(marketBasedId).getId();
-
-        String voltageLevelSide1 = getVoltageLevelSide1(id);
-        String voltageLevelSide2 = getVoltageLevelSide2(id);
-        String orderCode = getOrderCode(id);
+        String voltageLevelSide1 = getVoltageLevelSide1(marketBasedId);
+        String voltageLevelSide2 = getVoltageLevelSide2(marketBasedId);
+        String orderCode = getOrderCode(marketBasedId);
 
         List<Line> matchLine = new ArrayList<>();
         networkReference.getLines().forEach(line -> {
