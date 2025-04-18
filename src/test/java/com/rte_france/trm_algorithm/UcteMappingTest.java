@@ -10,6 +10,10 @@ package com.rte_france.trm_algorithm;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -35,5 +39,19 @@ public class UcteMappingTest {
         MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line.getId());
         String lineId = mappingResults.lineFromReferenceNetwork();
         assertEquals("BBE1AA12 BBE2AA11 1", lineId);
+        System.out.println();
+    }
+
+    @Test
+    void testMultiLines() {
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        List<Line> lines = new ArrayList<>();
+        lines = networkMarketBased.getLineStream().map(line -> line).toList();
+        for (int i = 0; i<lines.size();i++){
+            MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, lines.get(i).getId());
+            String lineId = mappingResults.lineFromReferenceNetwork();
+            System.out.println(lines.get(i)+"    "+lineId);
+        }
     }
 }
