@@ -1,4 +1,4 @@
-# Transfert Reliability Margin (TRM) algorithm
+# Transmission Reliability Margin (TRM) algorithm
 
 This document describes the current state of the algorithm.
 
