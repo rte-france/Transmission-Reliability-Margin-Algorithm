@@ -44,14 +44,16 @@ public class UcteMappingTest {
 
     @Test
     void testMultiLines() {
-        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
-        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        //Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
+        //Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
         List<Line> lines = new ArrayList<>();
-        lines = networkMarketBased.getLineStream().map(line -> line).toList();
-        for (int i = 0; i<lines.size();i++){
-            MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, lines.get(i).getId());
+        lines = networkMarketBased.getLineStream().toList();
+        for (Line line : lines) {
+            MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line.getId());
             String lineId = mappingResults.lineFromReferenceNetwork();
-            System.out.println(lines.get(i)+"    "+lineId);
+            System.out.println(line + "  ||  " + lineId);
         }
     }
 }
