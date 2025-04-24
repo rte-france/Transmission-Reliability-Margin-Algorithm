@@ -7,6 +7,7 @@
  */
 package com.rte_france.trm_algorithm;
 
+import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UcteMappingTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
+
     @Test
     void testMapIdenticalLine() {
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
@@ -44,22 +46,34 @@ public class UcteMappingTest {
         MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line.getId());
         String lineId = mappingResults.lineFromReferenceNetwork();
         assertEquals("BBE1AA12 BBE2AA11 1", lineId);
-        System.out.println();
     }
 
     @Test
     void testMultiLines() {
+        // Given
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
-        List<Line> lines;
-        lines = networkMarketBased.getLineStream().toList();
-        Map<String,String> groupedCodLines = new HashMap<>();
-        for (Line line : lines) {
-            MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line.getId());
-            String lineId = mappingResults.lineFromReferenceNetwork();
-             assert mappingResults.mappingFound()==true;
-             groupedCodLines.put(lineId,line.getId());
-        }
+        List<String> lineIds = networkMarketBased.getLineStream().map(Identifiable::getId).toList();
+        // When
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, lineIds);
+        // Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("BBE1AA1  BBE2AA1  1", "BBE1AA12 BBE2AA11 1", true),
+                new MappingResults("BBE1AA1  BBE3AA1  1", "BBE1AA12 BBE3AA1  1", true),
+                new MappingResults("FFR1AA1  FFR2AA1  1", "FFR1AA1  FFR2AA1  1", true),
+                new MappingResults("FFR1AA1  FFR3AA1  1", "FFR1AA1  FFR3AA1  1", true),
+                new MappingResults("FFR2AA1  FFR3AA1  1", "FFR2AA1  FFR3AA1  1", true),
+                new MappingResults("DDE1AA1  DDE2AA1  1", "DDE1AA1  DDE2AA1  1", true),
+                new MappingResults("DDE1AA1  DDE3AA1  1", "DDE1AA1  DDE3AA1  1", true),
+                new MappingResults("DDE2AA1  DDE3AA1  1", "DDE2AA1  DDE3AA1  1", true),
+                new MappingResults("NNL1AA1  NNL2AA1  1", "NNL1AA1  NNL2AA1  1", true),
+                new MappingResults("NNL1AA1  NNL3AA1  1", "NNL1AA1  NNL3AA1  1", true),
+                new MappingResults("NNL2AA1  NNL3AA1  1", "NNL2AA1  NNL3AA1  1", true),
+                new MappingResults("FFR2AA1  DDE3AA1  1", "FFR2AA1  DDE3AA1  1", true),
+                new MappingResults("DDE2AA1  NNL3AA1  1", "DDE2AA1  NNL3AA1  1", true),
+                new MappingResults("NNL2AA1  BBE3AA1  1", "NNL2AA1  BBE3AA1  1", true),
+                new MappingResults("BBE2AA1  FFR3AA1  1", "BBE2AA11 FFR3AA1  1", true));
+        assertEquals(expectedMappingResults, mappingResults);
     }
 
     @Test
@@ -70,10 +84,10 @@ public class UcteMappingTest {
         networkMarketBased.getLines().forEach(line -> {
             linesId.add(line.getId());
         });
-        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased,linesId);
-        Map<String,String> groupedCodLines = new HashMap<>();
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, linesId);
+        Map<String, String> groupedCodLines = new HashMap<>();
         mappingResults.forEach(n -> {
-            groupedCodLines.put(n.lineFromMarketBasedNetwork(),n.lineFromReferenceNetwork());
+            groupedCodLines.put(n.lineFromMarketBasedNetwork(), n.lineFromReferenceNetwork());
         });
     }
 
