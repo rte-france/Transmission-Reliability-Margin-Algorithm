@@ -7,6 +7,7 @@
  */
 package com.rte_france.trm_algorithm;
 
+import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
@@ -49,43 +50,58 @@ public class UcteMappingTest {
 
     @Test
     void testMultiLines() {
+        // Given
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
-        List<Line> lines;
-        lines = networkMarketBased.getLineStream().toList();
-        Map<String,String> groupedCodLines = new HashMap<>();
-        for (Line line : lines) {
-            MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line.getId());
-            String lineId = mappingResults.lineFromReferenceNetwork();
-             assert mappingResults.mappingFound()==true;
-             groupedCodLines.put(lineId,line.getId());
-        }
+        List<String> lineIds = networkMarketBased.getLineStream().map(Identifiable::getId).toList();
+        // When
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, lineIds);
+        // Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("BBE1AA1  BBE2AA1  1", "BBE1AA12 BBE2AA11 1", true),
+                new MappingResults("BBE1AA1  BBE3AA1  1", "BBE1AA12 BBE3AA1  1", true),
+                new MappingResults("FFR1AA1  FFR2AA1  1", "FFR1AA1  FFR2AA1  1", true),
+                new MappingResults("FFR1AA1  FFR3AA1  1", "FFR1AA1  FFR3AA1  1", true),
+                new MappingResults("FFR2AA1  FFR3AA1  1", "FFR2AA1  FFR3AA1  1", true),
+                new MappingResults("DDE1AA1  DDE2AA1  1", "DDE1AA1  DDE2AA1  1", true),
+                new MappingResults("DDE1AA1  DDE3AA1  1", "DDE1AA1  DDE3AA1  1", true),
+                new MappingResults("DDE2AA1  DDE3AA1  1", "DDE2AA1  DDE3AA1  1", true),
+                new MappingResults("NNL1AA1  NNL2AA1  1", "NNL1AA1  NNL2AA1  1", true),
+                new MappingResults("NNL1AA1  NNL3AA1  1", "NNL1AA1  NNL3AA1  1", true),
+                new MappingResults("NNL2AA1  NNL3AA1  1", "NNL2AA1  NNL3AA1  1", true),
+                new MappingResults("FFR2AA1  DDE3AA1  1", "FFR2AA1  DDE3AA1  1", true),
+                new MappingResults("DDE2AA1  NNL3AA1  1", "DDE2AA1  NNL3AA1  1", true),
+                new MappingResults("NNL2AA1  BBE3AA1  1", "NNL2AA1  BBE3AA1  1", true),
+                new MappingResults("BBE2AA1  FFR3AA1  1", "BBE2AA11 FFR3AA1  1", true));
+        assertEquals(expectedMappingResults, mappingResults);
     }
 
     @Test
     void testMultiLinesList() {
+        //Given
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2.uct");
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewId.uct");
-        List<String> linesId = new ArrayList<>();
-        networkMarketBased.getLines().forEach(line -> {
-            linesId.add(line.getId());
-        });
-        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased,linesId);
-        Map<String,String> groupedCodLines = new HashMap<>();
-        mappingResults.forEach(n -> {
-            groupedCodLines.put(n.lineFromMarketBasedNetwork(),n.lineFromReferenceNetwork());
-        });
+        List<String> lineIds = networkMarketBased.getLineStream().map(Identifiable::getId).toList();
+        //When
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased,lineIds);
+        //Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("FFNHV111 FFNHV211 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV111 FFNHV211 2", "FFNHV111 FFNHV211 2", true),
+                new MappingResults("FFNHV211 FFNHV311 1", "FFNHV211 FFNHV311 1", true));
+        assertEquals(expectedMappingResults, mappingResults);
     }
 
     @Test
-    void testLineElementName() {
+    void testLineSwitchPosition() {
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2.uct");
-        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2.uct");
-        List<String> linesId = new ArrayList<>();
-        networkMarketBased.getLines().forEach(line -> {
-            linesId.add(line.getId());
-        });
-        String elementName = networkReference.getLine("FFNHV111 FFNHV211 1").getProperty("elementName");
-        System.out.println(elementName);
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewPosition.uct");
+        List<String> lineIds = networkMarketBased.getLineStream().map(Identifiable::getId).toList();
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased,lineIds);
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV111 FFNHV211 2", "FFNHV111 FFNHV211 2", true),
+                new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true));
+        assertEquals(expectedMappingResults, mappingResults);
     }
 }

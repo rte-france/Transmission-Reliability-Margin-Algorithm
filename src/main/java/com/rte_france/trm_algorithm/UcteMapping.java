@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
@@ -40,20 +41,36 @@ public final class UcteMapping {
             String voltageLevelSide1 = getVoltageLevelSide1(id);
             String voltageLevelSide2 = getVoltageLevelSide2(id);
             String orderCode = getOrderCode(id);
-            String elementName = networkMarketBased.getLine(id).getProperty("elementName");
-            String elementName1 = elementName.substring(0, 4);
-            String elementName2 = elementName.substring(8);
+            Optional<String> elementName = Optional.ofNullable(networkMarketBased.getLine(id).getProperty("elementName"));
+            String elementName1 = elementName.map(s -> s.substring(0, 4)).orElse("");
+            String elementName2 = elementName.map(s -> s.substring(8)).orElse("");
 
             List<Line> matchLine = networkReference.getLineStream()
                     .filter(n -> getVoltageLevelSide1(n.getId()).equals(voltageLevelSide1))
                     .filter(n -> getVoltageLevelSide2(n.getId()).equals(voltageLevelSide2))
                     .filter(n -> getOrderCode(n.getId()).equals(orderCode)).toList();
-            if (matchLine.isEmpty()) {
+            if (matchLine.isEmpty() && elementName.isPresent()) {
                 matchLine = networkReference.getLineStream()
                         .filter(n -> getVoltageLevelSide1(n.getId()).equals(voltageLevelSide1))
                         .filter(n -> getVoltageLevelSide2(n.getId()).equals(voltageLevelSide2))
                         .filter(n -> n.getProperty("elementName").substring(0, 4).equals(elementName1)
                                 && n.getProperty("elementName").substring(8).equals(elementName2)).toList();
+            }
+            if (matchLine.isEmpty()) {
+                matchLine = networkReference.getLineStream()
+                        .filter(n -> getVoltageLevelSide1(n.getId()).equals(voltageLevelSide2))
+                        .filter(n -> getVoltageLevelSide2(n.getId()).equals(voltageLevelSide1))
+                        .filter(n -> getOrderCode(n.getId()).equals(orderCode)).toList();
+                if (matchLine.isEmpty() && elementName.isPresent()) {
+                    matchLine = networkReference.getLineStream()
+                            .filter(n -> getVoltageLevelSide1(n.getId()).equals(voltageLevelSide2))
+                            .filter(n -> getVoltageLevelSide2(n.getId()).equals(voltageLevelSide1))
+                            .filter(n -> n.getProperty("elementName").substring(0, 4).equals(elementName1)
+                                    && n.getProperty("elementName").substring(8).equals(elementName2)).toList();
+                }
+                if (matchLine.size()==1){
+                    LOGGER.error("Line: {} is inverted", id);
+                }
             }
             return createMappingResults(id, matchLine);
         }
