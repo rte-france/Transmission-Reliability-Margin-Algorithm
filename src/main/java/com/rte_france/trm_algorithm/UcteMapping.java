@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
@@ -72,7 +73,11 @@ public final class UcteMapping {
                     LOGGER.error("Line: {} is inverted", id);
                 }
             }
-            return createMappingResults(id, matchLine);
+            if (matchLine.size()==1) {
+                networkReference.getLine(matchLine.get(0).getId()).remove();
+            }
+
+                    return createMappingResults(id, matchLine);
         }
         ).toList();
     }

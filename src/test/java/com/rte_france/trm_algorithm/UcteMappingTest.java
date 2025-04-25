@@ -94,14 +94,34 @@ public class UcteMappingTest {
 
     @Test
     void testLineSwitchPosition() {
+        //Given
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2.uct");
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewPosition.uct");
         List<String> lineIds = networkMarketBased.getLineStream().map(Identifiable::getId).toList();
+        //When
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased,lineIds);
+        //Then
         List<MappingResults> expectedMappingResults = List.of(
                 new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
                 new MappingResults("FFNHV111 FFNHV211 2", "FFNHV111 FFNHV211 2", true),
                 new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true));
+        assertEquals(expectedMappingResults, mappingResults);
+    }
+
+    @Test
+    void testWeirdCases() {
+        //Given
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewPosition.uct");
+        networkReference.getLine("FFNHV111 FFNHV211 2").remove();
+        networkMarketBased.getLine("FFNHV311 FFNHV211 1").remove();
+        //When
+        List<String> lineIds = networkMarketBased.getLineStream().map(Identifiable::getId).toList();
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference,networkMarketBased,lineIds);
+        //Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV111 FFNHV211 2", "", false));
         assertEquals(expectedMappingResults, mappingResults);
     }
 }
