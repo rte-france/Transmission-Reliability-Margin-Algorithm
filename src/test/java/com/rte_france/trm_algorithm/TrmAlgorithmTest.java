@@ -22,9 +22,10 @@ import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.CracFactory;
-import com.powsybl.openrao.data.cracapi.parameters.CracCreationParameters;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.CracFactory;
+import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
+import com.powsybl.openrao.data.crac.io.fbconstraint.parameters.FbConstraintCracCreationParameters;
 import com.powsybl.sensitivity.SensitivityVariableSet;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.*;
 import org.junit.jupiter.api.Test;
@@ -316,7 +317,11 @@ class TrmAlgorithmTest {
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12NodesHvdc.uct");
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
         String cracFilePath = "TestCase12Nodes/cbcora_ep10us2case1.xml";
-        Crac localCrac = Crac.read(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)), referenceNetwork, OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC), new CracCreationParameters());
+        CracCreationParameters cracCreationParameters = new CracCreationParameters();
+        FbConstraintCracCreationParameters fbConstraintCracCreationParameters = new FbConstraintCracCreationParameters();
+        fbConstraintCracCreationParameters.setTimestamp(OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC));
+        cracCreationParameters.addExtension(FbConstraintCracCreationParameters.class, fbConstraintCracCreationParameters);
+        Crac localCrac = Crac.read(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)), referenceNetwork, cracCreationParameters);
         localCrac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
         ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
         XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()

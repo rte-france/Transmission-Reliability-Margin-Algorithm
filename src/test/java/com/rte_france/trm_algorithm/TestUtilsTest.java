@@ -10,7 +10,7 @@ package com.rte_france.trm_algorithm;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.openrao.data.cracapi.Crac;
+import com.powsybl.openrao.data.crac.api.Crac;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerResult;
 import org.junit.jupiter.api.Test;

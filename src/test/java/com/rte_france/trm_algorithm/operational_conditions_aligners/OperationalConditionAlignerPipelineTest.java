@@ -16,8 +16,8 @@ import com.powsybl.glsk.commons.ZonalDataImpl;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.CracFactory;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.CracFactory;
 import com.rte_france.trm_algorithm.TestUtils;
 import org.junit.jupiter.api.Test;
 
