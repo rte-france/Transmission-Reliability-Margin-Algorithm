@@ -64,7 +64,10 @@ public class TrmAlgorithm {
         checkReferenceElementNotEmpty(referenceNetworkElementIds);
         checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
 
-        //MappingResults
+        //////
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(referenceNetwork,marketBasedNetwork);
+        UcteMapping.duplicateCheck(mappingResults);
+        /////
 
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
         Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, referenceNetworkElementIds);

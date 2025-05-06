@@ -362,4 +362,6 @@ class TrmAlgorithmTest {
         assertEquals(1260.669, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
         assertEquals(1260.669, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
     }
+
+
 }

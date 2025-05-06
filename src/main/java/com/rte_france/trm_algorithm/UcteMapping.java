@@ -49,6 +49,10 @@ public final class UcteMapping {
         } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH && optionalElementName.isPresent()) {
             return severalMatchResult("Several matching lines found for: {}", marketBasedLine);
         }
+        if (resultOrderCode.getStatus() ==UcteMatchingResult.MatchStatus.NOT_FOUND && optionalElementName.isEmpty()) {
+            LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
+            return new MappingResults(marketBasedLine.getId(), "", false);
+        }
         List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
         return createMappingResults(marketBasedLine.getId(), line1);
     }
