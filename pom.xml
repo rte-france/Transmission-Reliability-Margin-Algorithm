@@ -50,12 +50,13 @@
         <maven.jacoco.version>0.8.10</maven.jacoco.version>
         <powsybl.entsoe.version>2.11.0</powsybl.entsoe.version>
         <powsybl.openloadflow.version>1.13.2</powsybl.openloadflow.version>
-        <powsybl.rao.version>6.1.2</powsybl.rao.version>
+        <powsybl.rao.version>6.1.2-mod</powsybl.rao.version>
         <powsybl.version>6.5.1</powsybl.version>
         <slf4j.version>2.0.13</slf4j.version>
     </properties>
 
     <dependencies>
+
         <!-- Compile dependencies -->
         <dependency>
             <groupId>com.farao-community.farao</groupId>
@@ -69,6 +70,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>open-rao-crac-io-commons</artifactId>
+            <version>${powsybl.rao.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-commons</artifactId>
@@ -195,7 +204,7 @@
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-crac-io-commons</artifactId>
             <version>${powsybl.rao.version}</version>
-            <scope>test</scope>
+            <!--scope>test</scope-->
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
