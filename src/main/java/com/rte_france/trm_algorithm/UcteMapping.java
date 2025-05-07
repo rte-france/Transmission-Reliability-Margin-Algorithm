@@ -42,14 +42,17 @@ public final class UcteMapping {
         UcteMatchingResult resultOrderCode = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, orderCode);
 
         //Filter 2 : ElementName
-        if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND && optionalElementName.isPresent()) {
-            return notFoundResult(networkReference, marketBasedLine, analyser, voltageLevelSide1, voltageLevelSide2, elementName);
-        } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH && optionalElementName.isPresent()) {
-            return singleMatchResult(networkReference, marketBasedLine, analyser, voltageLevelSide1, voltageLevelSide2, elementName, resultOrderCode);
-        } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH && optionalElementName.isPresent()) {
-            return severalMatchResult("Several matching lines found for: {}", marketBasedLine);
+        if (optionalElementName.isPresent()) {
+            return switch (resultOrderCode.getStatus()) {
+                case NOT_FOUND ->
+                        notFoundResult(networkReference, marketBasedLine, analyser, voltageLevelSide1, voltageLevelSide2, elementName);
+                case SINGLE_MATCH ->
+                        singleMatchResult(networkReference, marketBasedLine, analyser, voltageLevelSide1, voltageLevelSide2, elementName, resultOrderCode);
+                case SEVERAL_MATCH -> severalMatchResult("Several matching lines found for: {}", marketBasedLine);
+            };
         }
-        if (resultOrderCode.getStatus() ==UcteMatchingResult.MatchStatus.NOT_FOUND && optionalElementName.isEmpty()) {
+
+        if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
             LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
             return new MappingResults(marketBasedLine.getId(), "", false);
         }
@@ -65,21 +68,23 @@ public final class UcteMapping {
     private static MappingResults singleMatchResult(Network networkReference, Line marketBasedLine, UcteNetworkAnalyzer analyser, String voltageLevelSide1, String voltageLevelSide2, String elementName, UcteMatchingResult resultOrderCode) {
         boolean match;
         UcteMatchingResult resultElementName = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, elementName);
-        if (resultElementName.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
-            match = true;
-            //networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()).remove();
-            return new MappingResults(marketBasedLine.getId(), resultOrderCode.getIidmIdentifiable().getId(), match);
-        } else if (resultElementName.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH) {
-            if (resultOrderCode.getIidmIdentifiable().getId().equals(resultElementName.getIidmIdentifiable().getId())) {
-                match = resultElementName.hasMatched();
-                //networkReference.getLine(resultElementName.getIidmIdentifiable().getId()).remove();
-                return new MappingResults(marketBasedLine.getId(), resultElementName.getIidmIdentifiable().getId(), match);
-            } else {
+        switch (resultElementName.getStatus()) {
+            case NOT_FOUND -> {
+                return new MappingResults(marketBasedLine.getId(), resultOrderCode.getIidmIdentifiable().getId(), true);
+            }
+            case SINGLE_MATCH -> {
+                if (resultOrderCode.getIidmIdentifiable().getId().equals(resultElementName.getIidmIdentifiable().getId())) {
+                    match = resultElementName.hasMatched();
+                    return new MappingResults(marketBasedLine.getId(), resultElementName.getIidmIdentifiable().getId(), match);
+                } else {
+                    return severalMatchResult("Different matching lines found for: {}", marketBasedLine);
+                }
+            }
+            case SEVERAL_MATCH -> {
                 return severalMatchResult("Different matching lines found for: {}", marketBasedLine);
             }
-        } else {
-            return severalMatchResult("Several matching lines found for: {}", marketBasedLine);
         }
+        return  null;
     }
 
     private static MappingResults notFoundResult(Network networkReference, Line marketBasedLine, UcteNetworkAnalyzer analyser, String voltageLevelSide1, String voltageLevelSide2, String elementName) {
@@ -87,16 +92,14 @@ public final class UcteMapping {
         UcteMatchingResult resultElementName = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, elementName);
         if (resultElementName.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH) {
             match = resultElementName.hasMatched();
-            //networkReference.getLine(resultElementName.getIidmIdentifiable().getId()).remove();
             return new MappingResults(marketBasedLine.getId(), resultElementName.getIidmIdentifiable().getId(), match);
         } else {
-            match = false;
             if (resultElementName.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
                 LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
             } else {
                 LOGGER.error("Several matching lines found for: {}", marketBasedLine.getId());
             }
-            return new MappingResults(marketBasedLine.getId(), "", match);
+            return new MappingResults(marketBasedLine.getId(), "", false);
         }
     }
 
@@ -125,10 +128,10 @@ public final class UcteMapping {
             String pairingKey = tieline.getDanglingLine1().getPairingKey();
             Stream<TieLine> listTieLinesReference = networkReference.getTieLineStream();
             List<TieLine> match = new java.util.ArrayList<>(List.of());
-            listTieLinesReference.forEach(tieline2 -> {
-                if (tieline2.getPairingKey().equals(pairingKey)) {
-                    match.add(tieline2);
-                    networkReference.getTieLine(tieline2.getId()).remove();
+            listTieLinesReference.forEach(elementTieLine -> {
+                if (elementTieLine.getPairingKey().equals(pairingKey)) {
+                    match.add(elementTieLine);
+                    networkReference.getTieLine(elementTieLine.getId()).remove();
                 }
             });
             int nombreTieLines = match.size();
@@ -152,7 +155,7 @@ public final class UcteMapping {
         }
         for (Map.Entry<String, List<MappingResults>> entry : grouped.entrySet()) {
             List<MappingResults> same = entry.getValue();
-            if (same.size() > 1) {
+            if (entry.getValue().size() > 1) {
                 LOGGER.error("Duplicates values found for: {}", entry.getKey());
             }
         }

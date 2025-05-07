@@ -363,5 +363,21 @@ class TrmAlgorithmTest {
         assertEquals(1260.669, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
     }
 
-
+    @Test
+    void testUcteMapping() {
+        Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        referenceNetwork.getLine("FFR2AA1  DDE3AA1  1").remove();
+        referenceNetwork.getLine("BBE2AA1  FFR3AA1  1").remove();
+        Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
+        marketBasedNetwork.getLine("NNL1AA1  NNL3AA1  1").disconnect();
+        ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), localMarketZonalScalable);
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
+        assertEquals(2, result.size());
+        assertEquals(1260.669, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(1260.669, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+    }
 }
