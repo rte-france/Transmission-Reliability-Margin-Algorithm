@@ -10,13 +10,13 @@ package com.rte_france.trm_algorithm;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.TieLine;
+import com.powsybl.openrao.data.crac.io.commons.ucte.UcteMatchingResult;
+import com.powsybl.openrao.data.crac.io.commons.ucte.UcteNetworkAnalyzer;
+import com.powsybl.openrao.data.crac.io.commons.ucte.UcteNetworkAnalyzerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.*;
 import java.util.stream.Stream;
-
-import com.powsybl.openrao.data.cracio.commons.ucte.*;
 
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
@@ -26,7 +26,7 @@ public final class UcteMapping {
     private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
 
     public static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, Line marketBasedLine) {
-
+        LOGGER.error("Hecho: {}", marketBasedLine.getId());
         String voltageLevelSide1 = getVoltageLevelSide1(marketBasedLine.getId());
         String voltageLevelSide2 = getVoltageLevelSide2(marketBasedLine.getId());
         String orderCode = getOrderCode(marketBasedLine.getId());
@@ -56,6 +56,12 @@ public final class UcteMapping {
             LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
             return new MappingResults(marketBasedLine.getId(), "", false);
         }
+        if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH) {
+            LOGGER.error("Several matching line found for: {}", marketBasedLine.getId());
+            return new MappingResults(marketBasedLine.getId(), "", false);
+        }
+
+        //LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
         List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
         return createMappingResults(marketBasedLine.getId(), line1);
     }
@@ -105,9 +111,7 @@ public final class UcteMapping {
 
     public static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
         List <Line> marketBasedLine = networkMarketBased.getLineStream().toList();
-        return marketBasedLine.stream().map(line -> {
-            return mapNetworks(networkReference, networkMarketBased, line);
-        }).toList();
+        return marketBasedLine.stream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
     }
 
     private static MappingResults createMappingResults(String id, List<Line> matchLine) {
@@ -154,7 +158,6 @@ public final class UcteMapping {
                     .add(results);
         }
         for (Map.Entry<String, List<MappingResults>> entry : grouped.entrySet()) {
-            List<MappingResults> same = entry.getValue();
             if (entry.getValue().size() > 1) {
                 LOGGER.error("Duplicates values found for: {}", entry.getKey());
             }

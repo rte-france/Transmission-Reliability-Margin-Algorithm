@@ -50,7 +50,7 @@
         <maven.jacoco.version>0.8.10</maven.jacoco.version>
         <powsybl.entsoe.version>2.11.0</powsybl.entsoe.version>
         <powsybl.openloadflow.version>1.13.2</powsybl.openloadflow.version>
-        <powsybl.rao.version>6.1.2-mod</powsybl.rao.version>
+        <powsybl.rao.version>6.5.0-SNAPSHOT</powsybl.rao.version>
         <powsybl.version>6.5.1</powsybl.version>
         <slf4j.version>2.0.13</slf4j.version>
     </properties>

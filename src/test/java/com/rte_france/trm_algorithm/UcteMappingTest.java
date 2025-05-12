@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -150,11 +151,22 @@ public class UcteMappingTest {
         //Given
         Network networkReference = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE.uct");
         Network networkMarketBased = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE_NewId.uct");
+
         //Wheb
         List <MappingResults> mappingResults = UcteMapping.tieLines(networkReference, networkMarketBased);
         //Then
         List<MappingResults> expectedMappingResults = List.of(
                 new MappingResults("BLOAD 11 X     11 1 + X     11 DLOAD 11 1", "BLOAD 11 X     11 1 + X     11 DLOAD 11 1", true));
         assertEquals(expectedMappingResults, mappingResults);
+    }
+
+    @Test
+    void testRealNetwork() throws IOException {
+        //Given
+        Network networkReference = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0130_SN7_UX0.uct");
+        Network networkMarketBased = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0130_FO7_UX1.uct");
+        //Wheb
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        List.of();
     }
 }

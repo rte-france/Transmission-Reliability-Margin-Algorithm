@@ -65,7 +65,7 @@ public class TrmAlgorithm {
         checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
 
         //////
-        List<MappingResults> mappingResults = UcteMapping.mapNetworks(referenceNetwork,marketBasedNetwork);
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(referenceNetwork, marketBasedNetwork);
         UcteMapping.duplicateCheck(mappingResults);
         /////
 
