@@ -26,7 +26,6 @@ public final class UcteMapping {
     private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
 
     public static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, Line marketBasedLine) {
-        LOGGER.error("Hecho: {}", marketBasedLine.getId());
         String voltageLevelSide1 = getVoltageLevelSide1(marketBasedLine.getId());
         String voltageLevelSide2 = getVoltageLevelSide2(marketBasedLine.getId());
         String orderCode = getOrderCode(marketBasedLine.getId());
@@ -55,15 +54,21 @@ public final class UcteMapping {
         if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
             LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
             return new MappingResults(marketBasedLine.getId(), "", false);
-        }
-        if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH) {
+        } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH) {
             LOGGER.error("Several matching line found for: {}", marketBasedLine.getId());
             return new MappingResults(marketBasedLine.getId(), "", false);
+        } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH) {
+            //Not detected problem
+            if (networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()) == null) {
+                LOGGER.error("Line with ID {} was not detected as a valid line.", marketBasedLine.getId());
+                return new MappingResults(marketBasedLine.getId(), "", false);
+            } else {
+                List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
+                return createMappingResults(marketBasedLine.getId(), line1);
+            }
         }
-
-        //LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
-        List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
-        return createMappingResults(marketBasedLine.getId(), line1);
+        LOGGER.error("Several matching line found for: {}", marketBasedLine.getId());
+        return new MappingResults(marketBasedLine.getId(), "", false);
     }
 
     private static MappingResults severalMatchResult(String s, Line marketBasedLine) {
@@ -135,7 +140,6 @@ public final class UcteMapping {
             listTieLinesReference.forEach(elementTieLine -> {
                 if (elementTieLine.getPairingKey().equals(pairingKey)) {
                     match.add(elementTieLine);
-                    networkReference.getTieLine(elementTieLine.getId()).remove();
                 }
             });
             int nombreTieLines = match.size();

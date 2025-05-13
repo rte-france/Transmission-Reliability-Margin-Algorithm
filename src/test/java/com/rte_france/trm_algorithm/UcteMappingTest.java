@@ -165,8 +165,7 @@ public class UcteMappingTest {
         //Given
         Network networkReference = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0130_SN7_UX0.uct");
         Network networkMarketBased = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0130_FO7_UX1.uct");
-        //Wheb
+        //When
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
-        List.of();
     }
 }
