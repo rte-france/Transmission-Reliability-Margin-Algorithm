@@ -167,8 +167,6 @@ public class UcteMappingTest {
         Network networkReference = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0230_SN7_UX0.uct");
         Network networkMarketBased = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0230_FO7_UX1.uct");
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
-        //List<MappingResults> tielineResults = UcteMapping.tieLines(networkReference,networkMarketBased);
-        //mappingResults.stream().filter(MappingResults::mappingFound).count()
-        //tielineResults.stream().filter(MappingResults::mappingFound).count()
+        List<MappingResults> tielineResults = UcteMapping.tieLines(networkReference,networkMarketBased);
     }
 }

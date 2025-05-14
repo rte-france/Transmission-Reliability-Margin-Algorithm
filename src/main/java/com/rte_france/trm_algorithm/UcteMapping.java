@@ -48,28 +48,20 @@ public final class UcteMapping {
                         singleMatchResult(networkReference, marketBasedLine, analyser, voltageLevelSide1, voltageLevelSide2, elementName, resultOrderCode);
                 case SEVERAL_MATCH -> severalMatchResult("Several matching lines found for: {}", marketBasedLine);
             };
-        }
-
-        if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
-            LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
-            return new MappingResults(marketBasedLine.getId(), "", false);
-        } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH) {
-            LOGGER.error("Several matching line found for: {}", marketBasedLine.getId());
-            return new MappingResults(marketBasedLine.getId(), "", false);
-        } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH) {
-            //Not detected problem
-            if (networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()) == null) {
-                LOGGER.error("Line with ID {} was not detected as a valid line.", marketBasedLine.getId());
+        } else {
+            if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
+                LOGGER.error("No matching line found for: {}", marketBasedLine.getId());
                 return new MappingResults(marketBasedLine.getId(), "", false);
-            } else {
+            } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH) {
+                LOGGER.error("Several matching line found for: {}", marketBasedLine.getId());
+                return new MappingResults(marketBasedLine.getId(), "", false);
+            } else if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH) {
                 List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
                 return createMappingResults(marketBasedLine.getId(), line1);
+            } else {
+                LOGGER.error("Data error: {}", marketBasedLine.getId());
+                return new MappingResults(marketBasedLine.getId(), "", false);
             }
-            //List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
-            //return createMappingResults(marketBasedLine.getId(), line1);
-        } else {
-            LOGGER.error("Data error: {}", marketBasedLine.getId());
-            return new MappingResults(marketBasedLine.getId(), "", false);
         }
     }
 
@@ -119,7 +111,8 @@ public final class UcteMapping {
     public static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
         //List <Line> marketBasedLine = networkMarketBased.getLineStream().toList();
         List <Line> marketBasedLine = networkMarketBased.getLineStream()
-                .filter(item -> Stream.of(Country.IT.toString(),Country.FR.toString(),Country.SI.toString(),Country.CH.toString(),Country.AT.toString()).anyMatch(item.getTerminal1().getVoltageLevel().getSubstation().get().getCountry().get().toString()::contains)).toList();
+                .filter(item -> Set.of(Country.IT,Country.FR,Country.SI,Country.CH,Country.AT).contains(item.getTerminal1().getVoltageLevel().getSubstation().get().getCountry().get()))
+                .filter(item -> !item.isFictitious()).toList();
         return marketBasedLine.stream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
     }
 
