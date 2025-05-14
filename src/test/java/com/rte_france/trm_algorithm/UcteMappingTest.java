@@ -1,0 +1,172 @@
+/*
+ * Copyright (c) 2024, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * SPDX-License-Identifier: MPL-2.0
+ */
+package com.rte_france.trm_algorithm;
+
+import com.powsybl.iidm.network.Line;
+import com.powsybl.iidm.network.Network;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
+ */
+
+public class UcteMappingTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
+
+    @Test
+    void testMapIdenticalLine() {
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        Line line = networkMarketBased.getLine("BBE1AA1  BBE2AA1  1");
+        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line);
+        String lineId = mappingResults.lineFromReferenceNetwork();
+        assertEquals("BBE1AA1  BBE2AA1  1", lineId);
+    }
+
+    @Test
+    void testMapExistingLine() {
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        Line line = networkMarketBased.getLine("BBE1AA1  BBE2AA1  1");
+        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line);
+        String lineId = mappingResults.lineFromReferenceNetwork();
+        assertEquals("BBE1AA12 BBE2AA11 1", lineId);
+        System.out.println();
+    }
+
+    @Test
+    void testMultiLines() {
+        // Given
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        // When
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        // Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("BBE1AA1  BBE2AA1  1", "BBE1AA12 BBE2AA11 1", true),
+                new MappingResults("BBE1AA1  BBE3AA1  1", "BBE1AA12 BBE3AA1  1", true),
+                new MappingResults("FFR1AA1  FFR2AA1  1", "FFR1AA1  FFR2AA1  1", true),
+                new MappingResults("FFR1AA1  FFR3AA1  1", "FFR1AA1  FFR3AA1  1", true),
+                new MappingResults("FFR2AA1  FFR3AA1  1", "FFR2AA1  FFR3AA1  1", true),
+                new MappingResults("DDE1AA1  DDE2AA1  1", "DDE1AA1  DDE2AA1  1", true),
+                new MappingResults("DDE1AA1  DDE3AA1  1", "DDE1AA1  DDE3AA1  1", true),
+                new MappingResults("DDE2AA1  DDE3AA1  1", "DDE2AA1  DDE3AA1  1", true),
+                new MappingResults("NNL1AA1  NNL2AA1  1", "NNL1AA1  NNL2AA1  1", true),
+                new MappingResults("NNL1AA1  NNL3AA1  1", "NNL1AA1  NNL3AA1  1", true),
+                new MappingResults("NNL2AA1  NNL3AA1  1", "NNL2AA1  NNL3AA1  1", true),
+                new MappingResults("FFR2AA1  DDE3AA1  1", "FFR2AA1  DDE3AA1  1", true),
+                new MappingResults("DDE2AA1  NNL3AA1  1", "DDE2AA1  NNL3AA1  1", true),
+                new MappingResults("NNL2AA1  BBE3AA1  1", "NNL2AA1  BBE3AA1  1", true),
+                new MappingResults("BBE2AA1  FFR3AA1  1", "BBE2AA11 FFR3AA1  1", true));
+        assertEquals(expectedMappingResults, mappingResults);
+    }
+
+    @Test
+    void testMultiLinesList() {
+        //Given
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewId.uct");
+        //When
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        //Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("FFNHV111 FFNHV211 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV111 FFNHV211 2", "FFNHV111 FFNHV211 2", true),
+                new MappingResults("FFNHV211 FFNHV311 1", "FFNHV211 FFNHV311 1", true));
+        assertEquals(expectedMappingResults, mappingResults);
+    }
+
+    @Test
+    void testLineSwitchPosition() {
+        //Given
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewPosition.uct");
+        //When
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        //Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV111 FFNHV211 2", "FFNHV111 FFNHV211 2", true),
+                new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true));
+        assertEquals(expectedMappingResults, mappingResults);
+    }
+
+    @Test
+    void testRemoveLines() {
+        //Given
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewPosition.uct");
+        networkReference.getLine("FFNHV111 FFNHV211 2").remove();
+        networkMarketBased.getLine("FFNHV311 FFNHV211 1").remove();
+        //When
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        //Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV111 FFNHV211 2", "", false));
+        assertEquals(expectedMappingResults, mappingResults);
+    }
+
+    @Test
+    void testIdenticalOrderCodeDifferentElementName1Line() {
+        //Given
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_ChangesOrderElementName.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewId.uct");
+        Line line = networkMarketBased.getLine("FFNHV111 FFNHV211 2");
+        //When
+        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line);
+        assertEquals("FFNHV111 FFNHV211 1", mappingResults.lineFromReferenceNetwork());
+    }
+
+    @Test
+    void testDuplicateValues() {
+        //Given
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_Repetitive.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewDuplicate.uct");
+        //When
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        //Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV111 FFNHV211 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true));
+        assertEquals(expectedMappingResults, mappingResults);
+        UcteMapping.duplicateCheck(mappingResults);
+    }
+
+    @Test
+    void testInterconnection() {
+        //Given
+        Network networkReference = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE.uct");
+        Network networkMarketBased = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE_NewId.uct");
+
+        //Wheb
+        List <MappingResults> mappingResults = UcteMapping.tieLines(networkReference, networkMarketBased);
+        //Then
+        List<MappingResults> expectedMappingResults = List.of(
+                new MappingResults("BLOAD 11 X     11 1 + X     11 DLOAD 11 1", "BLOAD 11 X     11 1 + X     11 DLOAD 11 1", true));
+        assertEquals(expectedMappingResults, mappingResults);
+    }
+
+    @Test
+    void testRealNetwork() {
+        //Given
+        Network networkReference = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0230_SN7_UX0.uct");
+        Network networkMarketBased = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0230_FO7_UX1.uct");
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        List<MappingResults> tielineResults = UcteMapping.tieLines(networkReference,networkMarketBased);
+    }
+}

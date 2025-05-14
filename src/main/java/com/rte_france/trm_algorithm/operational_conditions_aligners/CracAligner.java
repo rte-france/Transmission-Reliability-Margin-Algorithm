@@ -8,9 +8,8 @@
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
 import com.powsybl.iidm.network.Network;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.Identifiable;
-import com.powsybl.openrao.data.cracapi.networkaction.NetworkAction;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.networkaction.NetworkAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public class CracAligner implements OperationalConditionAligner {
         LOGGER.info("Aligning CRAC network actions");
         cracAlignementResult = crac.getNetworkActions().stream()
             .collect(Collectors.toMap(
-                Identifiable::getId,
+                NetworkAction::getId,
                 networkAction -> applyNetworkActions(referenceNetwork, marketBasedNetwork, networkAction)
             ));
     }

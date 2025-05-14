@@ -8,10 +8,11 @@
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
 import com.powsybl.iidm.network.Network;
-import com.powsybl.openrao.data.cracapi.Crac;
-import com.powsybl.openrao.data.cracapi.CracFactory;
-import com.powsybl.openrao.data.cracapi.networkaction.ActionType;
-import com.powsybl.openrao.data.cracapi.parameters.CracCreationParameters;
+import com.powsybl.openrao.data.crac.api.Crac;
+import com.powsybl.openrao.data.crac.api.CracFactory;
+import com.powsybl.openrao.data.crac.api.networkaction.ActionType;
+import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
+import com.powsybl.openrao.data.crac.io.fbconstraint.parameters.FbConstraintCracCreationParameters;
 import com.rte_france.trm_algorithm.TestUtils;
 import org.junit.jupiter.api.Test;
 
@@ -80,7 +81,10 @@ class CracAlignerTest {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12NodesHvdc.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12NodesHvdc.uct");
         String cracFilePath = "../TestCase12Nodes/cbcora_ep10us2case1.xml";
-        Crac crac = Crac.read(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)), referenceNetwork, OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC), new CracCreationParameters());
+        CracCreationParameters parameters = new CracCreationParameters();
+        parameters.addExtension(FbConstraintCracCreationParameters.class, new FbConstraintCracCreationParameters());
+        parameters.getExtension(FbConstraintCracCreationParameters.class).setTimestamp(OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC));
+        Crac crac = Crac.read(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)), referenceNetwork, parameters);
         crac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
 
         CracAligner cracAligner = new CracAligner(crac);
