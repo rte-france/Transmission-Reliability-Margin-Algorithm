@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -163,9 +164,12 @@ public class UcteMappingTest {
     @Test
     void testRealNetwork() throws IOException {
         //Given
-        Network networkReference = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0130_SN7_UX0.uct");
-        Network networkMarketBased = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0130_FO7_UX1.uct");
-        //When
+        Network networkReference = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0230_SN7_UX0.uct");
+        Network networkMarketBased = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0230_FO7_UX1.uct");
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        //List<MappingResults> tielineResults = UcteMapping.tieLines(networkReference,networkMarketBased);
+        //mappingResults.stream().filter(MappingResults::mappingFound).count()
+        //tielineResults.stream().filter(MappingResults::mappingFound).count()
+        List.of();
     }
 }

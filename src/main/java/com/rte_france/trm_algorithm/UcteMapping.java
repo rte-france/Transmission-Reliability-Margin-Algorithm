@@ -66,9 +66,10 @@ public final class UcteMapping {
                 List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
                 return createMappingResults(marketBasedLine.getId(), line1);
             }
+        } else {
+            LOGGER.error("Data error: {}", marketBasedLine.getId());
+            return new MappingResults(marketBasedLine.getId(), "", false);
         }
-        LOGGER.error("Several matching line found for: {}", marketBasedLine.getId());
-        return new MappingResults(marketBasedLine.getId(), "", false);
     }
 
     private static MappingResults severalMatchResult(String s, Line marketBasedLine) {
@@ -92,7 +93,7 @@ public final class UcteMapping {
                 }
             }
             case SEVERAL_MATCH -> {
-                return severalMatchResult("Different matching lines found for: {}", marketBasedLine);
+                return severalMatchResult("Several matching lines found for: {}", marketBasedLine);
             }
         }
         return  null;
@@ -115,7 +116,8 @@ public final class UcteMapping {
     }
 
     public static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
-        List <Line> marketBasedLine = networkMarketBased.getLineStream().toList();
+        //List <Line> marketBasedLine = networkMarketBased.getLineStream().toList();
+        List <Line> marketBasedLine = networkMarketBased.getLineStream().filter(item -> Stream.of("IT","FR","SI","CH","AT").anyMatch(item.getId()::contains)).toList();
         return marketBasedLine.stream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
     }
 
