@@ -7,15 +7,14 @@
  */
 package com.rte_france.trm_algorithm;
 
-import com.powsybl.iidm.network.Line;
-import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.TieLine;
+import com.powsybl.iidm.network.*;
 import com.powsybl.openrao.data.crac.io.commons.ucte.UcteMatchingResult;
 import com.powsybl.openrao.data.crac.io.commons.ucte.UcteNetworkAnalyzer;
 import com.powsybl.openrao.data.crac.io.commons.ucte.UcteNetworkAnalyzerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -66,6 +65,8 @@ public final class UcteMapping {
                 List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
                 return createMappingResults(marketBasedLine.getId(), line1);
             }
+            //List<Line> line1 = List.of(networkReference.getLine(resultOrderCode.getIidmIdentifiable().getId()));
+            //return createMappingResults(marketBasedLine.getId(), line1);
         } else {
             LOGGER.error("Data error: {}", marketBasedLine.getId());
             return new MappingResults(marketBasedLine.getId(), "", false);
@@ -117,7 +118,8 @@ public final class UcteMapping {
 
     public static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
         //List <Line> marketBasedLine = networkMarketBased.getLineStream().toList();
-        List <Line> marketBasedLine = networkMarketBased.getLineStream().filter(item -> Stream.of("IT","FR","SI","CH","AT").anyMatch(item.getId()::contains)).toList();
+        List <Line> marketBasedLine = networkMarketBased.getLineStream()
+                .filter(item -> Stream.of(Country.IT.toString(),Country.FR.toString(),Country.SI.toString(),Country.CH.toString(),Country.AT.toString()).anyMatch(item.getTerminal1().getVoltageLevel().getSubstation().get().getCountry().get().toString()::contains)).toList();
         return marketBasedLine.stream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
     }
 
