@@ -63,7 +63,8 @@
         <Name v="CH"/>
         <TimeInterval v="2023-07-17T20:00Z/2023-07-17T21:00Z"/>
         <PropGSKBlock>
-	    <MaximumShift v="100"/>
+            <Order>1</Order>
+	        <MaximumShift v="100"/>
             <Node>
                 <Name v="DGENE111"/>
             </Node>
@@ -72,12 +73,12 @@
             <Node>
                 <Name v="SGENE111"/>
                 <Pmin v="0.00"/>
-                <Pmax v="300.0"/>
+                <Pmax v="-300.0"/>
             </Node>
             <Node>
                 <Name v="SGENE211"/>
                 <Pmin v="0.00"/>
-                <Pmax v="500.0"/>
+                <Pmax v="-500.0"/>
             </Node>
         </ReserveGSKBlock>
     </TimeSeries>
@@ -90,7 +91,7 @@
         <ManualGSKBlock>
             <Factor v="1"/>
             <Node>
-                <Name v="0GENE111"/>
+                <Name v="OGENE111"/>
                 <Factor v="1.0"/>
             </Node>
         </ManualGSKBlock>
@@ -139,16 +140,16 @@
             <Down>
                 <Factor v="1"/>
                 <Node>
-                    <Name v="IGENE311"/>
-                    <Pmax v="-100.00"/>
+                    <Name v="IGENE111"/>
+                    <Pmin v="-100.0"/>
                 </Node>
                 <Node>
                     <Name v="IGENE211"/>
-                    <Pmax v="-100.00"/>
+                    <Pmin v="-100.00"/>
                 </Node>
                 <Node>
-                    <Name v="IGENE111"/>
-                    <Pmax v="-100.0"/>
+                    <Name v="IGENE311"/>
+                    <Pmin v="-100.00"/>
                 </Node>
             </Down>
         </MeritOrderGSKBlock>
