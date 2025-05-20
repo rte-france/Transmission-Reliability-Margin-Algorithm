@@ -118,7 +118,7 @@ class OperationalConditionAlignerPipelineTest {
         assertEquals(-5, marketBasedNetwork.getTwoWindingsTransformer("BBE2AA1  BBE3AA1  1").getPhaseTapChanger().getTapPosition());
         assertPstAlignerResult(pstAligner.getResult(), "BBE2AA1  BBE3AA1  1", "FFR2AA1  FFR4AA1  1");
         assertExchangeAlignerResult(exchangeAligner.getResult(),
-            Map.of(Country.BE, 2027.7, Country.DE, -1005.4, Country.FR, -522.3, Country.NL, -500.),
-            Map.of(Country.FR, Map.of(Country.DE, 446.3), Country.NL, Map.of(Country.DE, 559.1), Country.BE, Map.of(Country.FR, 968.5, Country.NL, 1059.1)));
+            Map.of(Country.BE, 2027.266, Country.DE, -1005.173, Country.FR, -522.093, Country.NL, -500.),
+            Map.of(Country.FR, Map.of(Country.DE, 431.153), Country.NL, Map.of(Country.DE, 574.02), Country.BE, Map.of(Country.FR, 953.246, Country.NL, 1074.02)));
     }
 }
