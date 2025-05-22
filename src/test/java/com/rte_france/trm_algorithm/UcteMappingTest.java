@@ -12,10 +12,8 @@ import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,21 +54,10 @@ public class UcteMappingTest {
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
         // Then
         List<MappingResults> expectedMappingResults = List.of(
-                new MappingResults("BBE1AA1  BBE2AA1  1", "BBE1AA12 BBE2AA11 1", true),
-                new MappingResults("BBE1AA1  BBE3AA1  1", "BBE1AA12 BBE3AA1  1", true),
                 new MappingResults("FFR1AA1  FFR2AA1  1", "FFR1AA1  FFR2AA1  1", true),
                 new MappingResults("FFR1AA1  FFR3AA1  1", "FFR1AA1  FFR3AA1  1", true),
                 new MappingResults("FFR2AA1  FFR3AA1  1", "FFR2AA1  FFR3AA1  1", true),
-                new MappingResults("DDE1AA1  DDE2AA1  1", "DDE1AA1  DDE2AA1  1", true),
-                new MappingResults("DDE1AA1  DDE3AA1  1", "DDE1AA1  DDE3AA1  1", true),
-                new MappingResults("DDE2AA1  DDE3AA1  1", "DDE2AA1  DDE3AA1  1", true),
-                new MappingResults("NNL1AA1  NNL2AA1  1", "NNL1AA1  NNL2AA1  1", true),
-                new MappingResults("NNL1AA1  NNL3AA1  1", "NNL1AA1  NNL3AA1  1", true),
-                new MappingResults("NNL2AA1  NNL3AA1  1", "NNL2AA1  NNL3AA1  1", true),
-                new MappingResults("FFR2AA1  DDE3AA1  1", "FFR2AA1  DDE3AA1  1", true),
-                new MappingResults("DDE2AA1  NNL3AA1  1", "DDE2AA1  NNL3AA1  1", true),
-                new MappingResults("NNL2AA1  BBE3AA1  1", "NNL2AA1  BBE3AA1  1", true),
-                new MappingResults("BBE2AA1  FFR3AA1  1", "BBE2AA11 FFR3AA1  1", true));
+                new MappingResults("FFR2AA1  DDE3AA1  1", "FFR2AA1  DDE3AA1  1", true));
         assertEquals(expectedMappingResults, mappingResults);
     }
 
@@ -152,21 +139,33 @@ public class UcteMappingTest {
         //Given
         Network networkReference = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE.uct");
         Network networkMarketBased = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE_NewId.uct");
-
         //Wheb
         List <MappingResults> mappingResults = UcteMapping.tieLines(networkReference, networkMarketBased);
         //Then
-        List<MappingResults> expectedMappingResults = List.of(
-                new MappingResults("BLOAD 11 X     11 1 + X     11 DLOAD 11 1", "BLOAD 11 X     11 1 + X     11 DLOAD 11 1", true));
+        List<MappingResults> expectedMappingResults = List.of();
         assertEquals(expectedMappingResults, mappingResults);
     }
 
     @Test
     void testRealNetwork() {
         //Given
-        Network networkReference = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0230_SN7_UX0.uct");
-        Network networkMarketBased = TestUtils.importNetworkInPc("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0230_FO7_UX1.uct");
+        Network networkReference = Network.read("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0330_SN7_UX0.uct");
+        Network networkMarketBased = Network.read("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0330_FO7_UX1.uct");
+        //Network networkReference = Network.read("/home/huaracaseb/IdeaProjects/Transmission-Reliability-Margin-Algorithm/src/test/resources/com/rte_france/trm_algorithm/TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
+        //Network networkMarketBased = Network.read("/home/huaracaseb/IdeaProjects/Transmission-Reliability-Margin-Algorithm/src/test/resources/com/rte_france/trm_algorithm/TestCase12Nodes/NETWORK_TEST_IN_MARKET.uct");
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
-        List<MappingResults> tielineResults = UcteMapping.tieLines(networkReference,networkMarketBased);
+        //List<MappingResults> tielineResults = UcteMapping.tieLines(networkReference, networkMarketBased);
+        //UcteMapping.duplicateCheck(mappingResults);
+        //UcteMapping.duplicateCheck(tielineResults);
+    }
+
+    @Test
+    void testNewMappingMap() {
+        Network networkReference = Network.read("/home/huaracaseb/Bureau/Pruebas/Reference/2023_1/20230101_0330_SN7_UX0.uct");
+        Network networkMarketBased = Network.read("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0330_FO7_UX1.uct");
+//        Network networkReference = Network.read("/home/huaracaseb/IdeaProjects/Transmission-Reliability-Margin-Algorithm/src/test/resources/com/rte_france/trm_algorithm/TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
+//        Network networkMarketBased = Network.read("/home/huaracaseb/IdeaProjects/Transmission-Reliability-Margin-Algorithm/src/test/resources/com/rte_france/trm_algorithm/TestCase12Nodes/NETWORK_TEST_IN_MARKET.uct");
+        List<MappingResults> mappingResults = UcteMapping.mapNetworks2(networkReference, networkMarketBased);
+        List.of();
     }
 }

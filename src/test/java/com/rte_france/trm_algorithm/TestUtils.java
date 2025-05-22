@@ -20,9 +20,6 @@ import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.EmptyNetPosition;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPositionInterface;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.NetPositionInterface;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
@@ -61,15 +58,6 @@ public final class TestUtils {
     public static Network importNetwork(String networkResourcePath) {
         String networkName = Paths.get(networkResourcePath).getFileName().toString();
         return Network.read(networkName, TestUtils.class.getResourceAsStream(networkResourcePath));
-    }
-
-    public static Network importNetworkInPc(String networkResourcePath) {
-        String networkName = Paths.get(networkResourcePath).getFileName().toString();
-        try (InputStream inputStream = new FileInputStream(networkResourcePath)) {
-            return Network.read(networkName, inputStream);
-        } catch (IOException except) {
-            return null;
-        }
     }
 
     public static Crac getIdealTopologicalAlignerCrac(Network network) {

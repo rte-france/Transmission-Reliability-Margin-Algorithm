@@ -66,6 +66,7 @@ public class TrmAlgorithm {
 
         //////
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(referenceNetwork, marketBasedNetwork);
+
         UcteMapping.duplicateCheck(mappingResults);
         /////
 

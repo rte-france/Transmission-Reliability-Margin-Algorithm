@@ -17,12 +17,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.stream;
+
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
 
 public final class UcteMapping {
     private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
+
+    public static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
+        List <Line> marketBasedLine = networkMarketBased.getLineStream()
+                .filter(item -> Set.of(Country.IT, Country.FR, Country.SI, Country.CH, Country.AT).contains(item.getTerminal1().getVoltageLevel().getSubstation().get().getCountry().get()))
+                .filter(item -> !item.isFictitious()).toList();
+        return marketBasedLine.stream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
+    }
 
     public static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, Line marketBasedLine) {
         String voltageLevelSide1 = getVoltageLevelSide1(marketBasedLine.getId());
@@ -35,10 +44,16 @@ public final class UcteMapping {
             elementName = optionalElementName.get();
         }
 
+        Map<UcteMatchingResult.MatchStatus,String> dictionaryOrderCode = new HashMap<UcteMatchingResult.MatchStatus,String>();
+        dictionaryOrderCode.put(UcteMatchingResult.MatchStatus.NOT_FOUND,"");
+        dictionaryOrderCode.put(UcteMatchingResult.MatchStatus.SINGLE_MATCH,networkReference.getId());
+        dictionaryOrderCode.put(UcteMatchingResult.MatchStatus.SEVERAL_MATCH,"SEVERAL_MATCH");
+
+        Map<String, UcteMatchingResult.MatchStatus> resultsCodeOrdre = new HashMap<>(Map.of());
         //Filter 1 : Code order
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, new UcteNetworkAnalyzerProperties(UcteNetworkAnalyzerProperties.BusIdMatchPolicy.REPLACE_8TH_CHARACTER_WITH_WILDCARD));
         UcteMatchingResult resultOrderCode = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, orderCode);
-
+        resultsCodeOrdre.put(marketBasedLine.getId(),resultOrderCode.getStatus());
         //Filter 2 : ElementName
         if (optionalElementName.isPresent()) {
             return switch (resultOrderCode.getStatus()) {
@@ -108,14 +123,6 @@ public final class UcteMapping {
         }
     }
 
-    public static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
-        //List <Line> marketBasedLine = networkMarketBased.getLineStream().toList();
-        List <Line> marketBasedLine = networkMarketBased.getLineStream()
-                .filter(item -> Set.of(Country.IT,Country.FR,Country.SI,Country.CH,Country.AT).contains(item.getTerminal1().getVoltageLevel().getSubstation().get().getCountry().get()))
-                .filter(item -> !item.isFictitious()).toList();
-        return marketBasedLine.stream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
-    }
-
     private static MappingResults createMappingResults(String id, List<Line> matchLine) {
         int nombreLines = matchLine.size();
         if (nombreLines > 1) {
@@ -129,11 +136,14 @@ public final class UcteMapping {
     }
 
     public static List <MappingResults> tieLines(Network networkReference, Network networkMarketBased) {
-        List <TieLine> marketBasedTieLine = networkMarketBased.getTieLineStream().toList();
+        List <TieLine> marketBasedTieLine = networkMarketBased.getTieLineStream().filter(item -> !item.isFictitious())
+                .filter(item -> Set.of(Country.IT, Country.FR, Country.SI, Country.CH, Country.AT).contains(item.getTerminal1().getVoltageLevel().getSubstation().get().getCountry().get()) ||
+                        Set.of(Country.IT, Country.FR, Country.SI, Country.CH, Country.AT).contains(item.getTerminal2().getVoltageLevel().getSubstation().get().getCountry().get())).toList();
+
         return marketBasedTieLine.stream().map(tieline -> {
             String pairingKey = tieline.getDanglingLine1().getPairingKey();
             Stream<TieLine> listTieLinesReference = networkReference.getTieLineStream();
-            List<TieLine> match = new java.util.ArrayList<>(List.of());
+            List<TieLine> match = new ArrayList<>(List.of());
             listTieLinesReference.forEach(elementTieLine -> {
                 if (elementTieLine.getPairingKey().equals(pairingKey)) {
                     match.add(elementTieLine);
@@ -163,6 +173,92 @@ public final class UcteMapping {
                 LOGGER.error("Duplicates values found for: {}", entry.getKey());
             }
         }
+    }
+
+    public static List<MappingResults> mapNetworks2(Network networkReference, Network networkMarketBased) {
+        List<MappingResults> finalList = new ArrayList<>(List.of());
+        filterNetwork(networkReference);
+        filterNetwork(networkMarketBased);
+        networkMarketBased.getLines().forEach(line -> {
+            String voltageLevelSide1 = getVoltageLevelSide1(line.getId());
+            String voltageLevelSide2 = getVoltageLevelSide2(line.getId());
+            String orderCode = getOrderCode(line.getId());
+            UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, new UcteNetworkAnalyzerProperties(UcteNetworkAnalyzerProperties.BusIdMatchPolicy.REPLACE_8TH_CHARACTER_WITH_WILDCARD));
+            UcteMatchingResult resultOrderCode = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, orderCode);
+            String statusResultOrderCode = getStatusResult(resultOrderCode);
+            Integer valueOrderCode = valueMatch(statusResultOrderCode);
+            Optional<String> optionalElementName = Optional.ofNullable(networkMarketBased.getLine(line.getId()).getProperty("elementName"));
+            String statusResultElementName;
+            if (optionalElementName.isPresent()) {
+                UcteMatchingResult resultElementName = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, networkMarketBased.getLine(line.getId()).getProperty("elementName"));
+                 statusResultElementName = getStatusResult(resultElementName);
+            } else {
+                statusResultElementName = "";
+            }
+            Integer valueElementName = valueMatch(statusResultElementName);
+            switch (valueElementName+valueOrderCode) {
+                case 0 -> {
+                    finalList.add(new MappingResults(line.getId(), "", false));
+                    LOGGER.error("No matching Line found for: {}", line.getId());
+                }
+                case 1 -> {
+                    String matchedId = !statusResultOrderCode.isEmpty() ? statusResultOrderCode : statusResultElementName;
+                    finalList.add(new MappingResults(line.getId(), matchedId, true));
+                }
+                case 2 -> {
+                    if (statusResultElementName.equals(statusResultOrderCode)) {
+                        finalList.add(new MappingResults(line.getId(), statusResultOrderCode, true));
+                    } else {
+                        finalList.add(new MappingResults(line.getId(), "", false));
+                        LOGGER.error("Different matching lines found for: {}", line.getId());
+                    }
+                }
+                default -> {
+                    if (valueElementName+valueOrderCode>2) {
+                        finalList.add(new MappingResults(line.getId(), "", false));
+                        LOGGER.error("Several matching Lines found for: {}", line.getId());
+                    }
+                }
+            }
+        });
+        return finalList;
+    }
+
+    private static String getStatusResult(UcteMatchingResult resultOrderCode) {
+        return switch (resultOrderCode.getStatus()) {
+            case NOT_FOUND:
+                yield "";
+            case SINGLE_MATCH:
+                yield resultOrderCode.getIidmIdentifiable().getId();
+            case SEVERAL_MATCH:
+                yield "SEVERAL_MATCH";
+        };
+    }
+
+    public static int valueMatch(String valor) {
+        if (valor == null || valor.isEmpty()) {
+            return 0;
+        } else if (valor.equals("SEVERAL_MATCH")) {
+            return 10;
+        } else {
+            return 1;
+        }
+    }
+
+    public static void filterNetwork(Network network) {
+        Set<String> linesToRemoveIds = network.getLineStream()
+                .filter(line -> {
+                    Country country = line.getTerminal1()
+                            .getVoltageLevel()
+                            .getSubstation().get()
+                            .getCountry().get();
+                    boolean isCountryNotInEnum = Arrays.stream(CountrysArea.values())
+                            .noneMatch(e -> e.name().equals(country.name()));
+                    return isCountryNotInEnum || line.isFictitious();
+                })
+                .map(Line::getId)
+                .collect(Collectors.toSet());
+        linesToRemoveIds.forEach(id -> network.getLine(id).remove());
     }
 
     private static String getOrderCode(String id) {
