@@ -30,8 +30,8 @@
     <properties>
         <!-- Project properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
 
         <!-- Sonar properties -->
         <sonar.jacoco.reportPath>
@@ -42,21 +42,20 @@
         </sonar.jacoco.reportPath>
 
         <!-- Dependencies versions -->
-        <gridcapa-swe.version>1.27.0</gridcapa-swe.version>
+        <gridcapa-swe.version>1.37.0</gridcapa-swe.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <logback.version>1.5.6</logback.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven.checkstyle.version>3.3.1</maven.checkstyle.version>
         <maven.jacoco.version>0.8.10</maven.jacoco.version>
-        <powsybl.entsoe.version>2.11.0</powsybl.entsoe.version>
-        <powsybl.openloadflow.version>1.13.2</powsybl.openloadflow.version>
-        <powsybl.rao.version>6.5.0-SNAPSHOT</powsybl.rao.version>
-        <powsybl.version>6.5.1</powsybl.version>
+        <powsybl.entsoe.version>2.13.0</powsybl.entsoe.version>
+        <powsybl.openloadflow.version>1.15.0</powsybl.openloadflow.version>
+        <powsybl.rao.version>6.5.0</powsybl.rao.version>
+        <powsybl.version>6.7.0</powsybl.version>
         <slf4j.version>2.0.13</slf4j.version>
     </properties>
 
     <dependencies>
-
         <!-- Compile dependencies -->
         <dependency>
             <groupId>com.farao-community.farao</groupId>
@@ -70,14 +69,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>com.powsybl</groupId>
-            <artifactId>open-rao-crac-io-commons</artifactId>
-            <version>${powsybl.rao.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-commons</artifactId>
@@ -204,7 +195,7 @@
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-crac-io-commons</artifactId>
             <version>${powsybl.rao.version}</version>
-            <!--scope>test</scope-->
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>

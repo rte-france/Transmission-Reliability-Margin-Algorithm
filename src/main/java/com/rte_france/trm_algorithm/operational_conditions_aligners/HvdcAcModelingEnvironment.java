@@ -7,15 +7,15 @@
  */
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
+import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
-import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.*;
 import com.rte_france.trm_algorithm.TrmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
@@ -25,6 +25,8 @@ public class HvdcAcModelingEnvironment implements OperationalConditionAligner {
 
     private final Set<HvdcCreationParameters> creationParametersSet;
     private final OperationalConditionAligner operationalConditionAligner;
+    private List<HvdcInformation> hvdcReferenceInformationList;
+    private List<HvdcInformation> hvdcMarketBasedInformationList;
 
     public HvdcAcModelingEnvironment(Set<HvdcCreationParameters> creationParametersSet, OperationalConditionAligner operationalConditionAligner) {
         creationParametersSet.stream()
@@ -34,6 +36,8 @@ public class HvdcAcModelingEnvironment implements OperationalConditionAligner {
             });
         this.creationParametersSet = creationParametersSet;
         this.operationalConditionAligner = operationalConditionAligner;
+        this.hvdcReferenceInformationList = new ArrayList<>();
+        this.hvdcMarketBasedInformationList = new ArrayList<>();
     }
 
     private void replaceEquivalentModelByHvdc(Network referenceNetwork, Network marketBasedNetwork) {
@@ -44,8 +48,10 @@ public class HvdcAcModelingEnvironment implements OperationalConditionAligner {
 
     private void replaceHvdcByEquivalentModel(Network referenceNetwork, Network marketBasedNetwork) {
         LOGGER.info("Transform HVDC to their AC equivalent models");
-        HvdcLinkProcessor.replaceHvdcByEquivalentModel(referenceNetwork, creationParametersSet);
-        HvdcLinkProcessor.replaceHvdcByEquivalentModel(marketBasedNetwork, creationParametersSet);
+        hvdcReferenceInformationList = getHvdcInformationFromNetwork(referenceNetwork);
+        hvdcMarketBasedInformationList = getHvdcInformationFromNetwork(marketBasedNetwork);
+        HvdcLinkProcessor.replaceHvdcByEquivalentModel(referenceNetwork, creationParametersSet, hvdcReferenceInformationList);
+        HvdcLinkProcessor.replaceHvdcByEquivalentModel(marketBasedNetwork, creationParametersSet, hvdcMarketBasedInformationList);
     }
 
     @Override
@@ -53,5 +59,53 @@ public class HvdcAcModelingEnvironment implements OperationalConditionAligner {
         replaceEquivalentModelByHvdc(referenceNetwork, marketBasedNetwork);
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
         replaceHvdcByEquivalentModel(referenceNetwork, marketBasedNetwork);
+    }
+
+    List<HvdcInformation> getHvdcInformationFromNetwork(Network network) {
+        List<HvdcInformation> hvdcInformationList = new ArrayList<>();
+
+        for (HvdcCreationParameters parameter : creationParametersSet) {
+            HvdcInformation hvdcInformation = new HvdcInformation(parameter.getId());
+            Optional<Line> line = Optional.ofNullable(network.getLine(parameter.getEquivalentAcLineId()));
+            Optional<Generator> genSide1 = Optional.ofNullable(network.getGenerator(parameter.getEquivalentGeneratorId(TwoSides.ONE)));
+            Optional<Generator> genSide2 = Optional.ofNullable(network.getGenerator(parameter.getEquivalentGeneratorId(TwoSides.TWO)));
+            Optional<Load> loadSide1 = Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.ONE).get(1)));
+            Optional<Load> loadSide2 = Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.TWO).get(1)));
+
+            line.ifPresent(line1 -> {
+                hvdcInformation.setAcLineTerminal1Connected(line1.getTerminal1().isConnected());
+                hvdcInformation.setAcLineTerminal2Connected(line1.getTerminal2().isConnected());
+            });
+
+            genSide1.ifPresent(generator -> {
+                hvdcInformation.setSide1GeneratorConnected(generator.getTerminal().isConnected());
+                hvdcInformation.setSide1GeneratorTargetP(generator.getTargetP());
+            });
+            genSide2.ifPresent(generator -> {
+                hvdcInformation.setSide2GeneratorConnected(generator.getTerminal().isConnected());
+                hvdcInformation.setSide2GeneratorTargetP(generator.getTargetP());
+            });
+
+            loadSide1.ifPresentOrElse(
+                    load -> {
+                        hvdcInformation.setSide1LoadConnected(load.getTerminal().isConnected());
+                        hvdcInformation.setSide1LoadP(load.getP0());
+                    },
+                    () -> Optional.ofNullable(network.getLoad(parameter.getEquivalentLoadId(TwoSides.ONE).get(2)))
+                            .ifPresent(loadWithSecondOptionId -> {
+                                hvdcInformation.setSide1LoadConnected(loadWithSecondOptionId.getTerminal().isConnected());
+                                hvdcInformation.setSide1LoadP(loadWithSecondOptionId.getP0());
+                            })
+            );
+
+            loadSide2.ifPresent(load -> {
+                hvdcInformation.setSide2LoadConnected(load.getTerminal().isConnected());
+                hvdcInformation.setSide2LoadP(load.getP0());
+            });
+
+            hvdcInformationList.add(hvdcInformation);
+        }
+
+        return hvdcInformationList;
     }
 }

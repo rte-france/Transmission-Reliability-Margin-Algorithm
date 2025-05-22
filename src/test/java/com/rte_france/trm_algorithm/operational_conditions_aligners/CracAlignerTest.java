@@ -81,10 +81,11 @@ class CracAlignerTest {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12NodesHvdc.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12NodesHvdc.uct");
         String cracFilePath = "../TestCase12Nodes/cbcora_ep10us2case1.xml";
-        CracCreationParameters parameters = new CracCreationParameters();
-        parameters.addExtension(FbConstraintCracCreationParameters.class, new FbConstraintCracCreationParameters());
-        parameters.getExtension(FbConstraintCracCreationParameters.class).setTimestamp(OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC));
-        Crac crac = Crac.read(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)), referenceNetwork, parameters);
+        CracCreationParameters cracCreationParameters = new CracCreationParameters();
+        FbConstraintCracCreationParameters fbConstraintCracCreationParameters = new FbConstraintCracCreationParameters();
+        fbConstraintCracCreationParameters.setTimestamp(OffsetDateTime.of(2019, 1, 7, 23, 30, 0, 0, ZoneOffset.UTC));
+        cracCreationParameters.addExtension(FbConstraintCracCreationParameters.class, fbConstraintCracCreationParameters);
+        Crac crac = Crac.read(cracFilePath, Objects.requireNonNull(getClass().getResourceAsStream(cracFilePath)), referenceNetwork, cracCreationParameters);
         crac.getNetworkAction("Open FR1 FR2").apply(referenceNetwork);
 
         CracAligner cracAligner = new CracAligner(crac);
