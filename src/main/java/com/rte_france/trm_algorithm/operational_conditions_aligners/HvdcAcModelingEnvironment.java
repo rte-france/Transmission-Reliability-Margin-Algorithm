@@ -10,8 +10,6 @@ package com.rte_france.trm_algorithm.operational_conditions_aligners;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcInformation;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.HvdcLinkProcessor;
 import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.HvdcCreationParameters;
-import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.SwePreprocessorParameters;
-import com.farao_community.farao.gridcapa_swe_commons.hvdc.parameters.json.JsonSwePreprocessorImporter;
 import com.powsybl.iidm.network.*;
 import com.rte_france.trm_algorithm.TrmException;
 import org.slf4j.Logger;
@@ -65,12 +63,8 @@ public class HvdcAcModelingEnvironment implements OperationalConditionAligner {
 
     List<HvdcInformation> getHvdcInformationFromNetwork(Network network) {
         List<HvdcInformation> hvdcInformationList = new ArrayList<>();
-        SwePreprocessorParameters params = JsonSwePreprocessorImporter.read(getClass().getResourceAsStream("/hvdc/SwePreprocessorParameters.json"));
 
-        List<HvdcCreationParameters> sortedHvdcCreationParameters = params.getHvdcCreationParametersSet().stream()
-                .sorted(Comparator.comparing(HvdcCreationParameters::getId)).toList();
-
-        for (HvdcCreationParameters parameter : sortedHvdcCreationParameters) {
+        for (HvdcCreationParameters parameter : creationParametersSet) {
             HvdcInformation hvdcInformation = new HvdcInformation(parameter.getId());
             Optional<Line> line = Optional.ofNullable(network.getLine(parameter.getEquivalentAcLineId()));
             Optional<Generator> genSide1 = Optional.ofNullable(network.getGenerator(parameter.getEquivalentGeneratorId(TwoSides.ONE)));
