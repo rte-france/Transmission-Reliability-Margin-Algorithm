@@ -195,7 +195,6 @@
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-crac-io-commons</artifactId>
             <version>${powsybl.rao.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
