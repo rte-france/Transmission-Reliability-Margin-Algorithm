@@ -21,22 +21,22 @@ import java.util.stream.Stream;
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
 
-public final class UcteMapping {
+final class UcteMapping {
     private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
 
-    public static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
+    static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
         filterNetwork(networkReference);
         filterNetwork(networkMarketBased);
         return networkMarketBased.getLineStream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
     }
 
-    public static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased, Country... filtersCountries) {
+    static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased, Country... filtersCountries) {
         filterNetwork(networkReference, filtersCountries);
         filterNetwork(networkMarketBased, filtersCountries);
         return networkMarketBased.getLineStream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
     }
 
-    public static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, Line line) {
+    static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, Line line) {
         String voltageLevelSide1 = getVoltageLevelSide1(line.getId());
         String voltageLevelSide2 = getVoltageLevelSide2(line.getId());
         String orderCode = getOrderCode(line.getId());
@@ -91,7 +91,7 @@ public final class UcteMapping {
         };
     }
 
-    public static int valueMatch(String valor) {
+    static int valueMatch(String valor) {
         if (valor == null || valor.isEmpty()) {
             return 0;
         } else if (valor.equals("SEVERAL_MATCH")) {
@@ -101,7 +101,7 @@ public final class UcteMapping {
         }
     }
 
-    public static void filterNetwork(Network network) {
+    static void filterNetwork(Network network) {
         Set<String> linesToRemoveIds = network.getLineStream()
                 .filter(Identifiable::isFictitious)
                 .map(Line::getId)
@@ -109,7 +109,7 @@ public final class UcteMapping {
         linesToRemoveIds.forEach(id -> network.getLine(id).remove());
     }
 
-    public static void filterNetwork(Network network, Country... filtersCountries) {
+    static void filterNetwork(Network network, Country... filtersCountries) {
         Set<String> linesToRemoveIds = network.getLineStream()
                 .filter(line -> {
                     Country country = line.getTerminal1()
@@ -137,7 +137,7 @@ public final class UcteMapping {
         return id.substring(0, 7);
     }
 
-    public static List <MappingResults> tieLines(Network networkReference, Network networkMarketBased) {
+    static List <MappingResults> tieLines(Network networkReference, Network networkMarketBased) {
         List <TieLine> marketBasedTieLine = networkMarketBased.getTieLineStream().filter(item -> !item.isFictitious())
                 .filter(item -> Set.of(Country.IT, Country.FR, Country.SI, Country.CH, Country.AT).contains(item.getTerminal1().getVoltageLevel().getSubstation().get().getCountry().get()) ||
                         Set.of(Country.IT, Country.FR, Country.SI, Country.CH, Country.AT).contains(item.getTerminal2().getVoltageLevel().getSubstation().get().getCountry().get())).toList();
@@ -163,7 +163,7 @@ public final class UcteMapping {
         }).toList();
     }
 
-    public static void duplicateCheck(List <MappingResults> listMappingResults) {
+    static void duplicateCheck(List <MappingResults> listMappingResults) {
         Map<String, List<MappingResults>> grouped = new HashMap<>();
         for (MappingResults results : listMappingResults) {
             grouped
