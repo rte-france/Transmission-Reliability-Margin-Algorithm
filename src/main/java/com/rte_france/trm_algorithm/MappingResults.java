@@ -12,5 +12,11 @@ package com.rte_france.trm_algorithm;
  */
 
 public record MappingResults(String lineFromMarketBasedNetwork, String lineFromReferenceNetwork, boolean mappingFound) {
+    public static MappingResults notFound(String branchId) {
+        return new MappingResults(branchId, null, false);
+    }
 
+    public static MappingResults mappingFound(String branchId, String mappedId) {
+        return new MappingResults(branchId, mappedId, true);
+    }
 }

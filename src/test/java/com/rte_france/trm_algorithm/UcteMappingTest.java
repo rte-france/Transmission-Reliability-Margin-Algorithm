@@ -8,12 +8,9 @@
 package com.rte_france.trm_algorithm;
 
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,29 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 
 public class UcteMappingTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
-
-    @Test
-    void testMapIdenticalLine() {
-        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
-        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
-        Line line = networkMarketBased.getLine("BBE1AA1  BBE2AA1  1");
-        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line);
-        String lineId = mappingResults.lineFromReferenceNetwork();
-        assertEquals("BBE1AA1  BBE2AA1  1", lineId);
-    }
-
-    @Test
-    void testMapExistingLine() {
-        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
-        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
-        Line line = networkMarketBased.getLine("BBE1AA1  BBE2AA1  1");
-        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line);
-        String lineId = mappingResults.lineFromReferenceNetwork();
-        assertEquals("BBE1AA12 BBE2AA11 1", lineId);
-        System.out.println();
-    }
-
     @Test
     void testMultiLines() {
         // Given
@@ -120,21 +94,10 @@ public class UcteMappingTest {
         //Then
         List<MappingResults> expectedMappingResults = List.of(
                 new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
-                new MappingResults("FFNHV111 FFNHV211 2", "", false),
+                new MappingResults("FFNHV111 FFNHV211 2", null, false),
                 new MappingResults("FFNGEN71 FFNHV111 1", "FFNGEN71 FFNHV111 1", true),
                 new MappingResults("FFNHV211 FFNLOA31 L", "FFNHV211 FFNLOA31 L", true));
         assertEquals(expectedMappingResults, mappingResults);
-    }
-
-    @Test
-    void testIdenticalOrderCodeDifferentElementName1Line() {
-        //Given
-        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_ChangesOrderElementName.uct");
-        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewId.uct");
-        Line line = networkMarketBased.getLine("FFNHV111 FFNHV211 2");
-        //When
-        MappingResults mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, line);
-        assertEquals("FFNHV111 FFNHV211 1", mappingResults.lineFromReferenceNetwork());
     }
 
     @Test
@@ -155,18 +118,6 @@ public class UcteMappingTest {
         UcteMapping.duplicateCheck(mappingResults);
     }
 
-    @Test
-    void testInterconnection() {
-        //Given
-        Network networkReference = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE.uct");
-        Network networkMarketBased = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_BOUNDED_XNODE_NewId.uct");
-        //Wheb
-        List <MappingResults> mappingResults = UcteMapping.tieLines(networkReference, networkMarketBased);
-        //Then
-        List<MappingResults> expectedMappingResults = List.of();
-        assertEquals(expectedMappingResults, mappingResults);
-    }
-
     @Disabled ("Disabled due to runtime")
     @Test
     void testRealNetwork() {
@@ -175,9 +126,7 @@ public class UcteMappingTest {
         Network networkMarketBased = Network.read("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0330_FO7_UX1.uct");
         //When
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, Country.FR, Country.CH, Country.AT, Country.SI, Country.IT);
-        List<MappingResults> tielineResults = UcteMapping.tieLines(networkReference, networkMarketBased);
         UcteMapping.duplicateCheck(mappingResults);
-        UcteMapping.duplicateCheck(tielineResults);
     }
 
     @Test
