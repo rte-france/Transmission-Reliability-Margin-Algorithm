@@ -261,7 +261,6 @@ class TrmAlgorithmTest {
         assertEquals("Reference critical network elements are empty", exception.getMessage());
     }
 
-    @Disabled ("Bug detected in HVDC tools mapping (disconnect method)")
     @Test
     void testSameNetwork16NodesWithAutoGlskAndHvdcDisconnected() {
         Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWith2Hvdc.xiidm");
