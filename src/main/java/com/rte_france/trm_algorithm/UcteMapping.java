@@ -67,6 +67,7 @@ final class UcteMapping {
                     LOGGER.error("Different matching lines found for: {}", branch.getId());
                     return MappingResults.notFound(branch.getId());
                 }
+                default -> throw new AssertionError(String.format("Unknown UCTE matching result status : %s", resultOrderCode.getStatus()));
             }
         } else {
             UcteMatchingResult resultOrderCode = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, orderCode);
@@ -88,7 +89,6 @@ final class UcteMapping {
                 return MappingResults.mappingFound(branch.getId(), resultElementName.getIidmIdentifiable().getId());
             }
         }
-        return null;
     }
 
     private static String getOrderCode(String id) {
