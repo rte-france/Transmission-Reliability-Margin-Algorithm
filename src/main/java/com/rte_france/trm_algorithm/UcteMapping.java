@@ -14,7 +14,6 @@ import com.powsybl.openrao.data.crac.io.commons.ucte.UcteNetworkAnalyzerProperti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -23,57 +22,97 @@ import java.util.stream.Stream;
 
 final class UcteMapping {
     private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
+    private static final UcteNetworkAnalyzerProperties UCTE_NETWORK_ANALYZER_PROPERTIES = new UcteNetworkAnalyzerProperties(UcteNetworkAnalyzerProperties.BusIdMatchPolicy.REPLACE_8TH_CHARACTER_WITH_WILDCARD);;
 
     static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
-        filterNetwork(networkReference);
-        filterNetwork(networkMarketBased);
-        return networkMarketBased.getLineStream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
+        return networkMarketBased.getBranchStream().map(branch -> mapNetworks(networkReference, networkMarketBased, branch)).toList();
     }
 
     static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased, Country... filtersCountries) {
-        filterNetwork(networkReference, filtersCountries);
-        filterNetwork(networkMarketBased, filtersCountries);
-        return networkMarketBased.getLineStream().map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
+        return networkMarketBased.getBranchStream()
+                .filter(branch -> isBranchConnectedToAnyGivenCountry(branch, filtersCountries))
+                .map(line -> mapNetworks(networkReference, networkMarketBased, line)).toList();
     }
 
-    static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, Line line) {
-        String voltageLevelSide1 = getVoltageLevelSide1(line.getId());
-        String voltageLevelSide2 = getVoltageLevelSide2(line.getId());
-        String orderCode = getOrderCode(line.getId());
-        UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, new UcteNetworkAnalyzerProperties(UcteNetworkAnalyzerProperties.BusIdMatchPolicy.REPLACE_8TH_CHARACTER_WITH_WILDCARD));
-        UcteMatchingResult resultOrderCode = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, orderCode);
-        String statusResultOrderCode = getStatusResult(resultOrderCode);
-        Integer valueOrderCode = valueMatch(statusResultOrderCode);
-        Optional<String> optionalElementName = Optional.ofNullable(networkMarketBased.getLine(line.getId()).getProperty("elementName"));
-        String statusResultElementName;
-        if (optionalElementName.isPresent()) {
-            UcteMatchingResult resultElementName = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, networkMarketBased.getLine(line.getId()).getProperty("elementName"));
-            statusResultElementName = getStatusResult(resultElementName);
-        } else {
-            statusResultElementName = "";
-        }
-        Integer valueElementName = valueMatch(statusResultElementName);
-        switch (valueElementName + valueOrderCode) {
-            case 0 -> {
-                LOGGER.error("No matching Line found for: {}", line.getId());
-                return new MappingResults(line.getId(), "", false);
-            }
-            case 1 -> {
-                String matchedId = !statusResultOrderCode.isEmpty() ? statusResultOrderCode : statusResultElementName;
-                return new MappingResults(line.getId(), matchedId, true);
-            }
-            case 2 -> {
-                if (statusResultElementName.equals(statusResultOrderCode)) {
-                    return new MappingResults(line.getId(), statusResultOrderCode, true);
-                } else {
-                    LOGGER.error("Different matching lines found for: {}", line.getId());
-                    return new MappingResults(line.getId(), "", false);
+    private static boolean isBranchConnectedToAnyGivenCountry(Branch branch, Country... countries) {
+        return Arrays.stream(countries).anyMatch(country -> isBranchConnectedToCountry(branch, country));
+    }
+
+    private static boolean isBranchConnectedToCountry(Branch branch, Country country) {
+        Optional<Country> country1 = branch.getTerminal1().getVoltageLevel()
+                .getSubstation().flatMap(Substation::getCountry);
+        Optional<Country> country2 = branch.getTerminal2().getVoltageLevel()
+                .getSubstation().flatMap(Substation::getCountry);
+        return country1.isPresent() && country1.get().equals(country) ||
+                country2.isPresent() && country2.get().equals(country);
+    }
+
+    static MappingResults mapNetworks(Network networkReference, Network networkMarketBased, Branch branch) {
+        String voltageLevelSide1 = getVoltageLevelSide1(branch.getId());
+        String voltageLevelSide2 = getVoltageLevelSide2(branch.getId());
+        String orderCode = getOrderCode(branch.getId());
+        Optional<String> optionalElementName = Optional.ofNullable(networkMarketBased.getBranch(branch.getId()).getProperty("elementName"));
+        UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
+        if (optionalElementName.isEmpty() || optionalElementName.get().equals(orderCode)) {
+            UcteMatchingResult resultOrderCode = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, orderCode);
+            String statusResultOrderCode = getStatusResult(resultOrderCode);
+            Integer valueOrderCode = valueMatch(statusResultOrderCode);
+
+            String statusResultElementName = "";
+            Integer valueElementName = valueMatch(statusResultElementName);
+            switch (valueElementName + valueOrderCode) {
+                case 0 -> {
+                    LOGGER.error("No matching Line found for: {}", branch.getId());
+                    return new MappingResults(branch.getId(), "", false);
+                }
+                case 1 -> {
+                    String matchedId = !statusResultOrderCode.isEmpty() ? statusResultOrderCode : statusResultElementName;
+                    return new MappingResults(branch.getId(), matchedId, true);
+                }
+                case 2 -> {
+                    if (statusResultElementName.equals(statusResultOrderCode)) {
+                        return new MappingResults(branch.getId(), statusResultOrderCode, true);
+                    } else {
+                        LOGGER.error("Different matching lines found for: {}", branch.getId());
+                        return new MappingResults(branch.getId(), "", false);
+                    }
+                }
+                default -> {
+                    if (valueElementName + valueOrderCode > 2) {
+                        LOGGER.error("Several matching Lines found for: {}", branch.getId());
+                        return new MappingResults(branch.getId(), "", false);
+                    }
                 }
             }
-            default -> {
-                if (valueElementName + valueOrderCode > 2) {
-                    LOGGER.error("Several matching Lines found for: {}", line.getId());
-                    return new MappingResults(line.getId(), "", false);
+        } else {
+            UcteMatchingResult resultOrderCode = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, orderCode);
+            String statusResultOrderCode = getStatusResult(resultOrderCode);
+            Integer valueOrderCode = valueMatch(statusResultOrderCode);
+            UcteMatchingResult resultElementName = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, networkMarketBased.getBranch(branch.getId()).getProperty("elementName"));
+            String statusResultElementName = getStatusResult(resultElementName);
+            Integer valueElementName = valueMatch(statusResultElementName);
+            switch (valueElementName + valueOrderCode) {
+                case 0 -> {
+                    LOGGER.error("No matching Line found for: {}", branch.getId());
+                    return new MappingResults(branch.getId(), "", false);
+                }
+                case 1 -> {
+                    String matchedId = !statusResultOrderCode.isEmpty() ? statusResultOrderCode : statusResultElementName;
+                    return new MappingResults(branch.getId(), matchedId, true);
+                }
+                case 2 -> {
+                    if (statusResultElementName.equals(statusResultOrderCode)) {
+                        return new MappingResults(branch.getId(), statusResultOrderCode, true);
+                    } else {
+                        LOGGER.error("Different matching lines found for: {}", branch.getId());
+                        return new MappingResults(branch.getId(), "", false);
+                    }
+                }
+                default -> {
+                    if (valueElementName + valueOrderCode > 2) {
+                        LOGGER.error("Several matching Lines found for: {}", branch.getId());
+                        return new MappingResults(branch.getId(), "", false);
+                    }
                 }
             }
         }
@@ -99,30 +138,6 @@ final class UcteMapping {
         } else {
             return 1;
         }
-    }
-
-    static void filterNetwork(Network network) {
-        Set<String> linesToRemoveIds = network.getLineStream()
-                .filter(Identifiable::isFictitious)
-                .map(Line::getId)
-                .collect(Collectors.toSet());
-        linesToRemoveIds.forEach(id -> network.getLine(id).remove());
-    }
-
-    static void filterNetwork(Network network, Country... filtersCountries) {
-        Set<String> linesToRemoveIds = network.getLineStream()
-                .filter(line -> {
-                    Country country = line.getTerminal1()
-                            .getVoltageLevel()
-                            .getSubstation().get()
-                            .getCountry().get();
-                    boolean isCountryNotInEnum = Set.of(filtersCountries).stream()
-                            .noneMatch(e -> e.name().equals(country.name()));
-                    return isCountryNotInEnum || line.isFictitious();
-                })
-                .map(Line::getId)
-                .collect(Collectors.toSet());
-        linesToRemoveIds.forEach(id -> network.getLine(id).remove());
     }
 
     private static String getOrderCode(String id) {

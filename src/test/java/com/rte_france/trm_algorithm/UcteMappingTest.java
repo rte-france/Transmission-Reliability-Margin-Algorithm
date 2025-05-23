@@ -69,7 +69,8 @@ public class UcteMappingTest {
                 new MappingResults("FFR2AA1  DDE3AA1  1", "FFR2AA1  DDE3AA1  1", true),
                 new MappingResults("DDE2AA1  NNL3AA1  1", "DDE2AA1  NNL3AA1  1", true),
                 new MappingResults("NNL2AA1  BBE3AA1  1", "NNL2AA1  BBE3AA1  1", true),
-                new MappingResults("BBE2AA1  FFR3AA1  1", "BBE2AA11 FFR3AA1  1", true));
+                new MappingResults("BBE2AA1  FFR3AA1  1", "BBE2AA11 FFR3AA1  1", true),
+                new MappingResults("BBE2AA1  BBE3AA1  1", "BBE2AA11 BBE3AA1  1", true));
         assertEquals(expectedMappingResults, mappingResults);
     }
 
@@ -84,7 +85,9 @@ public class UcteMappingTest {
         List<MappingResults> expectedMappingResults = List.of(
                 new MappingResults("FFNHV111 FFNHV211 1", "FFNHV111 FFNHV211 1", true),
                 new MappingResults("FFNHV111 FFNHV211 2", "FFNHV111 FFNHV211 2", true),
-                new MappingResults("FFNHV211 FFNHV311 1", "FFNHV211 FFNHV311 1", true));
+                new MappingResults("FFNHV211 FFNHV311 1", "FFNHV211 FFNHV311 1", true),
+                new MappingResults("FFNGEN71 FFNHV111 1", "FFNGEN71 FFNHV111 1", true),
+                new MappingResults("FFNHV211 FFNLOA31 L", "FFNHV211 FFNLOA31 L", true));
         assertEquals(expectedMappingResults, mappingResults);
     }
 
@@ -99,7 +102,9 @@ public class UcteMappingTest {
         List<MappingResults> expectedMappingResults = List.of(
                 new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
                 new MappingResults("FFNHV111 FFNHV211 2", "FFNHV111 FFNHV211 2", true),
-                new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true));
+                new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true),
+                new MappingResults("FFNGEN71 FFNHV111 1", "FFNGEN71 FFNHV111 1", true),
+                new MappingResults("FFNHV211 FFNLOA31 L", "FFNHV211 FFNLOA31 L", true));
         assertEquals(expectedMappingResults, mappingResults);
     }
 
@@ -115,7 +120,9 @@ public class UcteMappingTest {
         //Then
         List<MappingResults> expectedMappingResults = List.of(
                 new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
-                new MappingResults("FFNHV111 FFNHV211 2", "", false));
+                new MappingResults("FFNHV111 FFNHV211 2", "", false),
+                new MappingResults("FFNGEN71 FFNHV111 1", "FFNGEN71 FFNHV111 1", true),
+                new MappingResults("FFNHV211 FFNLOA31 L", "FFNHV211 FFNLOA31 L", true));
         assertEquals(expectedMappingResults, mappingResults);
     }
 
@@ -141,7 +148,9 @@ public class UcteMappingTest {
         List<MappingResults> expectedMappingResults = List.of(
                 new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
                 new MappingResults("FFNHV111 FFNHV211 1", "FFNHV111 FFNHV211 1", true),
-                new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true));
+                new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true),
+                new MappingResults("FFNGEN71 FFNHV111 1", "FFNGEN71 FFNHV111 1", true),
+                new MappingResults("FFNHV211 FFNLOA31 L", "FFNHV211 FFNLOA31 L", true));
         assertEquals(expectedMappingResults, mappingResults);
         UcteMapping.duplicateCheck(mappingResults);
     }
