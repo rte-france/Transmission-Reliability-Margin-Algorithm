@@ -107,7 +107,6 @@ public class UcteMappingTest {
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewDuplicate.uct");
         //When
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
-        UcteMapping.duplicateCheck(mappingResults);
         //Then
         List<MappingResults> expectedMappingResults = List.of(
                 new MappingResults("FFNHV211 FFNHV111 1", null, false),
@@ -125,7 +124,6 @@ public class UcteMappingTest {
         Network networkMarketBased = Network.read("/home/huaracaseb/Bureau/Pruebas/MarketBased/2023_01/20230101_0330_FO7_UX1.uct");
         //When
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased, Country.FR, Country.CH, Country.AT, Country.SI, Country.IT);
-        UcteMapping.duplicateCheck(mappingResults);
     }
 
     @Test

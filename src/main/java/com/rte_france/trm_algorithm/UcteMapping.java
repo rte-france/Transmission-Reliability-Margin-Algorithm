@@ -26,14 +26,14 @@ final class UcteMapping {
 
     static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
-        return networkMarketBased.getBranchStream().map(branch -> mapNetworks(analyser, networkMarketBased, branch)).collect(Collectors.toList());
+        return  duplicateCheck(networkMarketBased.getBranchStream().map(branch -> mapNetworks(analyser, networkMarketBased, branch)).collect(Collectors.toList()));
     }
 
     static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased, Country... filtersCountries) {
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
-        return networkMarketBased.getBranchStream()
+        return duplicateCheck(networkMarketBased.getBranchStream()
                 .filter(branch -> isBranchConnectedToAnyGivenCountry(branch, filtersCountries))
-                .map(line -> mapNetworks(analyser, networkMarketBased, line)).collect(Collectors.toList());
+                .map(line -> mapNetworks(analyser, networkMarketBased, line)).collect(Collectors.toList()));
     }
 
     private static boolean isBranchConnectedToAnyGivenCountry(Branch branch, Country... countries) {
@@ -58,15 +58,13 @@ final class UcteMapping {
             UcteMatchingResult resultOrderCode = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, orderCode);
             switch (resultOrderCode.getStatus()) {
                 case NOT_FOUND -> {
-                    LOGGER.error("No matching Line found for: {}", branch.getId());
-                    return MappingResults.notFound(branch.getId());
+                    return getMappingResultsNotFound(branch);
                 }
                 case SINGLE_MATCH -> {
                     return MappingResults.mappingFound(branch.getId(), resultOrderCode.getIidmIdentifiable().getId());
                 }
                 case SEVERAL_MATCH -> {
-                    LOGGER.error("Several matching lines found for: {}", branch.getId());
-                    return MappingResults.notFound(branch.getId());
+                    return getMappingResultsSeveralMatch(branch);
                 }
                 default -> throw new AssertionError(String.format("Unknown UCTE matching result status : %s", resultOrderCode.getStatus()));
             }
@@ -75,16 +73,14 @@ final class UcteMapping {
             UcteMatchingResult resultElementName = analyser.findTopologicalElement(voltageLevelSide1, voltageLevelSide2, networkMarketBased.getBranch(branch.getId()).getProperty("elementName"));
             if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND &&
                     resultElementName.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
-                LOGGER.error("No matching Line found for: {}", branch.getId());
-                return MappingResults.notFound(branch.getId());
+                return getMappingResultsNotFound(branch);
             }
             if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH ||
                 resultElementName.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH ||
                 resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH &&
                         resultElementName.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH &&
                         !resultOrderCode.getIidmIdentifiable().equals(resultElementName.getIidmIdentifiable())) {
-                LOGGER.error("Different matching lines found for: {}", branch.getId());
-                return MappingResults.notFound(branch.getId());
+                return getMappingResultsSeveralMatch(branch);
             }
             if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH
                     && resultElementName.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
@@ -93,6 +89,16 @@ final class UcteMapping {
                 return MappingResults.mappingFound(branch.getId(), resultElementName.getIidmIdentifiable().getId());
             }
         }
+    }
+
+    private static MappingResults getMappingResultsSeveralMatch(Branch branch) {
+        LOGGER.error("Several matching lines found for: {}", branch.getId());
+        return MappingResults.notFound(branch.getId());
+    }
+
+    private static MappingResults getMappingResultsNotFound(Branch branch) {
+        LOGGER.error("No matching Line found for: {}", branch.getId());
+        return MappingResults.notFound(branch.getId());
     }
 
     private static String getOrderCode(String id) {
@@ -107,7 +113,7 @@ final class UcteMapping {
         return id.substring(0, 7);
     }
 
-    static void duplicateCheck(List <MappingResults> listMappingResults) {
+    private static List<MappingResults> duplicateCheck(List <MappingResults> listMappingResults) {
         Map<String, List<Integer>> position = new HashMap<>();
         for (int i = 0; i < listMappingResults.size(); i++) {
             String item = listMappingResults.get(i).lineFromReferenceNetwork();
@@ -117,10 +123,10 @@ final class UcteMapping {
             if (entry.getValue().size() > 1 && entry.getKey() != null) {
                 for (int j = 0; j < entry.getValue().size(); j++) {
                     listMappingResults.set(entry.getValue().get(j), MappingResults.notFound(listMappingResults.get(j).lineFromMarketBasedNetwork()));
-                    System.out.println(listMappingResults.get(entry.getValue().get(j)));
                 }
             }
         }
+        return listMappingResults;
     }
 
     //Utility class
