@@ -9,8 +9,8 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -107,18 +107,17 @@ public class UcteMappingTest {
         Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/20170322_1844_SN3_FR2_NewDuplicate.uct");
         //When
         List<MappingResults> mappingResults = UcteMapping.mapNetworks(networkReference, networkMarketBased);
+        UcteMapping.duplicateCheck(mappingResults);
         //Then
         List<MappingResults> expectedMappingResults = List.of(
-                new MappingResults("FFNHV211 FFNHV111 1", "FFNHV111 FFNHV211 1", true),
-                new MappingResults("FFNHV111 FFNHV211 1", "FFNHV111 FFNHV211 1", true),
+                new MappingResults("FFNHV211 FFNHV111 1", null, false),
+                new MappingResults("FFNHV111 FFNHV211 1", null, false),
                 new MappingResults("FFNHV311 FFNHV211 1", "FFNHV211 FFNHV311 1", true),
                 new MappingResults("FFNGEN71 FFNHV111 1", "FFNGEN71 FFNHV111 1", true),
                 new MappingResults("FFNHV211 FFNLOA31 L", "FFNHV211 FFNLOA31 L", true));
         assertEquals(expectedMappingResults, mappingResults);
-        UcteMapping.duplicateCheck(mappingResults);
     }
 
-    @Disabled ("Disabled due to runtime")
     @Test
     void testRealNetwork() {
         //Given

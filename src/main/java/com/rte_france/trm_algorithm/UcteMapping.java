@@ -14,6 +14,7 @@ import com.powsybl.openrao.data.crac.io.commons.ucte.UcteNetworkAnalyzerProperti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
@@ -25,14 +26,14 @@ final class UcteMapping {
 
     static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased) {
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
-        return networkMarketBased.getBranchStream().map(branch -> mapNetworks(analyser, networkMarketBased, branch)).toList();
+        return networkMarketBased.getBranchStream().map(branch -> mapNetworks(analyser, networkMarketBased, branch)).collect(Collectors.toList());
     }
 
     static List<MappingResults> mapNetworks(Network networkReference, Network networkMarketBased, Country... filtersCountries) {
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
         return networkMarketBased.getBranchStream()
                 .filter(branch -> isBranchConnectedToAnyGivenCountry(branch, filtersCountries))
-                .map(line -> mapNetworks(analyser, networkMarketBased, line)).toList();
+                .map(line -> mapNetworks(analyser, networkMarketBased, line)).collect(Collectors.toList());
     }
 
     private static boolean isBranchConnectedToAnyGivenCountry(Branch branch, Country... countries) {
@@ -64,7 +65,7 @@ final class UcteMapping {
                     return MappingResults.mappingFound(branch.getId(), resultOrderCode.getIidmIdentifiable().getId());
                 }
                 case SEVERAL_MATCH -> {
-                    LOGGER.error("Different matching lines found for: {}", branch.getId());
+                    LOGGER.error("Several matching lines found for: {}", branch.getId());
                     return MappingResults.notFound(branch.getId());
                 }
                 default -> throw new AssertionError(String.format("Unknown UCTE matching result status : %s", resultOrderCode.getStatus()));
@@ -79,11 +80,14 @@ final class UcteMapping {
             }
             if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH ||
                 resultElementName.getStatus() == UcteMatchingResult.MatchStatus.SEVERAL_MATCH ||
-                resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH && resultElementName.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH && !resultOrderCode.getIidmIdentifiable().equals(resultElementName.getIidmIdentifiable())) {
+                resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH &&
+                        resultElementName.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH &&
+                        !resultOrderCode.getIidmIdentifiable().equals(resultElementName.getIidmIdentifiable())) {
                 LOGGER.error("Different matching lines found for: {}", branch.getId());
                 return MappingResults.notFound(branch.getId());
             }
-            if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH) {
+            if (resultOrderCode.getStatus() == UcteMatchingResult.MatchStatus.SINGLE_MATCH
+                    && resultElementName.getStatus() == UcteMatchingResult.MatchStatus.NOT_FOUND) {
                 return MappingResults.mappingFound(branch.getId(), resultOrderCode.getIidmIdentifiable().getId());
             } else {
                 return MappingResults.mappingFound(branch.getId(), resultElementName.getIidmIdentifiable().getId());
@@ -104,15 +108,17 @@ final class UcteMapping {
     }
 
     static void duplicateCheck(List <MappingResults> listMappingResults) {
-        Map<String, List<MappingResults>> grouped = new HashMap<>();
-        for (MappingResults results : listMappingResults) {
-            grouped
-                    .computeIfAbsent(results.lineFromReferenceNetwork(), k -> new ArrayList<>())
-                    .add(results);
+        Map<String, List<Integer>> position = new HashMap<>();
+        for (int i = 0; i < listMappingResults.size(); i++) {
+            String item = listMappingResults.get(i).lineFromReferenceNetwork();
+            position.computeIfAbsent(item, k -> new ArrayList<>()).add(i);
         }
-        for (Map.Entry<String, List<MappingResults>> entry : grouped.entrySet()) {
-            if (entry.getValue().size() > 1) {
-                LOGGER.error("Duplicates values found for: {}", entry.getKey());
+        for (Map.Entry<String, List<Integer>> entry : position.entrySet()) {
+            if (entry.getValue().size() > 1 && entry.getKey() != null) {
+                for (int j = 0; j < entry.getValue().size(); j++) {
+                    listMappingResults.set(entry.getValue().get(j), MappingResults.notFound(listMappingResults.get(j).lineFromMarketBasedNetwork()));
+                    System.out.println(listMappingResults.get(entry.getValue().get(j)));
+                }
             }
         }
     }
