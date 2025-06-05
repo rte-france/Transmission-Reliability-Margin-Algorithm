@@ -11,30 +11,27 @@ import com.powsybl.iidm.network.*;
 import com.powsybl.openrao.data.crac.io.commons.ucte.UcteMatchingResult;
 import com.powsybl.openrao.data.crac.io.commons.ucte.UcteNetworkAnalyzer;
 import com.powsybl.openrao.data.crac.io.commons.ucte.UcteNetworkAnalyzerProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
 
-public final class UcteMapping {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UcteMapping.class);
+public final class UcteMapper {
     private static final UcteNetworkAnalyzerProperties UCTE_NETWORK_ANALYZER_PROPERTIES = new UcteNetworkAnalyzerProperties(UcteNetworkAnalyzerProperties.BusIdMatchPolicy.REPLACE_8TH_CHARACTER_WITH_WILDCARD);
 
-    public static IdentifiableMapp mapNetworks(Network networkReference, Network networkMarketBased) {
-        IdentifiableMapp.IdentifiableMappBuilder builder = new IdentifiableMapp.IdentifiableMappBuilder();
+    public static IdentifiableMapping mapNetworks(Network networkReference, Network networkMarketBased) {
+        IdentifiableMapping.IdentifiableMappingBuilder builder = new IdentifiableMapping.IdentifiableMappingBuilder();
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
         networkMarketBased.getBranchStream().forEach(branch -> mapNetworks(analyser, builder, networkMarketBased, branch));
         return builder.build();
     }
 
-    static IdentifiableMapp mapNetworks(Network networkReference, Network networkMarketBased, Country... filtersCountries) {
-        IdentifiableMapp.IdentifiableMappBuilder builder = new IdentifiableMapp.IdentifiableMappBuilder();
+    public static IdentifiableMapping mapNetworks(Network networkReference, Network networkMarketBased, Country... chosenCountries) {
+        IdentifiableMapping.IdentifiableMappingBuilder builder = new IdentifiableMapping.IdentifiableMappingBuilder();
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
         networkMarketBased.getBranchStream()
-                .filter(branch -> isBranchConnectedToAnyGivenCountry(branch, filtersCountries))
+                .filter(branch -> isBranchConnectedToAnyGivenCountry(branch, chosenCountries))
                 .forEach(line -> mapNetworks(analyser, builder, networkMarketBased, line));
         return builder.build();
     }
@@ -52,7 +49,7 @@ public final class UcteMapping {
                 country2.isPresent() && country2.get().equals(country);
     }
 
-    private static void mapNetworks(UcteNetworkAnalyzer analyser, IdentifiableMapp.IdentifiableMappBuilder builder, Network networkMarketBased, Branch branch) {
+    private static void mapNetworks(UcteNetworkAnalyzer analyser, IdentifiableMapping.IdentifiableMappingBuilder builder, Network networkMarketBased, Branch branch) {
         String voltageLevelSide1 = getVoltageLevelSide1(branch.getId());
         String voltageLevelSide2 = getVoltageLevelSide2(branch.getId());
         String orderCode = getOrderCode(branch.getId());
@@ -82,6 +79,6 @@ public final class UcteMapping {
     }
 
     //Utility class
-    private UcteMapping() {
+    private UcteMapper() {
     }
 }

@@ -20,6 +20,7 @@ import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.EmptyNetPosition;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPositionInterface;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.NetPositionInterface;
+
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;

@@ -8,12 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IdentifiableMapp {
-    private final Map<String, String> mappingFromMarketBasedToReference;
-    private final Map<String, String> mappingFromReferenceToMarketBased;
-    private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableMapp.class);
+public class IdentifiableMapping {
+    public final Map<String, String> mappingFromMarketBasedToReference;
+    public final Map<String, String> mappingFromReferenceToMarketBased;
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableMapping.class);
 
-    IdentifiableMapp(Map<String, String> mappingFromMarketBasedToReference, Map<String, String> mappingFromReferenceToMarketBased) {
+    IdentifiableMapping(Map<String, String> mappingFromMarketBasedToReference, Map<String, String> mappingFromReferenceToMarketBased) {
         this.mappingFromMarketBasedToReference = mappingFromMarketBasedToReference;
         this.mappingFromReferenceToMarketBased = mappingFromReferenceToMarketBased;
     }
@@ -30,23 +30,23 @@ public class IdentifiableMapp {
         });
     }
 
-    public static class IdentifiableMappBuilder {
+    public static class IdentifiableMappingBuilder {
         Map<String, String> mappingFromMarketBasedToReference = new HashMap<>();
         Map<String, String> mappingFromReferenceToMarketBased = new HashMap<>();
         List<String> invalidatedInMarketBased = new ArrayList<>();
         List<String> invalidatedInReference = new ArrayList<>();
 
-        IdentifiableMapp build() {
-            return new IdentifiableMapp(mappingFromMarketBasedToReference, mappingFromReferenceToMarketBased);
+        IdentifiableMapping build() {
+            return new IdentifiableMapping(mappingFromMarketBasedToReference, mappingFromReferenceToMarketBased);
         }
 
         public void addMappingOrInvalidateDuplicates(String idMarketBased, String idReference) {
             if (invalidatedInMarketBased.contains(idMarketBased)) {
-                LOGGER.error("Replicated branches found for: {} in reference", idMarketBased);
+                LOGGER.error("Replicated branches found for: {} in marketBased", idMarketBased);
                 return;
             }
             if (invalidatedInReference.contains(idReference)) {
-                LOGGER.error("Replicated branches found for: {} in marketBased", idReference);
+                LOGGER.error("Replicated branches found for: {} in reference", idReference);
                 return;
             }
 
