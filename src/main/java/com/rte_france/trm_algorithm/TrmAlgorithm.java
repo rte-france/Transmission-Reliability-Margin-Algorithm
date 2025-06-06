@@ -48,9 +48,9 @@ public class TrmAlgorithm {
 
     private void checkReferenceElementAreAvailableInMarketBasedNetwork(List<String> referenceNetworkElementIds, Network marketBasedNetwork) {
         List<String> missingBranches = referenceNetworkElementIds.stream()
-                .filter(branchId -> Objects.isNull(marketBasedNetwork.getBranch(branchId)))
-                .sorted()
-                .toList();
+            .filter(branchId -> Objects.isNull(marketBasedNetwork.getBranch(branchId)))
+            .sorted()
+            .toList();
         if (!missingBranches.isEmpty()) {
             throw new TrmException(String.format("Market-based network doesn't contain the following network elements: %s.", missingBranches));
         }
@@ -69,14 +69,14 @@ public class TrmAlgorithm {
         Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElementIds, referenceZonalGlsks);
         LOGGER.info("Computing uncertainties");
         Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> {
-                    Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
-                    double marketBasedFlow = marketBasedFlows.get(entry.getKey());
-                    double referenceFlow = entry.getValue().getFlow();
-                    double referenceZonalPtdf = entry.getValue().getZonalPtdf();
-                    return new UncertaintyResult(referenceBranch, marketBasedFlow, referenceFlow, referenceZonalPtdf);
-                }
+            Map.Entry::getKey,
+            entry -> {
+                Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
+                double marketBasedFlow = marketBasedFlows.get(entry.getKey());
+                double referenceFlow = entry.getValue().getFlow();
+                double referenceZonalPtdf = entry.getValue().getZonalPtdf();
+                return new UncertaintyResult(referenceBranch, marketBasedFlow, referenceFlow, referenceZonalPtdf);
+            }
         ));
 
         builder.addUncertainties(uncertaintiesMap);

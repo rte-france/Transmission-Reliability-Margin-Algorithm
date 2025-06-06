@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, RTE (http://www.rte-france.com)
+ * Copyright (c) 2025, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
-
 public class UcteMapperTest {
     @Test
     void testMultiLines() {
@@ -70,12 +69,14 @@ public class UcteMapperTest {
         //When
         IdentifiableMapping mappingResults = UcteMapper.mapNetworks(networkReference, networkMarketBased);
         //Then
-        assertEquals("FFNHV211 FFNLOA31 L", mappingResults.idInReference("FFNHV211 FFNLOA31 L"));
-        assertEquals("FFNHV111 FFNHV211 1", mappingResults.idInReference("FFNHV211 FFNHV111 1"));
-        assertEquals("FFNGEN71 FFNHV111 1", mappingResults.idInReference("FFNGEN71 FFNHV111 1"));
-        assertEquals("FFNHV211 FFNLOA31 L", mappingResults.idInMarketBased("FFNHV211 FFNLOA31 L"));
-        assertEquals("FFNHV211 FFNHV111 1", mappingResults.idInMarketBased("FFNHV111 FFNHV211 1"));
-        assertEquals("FFNGEN71 FFNHV111 1", mappingResults.idInMarketBased("FFNGEN71 FFNHV111 1"));
+        networkMarketBased.getLine("FFNHV111 FFNHV211 2");
+        assertThrows(IdMappingNotFoundException.class, () -> {
+            assertEquals("FFNHV111 FFNHV211 2", mappingResults.idInMarketBased("FFNHV111 FFNHV211 2"));
+        });
+        networkReference.getLine("FFNHV311 FFNHV211 1");
+        assertThrows(IdMappingNotFoundException.class, () -> {
+            assertEquals("FFNHV311 FFNHV211 1", mappingResults.idInReference("FFNHV311 FFNHV211 1"));
+        });
     }
 
     @Test
