@@ -14,8 +14,6 @@ import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.sensitivity.SensitivityVariableSet;
-import com.rte_france.trm_algorithm.id_mapping.IdentifiableMapping;
-import com.rte_france.trm_algorithm.id_mapping.UcteMapper;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.OperationalConditionAligner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,22 +60,16 @@ public class TrmAlgorithm {
         TrmResults.Builder builder = TrmResults.builder();
 
         LOGGER.info("Selecting Critical network elements");
-        List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().collect(Collectors.toList());
+        List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().toList();
 
         checkReferenceElementNotEmpty(referenceNetworkElementIds);
         checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
-
-        IdentifiableMapping idsMappingResults = UcteMapper.mapNetworks(referenceNetwork, marketBasedNetwork);
 
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
         Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, referenceNetworkElementIds);
         Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElementIds, referenceZonalGlsks);
         LOGGER.info("Computing uncertainties");
-        Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream()
-            .filter(entry ->
-                idsMappingResults.mappingFromReferenceToMarketBased.containsKey(entry.getKey()) ||
-                idsMappingResults.mappingFromMarketBasedToReference.containsKey(entry.getKey()))
-            .collect(Collectors.toMap(
+        Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
                 entry -> {
                     Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());

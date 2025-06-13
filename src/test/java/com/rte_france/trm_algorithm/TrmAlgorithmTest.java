@@ -28,7 +28,6 @@ import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
 import com.powsybl.openrao.data.crac.io.fbconstraint.parameters.FbConstraintCracCreationParameters;
 import com.powsybl.sensitivity.SensitivityVariableSet;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.*;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -261,7 +260,6 @@ class TrmAlgorithmTest {
         assertEquals("Reference critical network elements are empty", exception.getMessage());
     }
 
-    @Disabled("Bug detected in HVDC tools mapping (disconnect method)")
     @Test
     void testSameNetwork16NodesWithAutoGlskAndHvdcDisconnected() {
         Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/hvdc/TestCase16NodesWith2Hvdc.xiidm");
