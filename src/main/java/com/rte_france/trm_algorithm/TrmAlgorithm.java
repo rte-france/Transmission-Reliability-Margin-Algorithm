@@ -61,6 +61,7 @@ public class TrmAlgorithm {
 
         LOGGER.info("Selecting Critical network elements");
         List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().toList();
+
         checkReferenceElementNotEmpty(referenceNetworkElementIds);
         checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
 
@@ -70,13 +71,13 @@ public class TrmAlgorithm {
         LOGGER.info("Computing uncertainties");
         Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
-            entry -> {
-                Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
-                double marketBasedFlow = marketBasedFlows.get(entry.getKey());
-                double referenceFlow = entry.getValue().getFlow();
-                double referenceZonalPtdf = entry.getValue().getZonalPtdf();
-                return new UncertaintyResult(referenceBranch, marketBasedFlow, referenceFlow, referenceZonalPtdf);
-            }
+                entry -> {
+                    Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
+                    double marketBasedFlow = marketBasedFlows.get(entry.getKey());
+                    double referenceFlow = entry.getValue().getFlow();
+                    double referenceZonalPtdf = entry.getValue().getZonalPtdf();
+                    return new UncertaintyResult(referenceBranch, marketBasedFlow, referenceFlow, referenceZonalPtdf);
+                }
         ));
 
         builder.addUncertainties(uncertaintiesMap);
