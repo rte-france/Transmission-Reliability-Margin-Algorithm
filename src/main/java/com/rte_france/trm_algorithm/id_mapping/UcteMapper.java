@@ -23,16 +23,21 @@ public final class UcteMapper {
     public static IdentifiableMapping mapNetworks(Network networkReference, Network networkMarketBased) {
         IdentifiableMapping.IdentifiableMappingBuilder builder = new IdentifiableMapping.IdentifiableMappingBuilder();
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
-        networkMarketBased.getBranchStream().forEach(branch -> mapNetworks(analyser, builder, networkMarketBased, branch));
+        // Code unable to map the Tielines
+        networkMarketBased.getBranchStream()
+            .filter(branch -> branch.getId().length() == 19)
+            .forEach(branch -> mapNetworks(analyser, builder, networkMarketBased, branch));
         return builder.build();
     }
 
     public static IdentifiableMapping mapNetworks(Network networkReference, Network networkMarketBased, Country... chosenCountries) {
         IdentifiableMapping.IdentifiableMappingBuilder builder = new IdentifiableMapping.IdentifiableMappingBuilder();
         UcteNetworkAnalyzer analyser = new UcteNetworkAnalyzer(networkReference, UCTE_NETWORK_ANALYZER_PROPERTIES);
+        // Code unable to map the Tielines
         networkMarketBased.getBranchStream()
-                .filter(branch -> isBranchConnectedToAnyGivenCountry(branch, chosenCountries))
-                .forEach(branch -> mapNetworks(analyser, builder, networkMarketBased, branch));
+            .filter(branch -> isBranchConnectedToAnyGivenCountry(branch, chosenCountries))
+            .filter(branch -> branch.getId().length() == 19)
+            .forEach(branch -> mapNetworks(analyser, builder, networkMarketBased, branch));
         return builder.build();
     }
 
@@ -42,11 +47,11 @@ public final class UcteMapper {
 
     private static boolean isBranchConnectedToCountry(Branch branch, Country country) {
         Optional<Country> country1 = branch.getTerminal1().getVoltageLevel()
-                .getSubstation().flatMap(Substation::getCountry);
+            .getSubstation().flatMap(Substation::getCountry);
         Optional<Country> country2 = branch.getTerminal2().getVoltageLevel()
-                .getSubstation().flatMap(Substation::getCountry);
+            .getSubstation().flatMap(Substation::getCountry);
         return country1.isPresent() && country1.get().equals(country) ||
-                country2.isPresent() && country2.get().equals(country);
+            country2.isPresent() && country2.get().equals(country);
     }
 
     private static void mapNetworks(UcteNetworkAnalyzer analyser, IdentifiableMapping.IdentifiableMappingBuilder builder, Network networkMarketBased, Branch branch) {
