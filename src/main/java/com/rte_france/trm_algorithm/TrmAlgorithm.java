@@ -69,7 +69,7 @@ public class TrmAlgorithm {
         Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElementIds, referenceZonalGlsks);
         LOGGER.info("Computing uncertainties");
         Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
-        Map.Entry::getKey,
+            Map.Entry::getKey,
             entry -> {
                 Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
                 double marketBasedFlow = marketBasedFlows.get(entry.getKey());
