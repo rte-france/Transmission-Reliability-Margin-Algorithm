@@ -27,6 +27,8 @@ import com.powsybl.openrao.data.crac.api.CracFactory;
 import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
 import com.powsybl.openrao.data.crac.io.fbconstraint.parameters.FbConstraintCracCreationParameters;
 import com.powsybl.sensitivity.SensitivityVariableSet;
+import com.rte_france.trm_algorithm.id_mapping.IdentifiableMapping;
+import com.rte_france.trm_algorithm.id_mapping.UcteMapper;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.*;
 import org.junit.jupiter.api.Test;
 
@@ -58,6 +60,21 @@ class TrmAlgorithmTest {
         ExchangeAligner exchangeAligner = new ExchangeAligner(balanceComputationParameters, loadFlowRunner, computationManager, marketZonalScalable);
         OperationalConditionAligner operationalConditionAligner = new OperationalConditionAlignerPipeline(cracAligner, hvdcAligner, pstAligner, danglingLineAligner, exchangeAligner);
         return new TrmAlgorithm(loadFlowParameters, operationalConditionAligner);
+    }
+
+    private TrmAlgorithm setUp(Crac crac, ZonalData<Scalable> localMarketZonalScalable, IdentifiableMapper identifiableMapper) {
+        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
+        BalanceComputationParameters balanceComputationParameters = new BalanceComputationParameters();
+        LoadFlow.Runner loadFlowRunner = LoadFlow.find();
+        ComputationManager computationManager = LocalComputationManager.getDefault();
+
+        CracAligner cracAligner = new CracAligner(crac);
+        HvdcAligner hvdcAligner = new HvdcAligner();
+        PstAligner pstAligner = new PstAligner();
+        DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
+        ExchangeAligner exchangeAligner = new ExchangeAligner(balanceComputationParameters, loadFlowRunner, computationManager, localMarketZonalScalable);
+        OperationalConditionAligner operationalConditionAligner = new OperationalConditionAlignerPipeline(cracAligner, hvdcAligner, pstAligner, danglingLineAligner, exchangeAligner);
+        return new TrmAlgorithm(loadFlowParameters, operationalConditionAligner, identifiableMapper);
     }
 
     @Test
@@ -366,5 +383,25 @@ class TrmAlgorithmTest {
         assertEquals(2, result.size());
         assertEquals(1260.669, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
         assertEquals(1260.669, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+    }
+
+@Test
+    void testUcte() {
+        Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
+        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"));
+        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProvider xnecProvider = new XnecProviderInterconnection();
+        TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), localMarketZonalScalable, UcteMapper.mapNetworks(referenceNetwork, marketBasedNetwork));
+
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
+
+        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
+        assertEquals(4, result.size());
+        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 }

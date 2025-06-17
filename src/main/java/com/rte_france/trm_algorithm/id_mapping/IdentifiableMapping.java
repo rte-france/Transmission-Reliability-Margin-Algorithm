@@ -7,6 +7,7 @@
  */
 package com.rte_france.trm_algorithm.id_mapping;
 
+import com.rte_france.trm_algorithm.IdentifiableMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ import java.util.Map;
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
-public class IdentifiableMapping {
+public class IdentifiableMapping implements IdentifiableMapper {
     public final Map<String, String> mappingFromMarketBasedToReference;
     public final Map<String, String> mappingFromReferenceToMarketBased;
     private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableMapping.class);
@@ -38,6 +39,16 @@ public class IdentifiableMapping {
         return mappingFromReferenceToMarketBased.computeIfAbsent(s, idInReference -> {
             throw new IdMappingNotFoundException("Id - " + s + " - not found in marketBased");
         });
+    }
+
+    @Override
+    public String getIdInMarket(String idInReference) {
+        return idInMarketBased(idInReference);
+    }
+
+    @Override
+    public String getIdInReference(String idInMarket) {
+        return "";
     }
 
     public static class IdentifiableMappingBuilder {

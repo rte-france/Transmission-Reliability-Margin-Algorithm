@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -33,11 +34,18 @@ public class TrmAlgorithm {
     private final OperationalConditionAligner operationalConditionAligner;
     private final ZonalSensitivityComputer zonalSensitivityComputer;
     private final FlowExtractor flowExtractor;
+    //
+    private final IdentifiableMapper identifiableMapper;
 
     public TrmAlgorithm(LoadFlowParameters loadFlowParameters, OperationalConditionAligner operationalConditionAligner) {
+        this(loadFlowParameters, operationalConditionAligner, new IdentityIdMapper());
+    }
+
+    public TrmAlgorithm(LoadFlowParameters loadFlowParameters, OperationalConditionAligner operationalConditionAligner, IdentifiableMapper identifiableMapper) {
         this.operationalConditionAligner = operationalConditionAligner;
         this.flowExtractor = new FlowExtractor(loadFlowParameters);
         this.zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
+        this.identifiableMapper = identifiableMapper;
     }
 
     private void checkReferenceElementNotEmpty(List<String> referenceNetworkElementIds) {
@@ -48,7 +56,7 @@ public class TrmAlgorithm {
 
     private void checkReferenceElementAreAvailableInMarketBasedNetwork(List<String> referenceNetworkElementIds, Network marketBasedNetwork) {
         List<String> missingBranches = referenceNetworkElementIds.stream()
-            .filter(branchId -> Objects.isNull(marketBasedNetwork.getBranch(branchId)))
+            .filter(branchIdInReference -> Objects.isNull(marketBasedNetwork.getBranch(identifiableMapper.getIdInMarket(branchIdInReference))))
             .sorted()
             .toList();
         if (!missingBranches.isEmpty()) {
@@ -60,19 +68,28 @@ public class TrmAlgorithm {
         TrmResults.Builder builder = TrmResults.builder();
 
         LOGGER.info("Selecting Critical network elements");
+        // Filtrer pour n'utiliser que les branches présentes dans les deux fichiers
+//        Set<String> idsMarket = marketBasedNetwork.getBranchStream()
+//            .map(Identifiable::getId)
+//            .collect(Collectors.toSet());
+//        List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().filter(idsMarket::contains).toList();
         List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().toList();
         checkReferenceElementNotEmpty(referenceNetworkElementIds);
         checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
 
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
-        Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, referenceNetworkElementIds);
+        List<String> marketBasedNetworkElementsIds = referenceNetworkElementIds.stream().map(id -> identifiableMapper.getIdInMarket(id)).toList();
+        Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, marketBasedNetworkElementsIds);
         Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElementIds, referenceZonalGlsks);
         LOGGER.info("Computing uncertainties");
         Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
             entry -> {
-                Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
-                double marketBasedFlow = marketBasedFlows.get(entry.getKey());
+                String idInReference = entry.getKey();
+                //
+                String idInMarket = identifiableMapper.getIdInMarket(idInReference);
+                Branch<?> referenceBranch = referenceNetwork.getBranch(idInReference);
+                double marketBasedFlow = marketBasedFlows.get(idInMarket);
                 double referenceFlow = entry.getValue().getFlow();
                 double referenceZonalPtdf = entry.getValue().getZonalPtdf();
                 return new UncertaintyResult(referenceBranch, marketBasedFlow, referenceFlow, referenceZonalPtdf);
