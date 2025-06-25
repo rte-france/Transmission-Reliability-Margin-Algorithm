@@ -42,6 +42,7 @@
         </sonar.jacoco.reportPath>
 
         <!-- Dependencies versions -->
+        <farao-dichotomy.version>4.28.0</farao-dichotomy.version>
         <gridcapa-swe.version>1.37.0</gridcapa-swe.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <logback.version>1.5.6</logback.version>
@@ -57,6 +58,18 @@
 
     <dependencies>
         <!-- Compile dependencies -->
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>farao-dichotomy-shift</artifactId>
+            <version>${farao-dichotomy.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.powsybl</groupId>
+                    <artifactId>powsybl-config-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
             <artifactId>gridcapa-swe-commons</artifactId>
@@ -225,7 +238,7 @@
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-glsk-document-ucte</artifactId>
             <version>${powsybl.entsoe.version}</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
