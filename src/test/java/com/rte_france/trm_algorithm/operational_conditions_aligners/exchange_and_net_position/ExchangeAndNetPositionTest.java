@@ -48,4 +48,18 @@ class ExchangeAndNetPositionTest {
         assertEquals(0, exchangeAndNetPosition.getExchangeToExterior(Country.FR), EPSILON);
         assertEquals(100., exchangeAndNetPosition.getExchangeToExterior(Country.BE), EPSILON);
     }
+
+    @Test
+    void testItalyNorthNetwork() {
+        Network network = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
+        LoadFlow.run(network);
+        ExchangeAndNetPosition exchangeAndNetPosition = new ExchangeAndNetPosition(network);
+        assertEquals(Set.of(Country.AT, Country.CH, Country.DE, Country.FR, Country.IT, Country.SI), exchangeAndNetPosition.getCountries());
+        assertEquals(401.098, exchangeAndNetPosition.getNetPosition(Country.AT), EPSILON);
+        assertEquals(323.276, exchangeAndNetPosition.getNetPosition(Country.CH), EPSILON); //350
+        assertEquals(501.792, exchangeAndNetPosition.getNetPosition(Country.DE), EPSILON);
+        assertEquals(618.850, exchangeAndNetPosition.getNetPosition(Country.FR), EPSILON); //600
+        assertEquals(-1948.416, exchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+        assertEquals(103.399, exchangeAndNetPosition.getNetPosition(Country.SI), EPSILON);
+    }
 }

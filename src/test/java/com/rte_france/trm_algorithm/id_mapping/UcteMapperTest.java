@@ -100,7 +100,7 @@ public class UcteMapperTest {
     void testChosenCountries() {
         //Given
         Network networkReference = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
-        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_MARKET.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
         //When
         IdentifiableMapping mappingResults =  UcteMapper.mapNetworks(networkReference, networkMarketBased);
         IdentifiableMapping mappingResultsChosenCountrys = UcteMapper.mapNetworks(networkReference, networkMarketBased, Country.IT, Country.FR, Country.SI, Country.CH, Country.AT);
