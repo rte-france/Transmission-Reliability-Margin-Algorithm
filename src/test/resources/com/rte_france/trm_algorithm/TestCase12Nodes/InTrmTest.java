@@ -20,7 +20,7 @@ public class InTrmTest {
 
     @Test
     void testInNetworkTestIsFullyConverged() {
-        Network network = TestUtils.importNetwork("TestCaseIn/NETWORK_TEST_IN_MARKET.uct");
+        Network network = TestUtils.importNetwork("TestCaseIn/NETWORK_TEST_IN.uct");
         var lfResult = LoadFlow.run(network);
         assertTrue(lfResult.isFullyConverged());
     }
