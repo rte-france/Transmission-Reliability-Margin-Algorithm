@@ -7,9 +7,13 @@
  */
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.rte_france.trm_algorithm.TestUtils;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPosition;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
@@ -18,19 +22,24 @@ class ItalyNorthExchangeAlignerTest {
     public static final double EPSILON = 1e-1;
 
     @Test
-    void testComputeAllNetPositions() {
+    void testSimpleShift() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
 
         ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner();
+
+        ExchangeAndNetPosition referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
+        ExchangeAndNetPosition marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
+
+        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+        assertEquals(-1948.416, marketBasedExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+
         italyNorthExchangeAligner.align(referenceNetwork, marketBasedNetwork);
-    }
 
-    @Test
-    void testReadShiftingFactors() {
-    }
+        referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
+        marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
 
-    @Test
-    void testShiftNetworkWithShiftingFactors() {
+        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+        assertEquals(-2970.077, marketBasedExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
     }
 }

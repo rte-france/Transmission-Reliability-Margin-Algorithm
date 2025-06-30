@@ -11,7 +11,6 @@ import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationExceptio
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.LinearScaler;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
-import com.farao_community.farao.dichotomy.shift.SplittingFactors;
 import com.google.common.collect.ImmutableMap;
 import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.glsk.commons.ZonalData;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 import static com.powsybl.iidm.network.Country.*;
+import static java.lang.Math.abs;
 
 /**
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
@@ -43,35 +43,105 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
 
     @Override
     public void align(Network referenceNetwork, Network marketBasedNetwork) {
-        LOGGER.info("Aligning exchanges");
+        LOGGER.info("Aligning North Italian exchanges");
 
-        LoadFlow.run(referenceNetwork); // TODO: point at loadflow parameters
-        LoadFlow.run(marketBasedNetwork);
-
-        ExchangeAndNetPosition referenceExchangeAndNetPosition = new ExchangeAndNetPosition(referenceNetwork);
-        ExchangeAndNetPosition initialMarketBasedExchangeAndNetPosition = new ExchangeAndNetPosition(marketBasedNetwork);
+        ExchangeAndNetPosition referenceExchangeAndNetPosition = computeExchangeAndNetPosition(referenceNetwork);
+        ExchangeAndNetPosition initialMarketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
 
         ZonalData<Scalable> zonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-
-        Map<String, Double>  splittingFactors = ImmutableMap.of(
+        Map<String, Double> reducedSplittingFactors = ImmutableMap.of(
                 new CountryEICode(FR).getCode(), 0.4,
                 new CountryEICode(AT).getCode(), 0.3,
                 new CountryEICode(CH).getCode(), 0.1,
                 new CountryEICode(SI).getCode(), 0.2
         );
 
-        ShiftDispatcher shiftDispatcher = new SplittingFactors(splittingFactors);
-
-        LinearScaler linearScaler = new LinearScaler(zonalScalable, shiftDispatcher);
         try {
-            linearScaler.shiftNetwork(referenceExchangeAndNetPosition.getNetPosition(Country.IT), marketBasedNetwork);
-            ExchangeAndNetPosition finalMarketBasedExchangeAndNetPosition = new ExchangeAndNetPosition(marketBasedNetwork);
+            // value : (opposite to) the Italian NP in the reference network
+            // ntc : ntc in the market based network
+            Map<String, Double> ntcs = updateMarketBasedNtcs(initialMarketBasedExchangeAndNetPosition);
 
+            LOGGER.info("Initial " + npSummaryForLogs(initialMarketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition));
+            shiftNetwork(marketBasedNetwork, reducedSplittingFactors, ntcs, zonalScalable, referenceExchangeAndNetPosition);
+
+            referenceExchangeAndNetPosition = computeExchangeAndNetPosition(referenceNetwork);
+            ExchangeAndNetPosition marketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
+
+            int nbIterations = 1;
+            while (nbIterations < 20 & abs(referenceExchangeAndNetPosition.getNetPosition(Country.IT) - marketBasedExchangeAndNetPosition.getNetPosition(Country.IT)) > EXCHANGE_EPSILON) {
+
+                nbIterations++;
+                LOGGER.info(npSummaryForLogs(marketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition) + " Iteration " + nbIterations + " will be run.");
+
+                ntcs = updateMarketBasedNtcs(marketBasedExchangeAndNetPosition);
+
+                shiftNetwork(marketBasedNetwork, reducedSplittingFactors, ntcs, zonalScalable, referenceExchangeAndNetPosition);
+                referenceExchangeAndNetPosition = computeExchangeAndNetPosition(referenceNetwork);
+                marketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
+            }
+
+            if (abs(referenceExchangeAndNetPosition.getNetPosition(Country.IT) - marketBasedExchangeAndNetPosition.getNetPosition(Country.IT)) > EXCHANGE_EPSILON) {
+                LOGGER.error("North Italian exchange aligner failed: nb max iterations is reached. " + npSummaryForLogs(initialMarketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition));
+            }
+            LOGGER.info("Both networks are aligned. North Italian NP is " + marketBasedExchangeAndNetPosition.getNetPosition(Country.IT) + " MW.");
+
+            finalDebugLoggerNp("reference", referenceExchangeAndNetPosition);
+            finalDebugLoggerNp("initial market-based", initialMarketBasedExchangeAndNetPosition);
+            finalDebugLoggerNp("final market-based", marketBasedExchangeAndNetPosition);
+            finalDebugLoggerShift(initialMarketBasedExchangeAndNetPosition, marketBasedExchangeAndNetPosition);
             int i = 1;
-        } catch (GlskLimitationException e) {
-            throw new RuntimeException(e);
         } catch (ShiftingException e) {
             throw new RuntimeException(e);
+        } catch (GlskLimitationException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private static void finalDebugLoggerNp(String networkName, ExchangeAndNetPosition referenceExchangeAndNetPosition) {
+        LOGGER.debug("Net positions in the " + networkName
+                + " network: IT = " + referenceExchangeAndNetPosition.getNetPosition(Country.IT)
+                + " MW, AT = " + referenceExchangeAndNetPosition.getNetPosition(Country.AT)
+                + " MW, CH = " + referenceExchangeAndNetPosition.getNetPosition(Country.CH)
+                + " MW, DE = " + referenceExchangeAndNetPosition.getNetPosition(Country.DE)
+                + " MW, FR = " + referenceExchangeAndNetPosition.getNetPosition(Country.FR)
+                + " MW, SI = " + referenceExchangeAndNetPosition.getNetPosition(Country.SI) + " MW.");
+    }
+
+    private static void finalDebugLoggerShift(ExchangeAndNetPosition initialMarketBasedExchangeAndNetPosition, ExchangeAndNetPosition marketBasedExchangeAndNetPosition) {
+        LOGGER.debug("Shift performed on the market-based network: "
+                + " IT = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.IT) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.IT))
+                + " MW, AT = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.AT) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.AT))
+                + " MW, CH = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.CH) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.CH))
+                + " MW, DE = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.DE) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.DE))
+                + " MW, FR = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.FR) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.FR))
+                + " MW, SI = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.SI) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.SI))
+                + " MW.");
+    }
+
+    private static String npSummaryForLogs(ExchangeAndNetPosition marketBasedExchangeAndNetPosition, ExchangeAndNetPosition referenceExchangeAndNetPosition) {
+        return "North Italian NP is " + marketBasedExchangeAndNetPosition.getNetPosition(Country.IT)
+                + " MW for the market based network and " + referenceExchangeAndNetPosition.getNetPosition(Country.IT)
+                + "MW for the reference network.";
+    }
+
+    private static void shiftNetwork(Network marketBasedNetwork, Map<String, Double> reducedSplittingFactors, Map<String, Double> ntcs, ZonalData<Scalable> zonalScalable, ExchangeAndNetPosition referenceExchangeAndNetPosition) throws GlskLimitationException, ShiftingException {
+        ShiftDispatcher shiftDispatcher = new CseD2ccShiftDispatcherTmp(LOGGER, reducedSplittingFactors, ntcs);
+        LinearScaler linearScaler = new LinearScaler(zonalScalable, shiftDispatcher);
+        linearScaler.shiftNetwork(-referenceExchangeAndNetPosition.getNetPosition(IT), marketBasedNetwork);
+    }
+
+    ExchangeAndNetPosition computeExchangeAndNetPosition(Network network) {
+        LoadFlow.run(network);
+        return new ExchangeAndNetPosition(network);
+    }
+
+    private static Map<String, Double> updateMarketBasedNtcs(ExchangeAndNetPosition marketBasedExchangeAndNetPosition) {
+        Map<String, Double> ntcs = Map.of(
+                new CountryEICode(FR).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(FR),
+                new CountryEICode(CH).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(CH) + marketBasedExchangeAndNetPosition.getNetPosition(DE),
+                new CountryEICode(AT).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(AT),
+                new CountryEICode(SI).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(SI)
+        );
+        return ntcs;
     }
 }
