@@ -44,6 +44,7 @@
         <!-- Dependencies versions -->
         <farao-dichotomy.version>4.28.0</farao-dichotomy.version>
         <gridcapa-swe.version>1.37.0</gridcapa-swe.version>
+        <gridcapa-cse.version>1.45.0</gridcapa-cse.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <logback.version>1.5.6</logback.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
@@ -72,8 +73,8 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
-            <artifactId>gridcapa-swe-commons</artifactId>
-            <version>${gridcapa-swe.version}</version>
+            <artifactId>gridcapa-cse-data</artifactId>
+            <version>${gridcapa-cse.version}</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
@@ -84,8 +85,8 @@
         </dependency>
         <dependency>
             <groupId>com.farao-community.farao</groupId>
-            <artifactId>gridcapa-cse-data</artifactId>
-            <version>1.45.0</version>
+            <artifactId>gridcapa-swe-commons</artifactId>
+            <version>${gridcapa-swe.version}</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>

@@ -17,7 +17,6 @@ import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationExceptio
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.LinearScaler;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
-import com.google.common.collect.ImmutableMap;
 import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.ucte.UcteGlskDocument;
@@ -35,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.powsybl.iidm.network.Country.*;
@@ -46,17 +46,11 @@ import static java.lang.Math.abs;
 public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     private static final double EXCHANGE_EPSILON = 1e-1;
     private static final Logger LOGGER = LoggerFactory.getLogger(ItalyNorthExchangeAligner.class);
-    private static Map<String, Double> reducedSplittingFactors;
+    private final Map<String, Double> reducedSplittingFactors;
 
-    public ItalyNorthExchangeAligner() {
+    public ItalyNorthExchangeAligner(Map<String, Double> reducedSplittingFactors) {
         UcteGlskDocument ucteGlskDocument = null;
-
-        reducedSplittingFactors = ImmutableMap.of(
-                new CountryEICode(FR).getCode(), 0.4,
-                new CountryEICode(AT).getCode(), 0.3,
-                new CountryEICode(CH).getCode(), 0.1,
-                new CountryEICode(SI).getCode(), 0.2
-        );
+        this.reducedSplittingFactors = reducedSplittingFactors;
     }
 
     @Override
@@ -165,7 +159,12 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
             DailyNtcDocument dailyNtcDocument = new DailyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(dailyData, NTCReductionsDocument.class));
             Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, false);
 
-            return ntc.computeReducedSplittingFactors();
+            Map<String, Double> reducedSplittingFactors = new HashMap<>();
+            ntc.computeReducedSplittingFactors().forEach((country, value) -> {
+                reducedSplittingFactors.put(new CountryEICode(Country.valueOf(country)).getCode(), value);
+            });
+
+            return reducedSplittingFactors;
 
         } catch (IOException | JAXBException e) {
             //TODO
