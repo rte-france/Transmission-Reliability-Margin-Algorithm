@@ -13,6 +13,10 @@ import com.rte_france.trm_algorithm.TestUtils;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPosition;
 import org.junit.jupiter.api.Test;
 
+import java.time.OffsetDateTime;
+import java.util.Map;
+
+import static com.rte_france.trm_algorithm.operational_conditions_aligners.ItalyNorthExchangeAligner.importSplittingFactorsFromNtcDocs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -20,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ItalyNorthExchangeAlignerTest {
     public static final double EPSILON = 1e-1;
+    private static final double DOUBLE_PRECISION = 0.001;
 
     @Test
     void testSimpleShift() {
@@ -41,5 +46,16 @@ class ItalyNorthExchangeAlignerTest {
 
         assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
         assertEquals(-2970.077, marketBasedExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+    }
+
+    @Test
+    void testNtcReductionsImport() {
+        Map<String, Double> splittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml", "../TestCase12Nodes/NTC_reductions_CSE.xml");
+
+        assertEquals(4, splittingFactors.size());
+        assertEquals(0.456, splittingFactors.get("FR"), DOUBLE_PRECISION);
+        assertEquals(0.425, splittingFactors.get("CH"), DOUBLE_PRECISION);
+        assertEquals(0.045, splittingFactors.get("AT"), DOUBLE_PRECISION);
+        assertEquals(0.073, splittingFactors.get("SI"), DOUBLE_PRECISION);
     }
 }

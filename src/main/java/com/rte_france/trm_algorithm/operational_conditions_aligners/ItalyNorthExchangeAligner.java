@@ -7,6 +7,12 @@
  */
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
+import com.farao_community.farao.cse.data.DataUtil;
+import com.farao_community.farao.cse.data.ntc.DailyNtcDocument;
+import com.farao_community.farao.cse.data.ntc.Ntc;
+import com.farao_community.farao.cse.data.ntc.YearlyNtcDocument;
+import com.farao_community.farao.cse.data.xsd.NTCAnnualDocument;
+import com.farao_community.farao.cse.data.xsd.NTCReductionsDocument;
 import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationException;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.LinearScaler;
@@ -22,9 +28,13 @@ import com.powsybl.loadflow.LoadFlow;
 
 import com.rte_france.trm_algorithm.TrmUtils;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPosition;
+import jakarta.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 import static com.powsybl.iidm.network.Country.*;
@@ -36,9 +46,17 @@ import static java.lang.Math.abs;
 public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     private static final double EXCHANGE_EPSILON = 1e-1;
     private static final Logger LOGGER = LoggerFactory.getLogger(ItalyNorthExchangeAligner.class);
+    private static Map<String, Double> reducedSplittingFactors;
 
     public ItalyNorthExchangeAligner() {
         UcteGlskDocument ucteGlskDocument = null;
+
+        reducedSplittingFactors = ImmutableMap.of(
+                new CountryEICode(FR).getCode(), 0.4,
+                new CountryEICode(AT).getCode(), 0.3,
+                new CountryEICode(CH).getCode(), 0.1,
+                new CountryEICode(SI).getCode(), 0.2
+        );
     }
 
     @Override
@@ -49,12 +67,6 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         ExchangeAndNetPosition initialMarketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
 
         ZonalData<Scalable> zonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        Map<String, Double> reducedSplittingFactors = ImmutableMap.of(
-                new CountryEICode(FR).getCode(), 0.4,
-                new CountryEICode(AT).getCode(), 0.3,
-                new CountryEICode(CH).getCode(), 0.1,
-                new CountryEICode(SI).getCode(), 0.2
-        );
 
         try {
             // value : (opposite to) the Italian NP in the reference network
@@ -143,5 +155,21 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
                 new CountryEICode(SI).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(SI)
         );
         return ntcs;
+    }
+
+    static Map<String, Double> importSplittingFactorsFromNtcDocs(OffsetDateTime targetDateTime, String ntcAnnualPath, String ntcReductionsPath) {
+        try (InputStream yearlyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcAnnualPath);
+             InputStream dailyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcReductionsPath)
+        ) {
+            YearlyNtcDocument yearlyNtcDocument = new YearlyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(yearlyData, NTCAnnualDocument.class));
+            DailyNtcDocument dailyNtcDocument = new DailyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(dailyData, NTCReductionsDocument.class));
+            Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, false);
+
+            return ntc.computeReducedSplittingFactors();
+
+        } catch (IOException | JAXBException e) {
+            //TODO
+            throw new RuntimeException("Impossible to create NTC", e);
+        }
     }
 }

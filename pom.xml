@@ -83,6 +83,18 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>gridcapa-cse-data</artifactId>
+            <version>1.45.0</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.powsybl</groupId>
+                    <artifactId>powsybl-config-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>open-rao-commons</artifactId>
             <version>${powsybl.rao.version}</version>
