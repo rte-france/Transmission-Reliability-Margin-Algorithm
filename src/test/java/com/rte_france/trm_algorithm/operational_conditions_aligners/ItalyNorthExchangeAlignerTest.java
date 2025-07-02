@@ -9,7 +9,6 @@ package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
 import com.google.common.collect.ImmutableMap;
 import com.powsybl.glsk.commons.CountryEICode;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.rte_france.trm_algorithm.TestUtils;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPosition;
@@ -46,16 +45,21 @@ class ItalyNorthExchangeAlignerTest {
         ExchangeAndNetPosition referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
         ExchangeAndNetPosition marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
 
-        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
-        assertEquals(-1948.416, marketBasedExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+        assertEquals(-1948.416, marketBasedExchangeAndNetPosition.getNetPosition(IT), EPSILON);
 
         italyNorthExchangeAligner.align(referenceNetwork, marketBasedNetwork);
 
         referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
         marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
 
-        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
-        assertEquals(-2970.077, marketBasedExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+        assertEquals(-2970.077, marketBasedExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+
+        assertEquals(705.517, marketBasedExchangeAndNetPosition.getNetPosition(AT), EPSILON);
+        assertEquals(425.356, marketBasedExchangeAndNetPosition.getNetPosition(CH), EPSILON);
+        assertEquals(1029.614, marketBasedExchangeAndNetPosition.getNetPosition(FR), EPSILON);
+        assertEquals(307.032, marketBasedExchangeAndNetPosition.getNetPosition(SI), EPSILON);
     }
 
     @Test
@@ -63,10 +67,10 @@ class ItalyNorthExchangeAlignerTest {
         Map<String, Double> splittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml", "../TestCase12Nodes/NTC_reductions_CSE.xml");
 
         assertEquals(4, splittingFactors.size());
-        assertEquals(0.456, splittingFactors.get(new CountryEICode(Country.valueOf("FR")).getCode()), DOUBLE_PRECISION);
-        assertEquals(0.425, splittingFactors.get(new CountryEICode(Country.valueOf("CH")).getCode()), DOUBLE_PRECISION);
-        assertEquals(0.045, splittingFactors.get(new CountryEICode(Country.valueOf("AT")).getCode()), DOUBLE_PRECISION);
-        assertEquals(0.073, splittingFactors.get(new CountryEICode(Country.valueOf("SI")).getCode()), DOUBLE_PRECISION);
+        assertEquals(0.456, splittingFactors.get(new CountryEICode(FR).getCode()), DOUBLE_PRECISION);
+        assertEquals(0.425, splittingFactors.get(new CountryEICode(CH).getCode()), DOUBLE_PRECISION);
+        assertEquals(0.045, splittingFactors.get(new CountryEICode(AT).getCode()), DOUBLE_PRECISION);
+        assertEquals(0.073, splittingFactors.get(new CountryEICode(SI).getCode()), DOUBLE_PRECISION);
     }
 
     @Test
@@ -74,22 +78,50 @@ class ItalyNorthExchangeAlignerTest {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
 
-        Map<String, Double> reducedSplittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml", "../TestCase12Nodes/NTC_reductions_CSE.xml");
+        String ntcReductionsPath = "../TestCase12Nodes/NTC_reductions_CSE.xml";
+        String ntcAnnualPath = "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml";
+        Map<String, Double> reducedSplittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), ntcAnnualPath, ntcReductionsPath);
 
         ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(reducedSplittingFactors);
 
         ExchangeAndNetPosition referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
         ExchangeAndNetPosition marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
 
-        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
-        assertEquals(-1948.416, marketBasedExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+        assertEquals(-1948.416, marketBasedExchangeAndNetPosition.getNetPosition(IT), EPSILON);
 
         italyNorthExchangeAligner.align(referenceNetwork, marketBasedNetwork);
 
         referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
         marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
 
-        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
-        assertEquals(-2970.077, marketBasedExchangeAndNetPosition.getNetPosition(Country.IT), EPSILON);
+        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+        assertEquals(-2970.077, marketBasedExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+    }
+
+    @Test
+    void testShiftWithImportedSplittingFactors2() {
+        Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
+        Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
+
+        String ntcReductionsPath = "../TestCase12Nodes/NTC_reductions_CSE.xml";
+        String ntcAnnualPath = "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml";
+        Map<String, Double> reducedSplittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), ntcAnnualPath, ntcReductionsPath);
+
+        ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(reducedSplittingFactors);
+
+        ExchangeAndNetPosition referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
+        ExchangeAndNetPosition marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
+
+        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+        assertEquals(-1948.416, marketBasedExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+
+        italyNorthExchangeAligner.align(referenceNetwork, marketBasedNetwork);
+
+        referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
+        marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
+
+        assertEquals(-2970.077, referenceExchangeAndNetPosition.getNetPosition(IT), EPSILON);
+        assertEquals(-2970.077, marketBasedExchangeAndNetPosition.getNetPosition(IT), EPSILON);
     }
 }

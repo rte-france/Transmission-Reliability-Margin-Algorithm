@@ -108,8 +108,10 @@ We want to align exchanges with countries that are not included in the reference
 #### Align inner exchanges
 
 The goal is to align the exchanges of market-based network on the exchanges of the real time snapshot for each boundary 
-of the real time snapshot.  
-The alignement is done with balances adjustment.  
+of the real time snapshot.
+
+##### With balances adjustment
+The alignement can be done with balances adjustment, which is used for the SWE.  
 The alignment is ignored if the exchanges are already the same.  
 
 $`c`$ is a country in the market-based network.  
@@ -126,6 +128,21 @@ If the networks have the same countries, this is equivalent to setting the targe
 positions.  
 If the network is not for a NTC process and if a smaller network is used, the alignement might fail with a status `TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED`.  
 > This simple bahavior might be changed in the futur is required. But it does not make sens from a métier point of view as the afrr concept exists. 
+
+##### With simple shifts
+Another alternative for inner exchanges alignment is the use of a network shift, as done for the Italy North capacity calculation region.
+
+In the Italy North region, the target is defined on the global Italian import from the four countries to the north. 
+two input documents (NTC annual and NTC reductions) define how to split the generation increase among the four countries: 
+they define splitting factors (between 0 and 1, with their sum equal to 1) to fix the share of each country (NB: Germany 
+is included in the share of Switzerland).
+
+Several iterations of shifts are run in order to reach the targeted Italian import value to take into account the losses 
+(an increase of X MW of the generation in a given area does not mean that the exports from the area increase by exactly the same value).
+
+The code calls a method called shiftNetwork from the external class LinearScaler: its inputs are the targeted value 
+of Italian import (positive when Italy imports, opposite to the Italian net position) from the reference network, 
+whereas the NTC values used for the computation are the ones from the market-based network.
 
 #### HVDC AC modeling environment
 
