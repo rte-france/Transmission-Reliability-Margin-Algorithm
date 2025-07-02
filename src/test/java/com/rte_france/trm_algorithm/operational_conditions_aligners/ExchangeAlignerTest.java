@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.rte_france.trm_algorithm.TrmUtils.getCountryGeneratorsScalable;
+import static com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -77,7 +78,7 @@ class ExchangeAlignerTest {
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
-        assertEquals(ExchangeAligner.Status.NOT_ALIGNED, result.getStatus());
+        assertEquals(NOT_ALIGNED, result.getStatus());
         assertEquals(BalanceComputationResult.Status.FAILED, result.getBalanceComputationResult().getStatus());
         TestUtils.assertNetPositions(Map.of(Country.ES, -983.6, Country.FR, 0.2, Country.PT, 983.4), result.getReferenceExchangeAndNetPosition());
         TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedExchangeAndNetPosition());
@@ -98,7 +99,7 @@ class ExchangeAlignerTest {
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
-        assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, result.getStatus());
+        assertEquals(ALREADY_ALIGNED, result.getStatus());
         assertNull(result.getBalanceComputationResult());
         TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getReferenceExchangeAndNetPosition());
         TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedExchangeAndNetPosition());
@@ -137,7 +138,7 @@ class ExchangeAlignerTest {
         ExchangeAligner exchangeAligner = new ExchangeAligner(parameters, LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
-        assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
+        assertEquals(ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
         assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
         TestUtils.assertNetPositions(Map.of(Country.ES, -1200., Country.FR, 500., Country.PT, 700.), result.getReferenceExchangeAndNetPosition());
         TestUtils.assertNetPositions(Map.of(Country.ES, -0.4, Country.FR, 0.2, Country.PT, 0.2), result.getInitialMarketBasedExchangeAndNetPosition());
@@ -175,7 +176,7 @@ class ExchangeAlignerTest {
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
-        assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
+        assertEquals(ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
         assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
         TestUtils.assertNetPositions(Map.of(Country.BE, -2500., Country.DE, -1500., Country.FR, 3000., Country.NL, 1000.), result.getReferenceExchangeAndNetPosition());
         TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getInitialMarketBasedExchangeAndNetPosition());
@@ -196,7 +197,7 @@ class ExchangeAlignerTest {
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
-        assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, result.getStatus());
+        assertEquals(ALREADY_ALIGNED, result.getStatus());
         assertNull(result.getBalanceComputationResult());
         TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getReferenceExchangeAndNetPosition());
         TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -2000., Country.FR, 0., Country.NL, -500.), result.getInitialMarketBasedExchangeAndNetPosition());
@@ -230,7 +231,7 @@ class ExchangeAlignerTest {
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
-        assertEquals(ExchangeAligner.Status.ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
+        assertEquals(ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
         assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
         TestUtils.assertNetPositions(Map.of(Country.DE, -1111.1, Country.FR, 1111.1), result.getReferenceExchangeAndNetPosition());
         TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -1653.8, Country.FR, -692.3), result.getInitialMarketBasedExchangeAndNetPosition());
@@ -255,7 +256,7 @@ class ExchangeAlignerTest {
         ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
-        assertEquals(ExchangeAligner.Status.TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED, result.getStatus());
+        assertEquals(TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED, result.getStatus());
         assertEquals(BalanceComputationResult.Status.SUCCESS, result.getBalanceComputationResult().getStatus());
         TestUtils.assertNetPositions(Map.of(Country.BE, 2346.1, Country.DE, -2153.8, Country.FR, -192.3), result.getReferenceExchangeAndNetPosition());
         TestUtils.assertNetPositions(Map.of(Country.BE, 2500., Country.DE, -1500., Country.FR, -500., Country.NL, -500.), result.getInitialMarketBasedExchangeAndNetPosition());

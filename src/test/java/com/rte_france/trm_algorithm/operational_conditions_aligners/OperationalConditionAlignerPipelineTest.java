@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import static com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerStatus.ALREADY_ALIGNED;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -48,7 +49,7 @@ class OperationalConditionAlignerPipelineTest {
     }
 
     private static void assertExchangeAlignerResult(ExchangeAlignerResult exchangeAlignerResult, Map<Country, Double> expectedNetPositions, Map<Country, Map<Country, Double>> expectedExchanges) {
-        assertEquals(ExchangeAligner.Status.ALREADY_ALIGNED, exchangeAlignerResult.getStatus());
+        assertEquals(ALREADY_ALIGNED, exchangeAlignerResult.getStatus());
         TestUtils.assertNetPositions(expectedNetPositions, exchangeAlignerResult.getReferenceExchangeAndNetPosition());
         TestUtils.assertNetPositions(expectedNetPositions, exchangeAlignerResult.getInitialMarketBasedExchangeAndNetPosition());
         TestUtils.assertExchanges(expectedExchanges, exchangeAlignerResult.getReferenceExchangeAndNetPosition());

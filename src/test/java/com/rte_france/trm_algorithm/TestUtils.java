@@ -14,7 +14,6 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.CracFactory;
 import com.powsybl.openrao.data.crac.api.networkaction.ActionType;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAligner;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerResult;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.EmptyExchangeAndNetPosition;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.EmptyNetPosition;
@@ -25,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerStatus.NOT_ALIGNED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -85,7 +85,7 @@ public final class TestUtils {
             .addTargetNetPosition(new EmptyNetPosition())
             .addBalanceComputationResult(new BalanceComputationResult(BalanceComputationResult.Status.FAILED))
             .addNewMarketBasedExchangeAndNetPositions(new EmptyExchangeAndNetPosition())
-            .addExchangeAlignerStatus(ExchangeAligner.Status.NOT_ALIGNED)
+            .addExchangeAlignerStatus(NOT_ALIGNED)
             .build();
     }
 

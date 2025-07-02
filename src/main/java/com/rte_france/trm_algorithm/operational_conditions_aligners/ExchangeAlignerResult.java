@@ -24,7 +24,7 @@ public final class ExchangeAlignerResult {
     private final NetPositionInterface targetNetPositions;
     private final BalanceComputationResult balanceComputationResult;
     private final ExchangeAndNetPositionInterface newMarketBasedExchangeAndNetPosition;
-    private final ExchangeAligner.Status status;
+    private final ExchangeAlignerStatus status;
 
     public ExchangeAlignerResult(Builder builder) {
         referenceExchangeAndNetPosition = builder.referenceExchangeAndNetPosition;
@@ -59,7 +59,7 @@ public final class ExchangeAlignerResult {
         return newMarketBasedExchangeAndNetPosition;
     }
 
-    public ExchangeAligner.Status getStatus() {
+    public ExchangeAlignerStatus getStatus() {
         return status;
     }
 
@@ -77,7 +77,7 @@ public final class ExchangeAlignerResult {
         private NetPositionInterface targetNetPositions;
         private BalanceComputationResult balanceComputationResult;
         private ExchangeAndNetPositionInterface newMarketBasedExchangeAndNetPosition = new EmptyExchangeAndNetPosition();
-        private ExchangeAligner.Status status;
+        private ExchangeAlignerStatus status;
 
         private Builder() {
             // Builder pattern
@@ -108,7 +108,7 @@ public final class ExchangeAlignerResult {
             return this;
         }
 
-        public Builder addExchangeAlignerStatus(ExchangeAligner.Status status) {
+        public Builder addExchangeAlignerStatus(ExchangeAlignerStatus status) {
             this.status = status;
             return this;
         }
