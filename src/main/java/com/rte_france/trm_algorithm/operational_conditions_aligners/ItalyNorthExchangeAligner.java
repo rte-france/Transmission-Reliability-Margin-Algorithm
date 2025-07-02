@@ -28,6 +28,7 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import com.rte_france.trm_algorithm.TrmException;
 import com.rte_france.trm_algorithm.TrmUtils;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPosition;
+import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPositionInterface;
 import jakarta.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,10 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         this.reducedSplittingFactors = reducedSplittingFactors;
     }
 
+    public ItalyNorthExchangeAlignerResult getItalyNorthExchangeAlignerResult() {
+        return result;
+    }
+
     @Override
     public void align(Network referenceNetwork, Network marketBasedNetwork) {
         LOGGER.info("Aligning North Italian exchanges");
@@ -83,7 +88,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
             ExchangeAndNetPosition newMarketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
 
             int nbIterations = 1;
-            while (nbIterations < 20 & abs(referenceExchangeAndNetPosition.getNetPosition(IT) - newMarketBasedExchangeAndNetPosition.getNetPosition(IT)) > EXCHANGE_EPSILON) {
+            while (nbIterations < 20 & abs(referenceExchangeAndNetPosition.getNetPosition(IT) - newMarketBasedExchangeAndNetPosition.getNetPosition(IT)) >= EXCHANGE_EPSILON) {
 
                 nbIterations++;
                 LOGGER.info("{} Iteration {} will be run.",
@@ -96,7 +101,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
 
             builder.addNewMarketBasedExchangeAndNetPositions(newMarketBasedExchangeAndNetPosition);
 
-            if (abs(referenceExchangeAndNetPosition.getNetPosition(IT) - newMarketBasedExchangeAndNetPosition.getNetPosition(IT)) > EXCHANGE_EPSILON) {
+            if (abs(referenceExchangeAndNetPosition.getNetPosition(IT) - newMarketBasedExchangeAndNetPosition.getNetPosition(IT)) >= EXCHANGE_EPSILON) {
                 LOGGER.error("North Italian exchange aligner failed: nb max iterations is reached. {}",
                         npSummaryForLogs(initialMarketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition));
                 result = builder.addExchangeAlignerStatus(NOT_ALIGNED).build();
@@ -105,10 +110,10 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
             LOGGER.info("Both networks are aligned. North Italian NP is {} MW.", newMarketBasedExchangeAndNetPosition.getNetPosition(IT));
             result = builder.addExchangeAlignerStatus(ALIGNED_WITH_SHIFT).build();
 
-            finalDebugLoggerNp("reference", referenceExchangeAndNetPosition);
-            finalDebugLoggerNp("initial market-based", initialMarketBasedExchangeAndNetPosition);
-            finalDebugLoggerNp("final market-based", newMarketBasedExchangeAndNetPosition);
-            finalDebugLoggerShift(initialMarketBasedExchangeAndNetPosition, newMarketBasedExchangeAndNetPosition);
+            finalDebugLoggerNp("reference", result.getReferenceExchangeAndNetPosition());
+            finalDebugLoggerNp("initial market-based", result.getInitialMarketBasedExchangeAndNetPosition());
+            finalDebugLoggerNp("final market-based", result.getNewMarketBasedExchangeAndNetPosition());
+            finalDebugLoggerShift(result.getInitialMarketBasedExchangeAndNetPosition(), result.getNewMarketBasedExchangeAndNetPosition());
 
         } catch (ShiftingException | GlskLimitationException e) {
             throw new TrmException(e);
@@ -133,40 +138,6 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         }
     }
 
-    private static void finalDebugLoggerNp(String networkName, ExchangeAndNetPosition referenceExchangeAndNetPosition) {
-        LOGGER.debug("Net positions in the {} network: {}, {}, {}, {}, {}, {}.", networkName,
-                printNpCountry(IT, referenceExchangeAndNetPosition),
-                printNpCountry(AT, referenceExchangeAndNetPosition),
-                printNpCountry(CH, referenceExchangeAndNetPosition),
-                printNpCountry(FR, referenceExchangeAndNetPosition),
-                printNpCountry(SI, referenceExchangeAndNetPosition),
-                printNpCountry(DE, referenceExchangeAndNetPosition));
-    }
-
-    private static void finalDebugLoggerShift(ExchangeAndNetPosition initialMarketBasedExchangeAndNetPosition, ExchangeAndNetPosition marketBasedExchangeAndNetPosition) {
-        LOGGER.debug("Shift performed on the market-based network: {}, {}, {}, {}, {}, {}.",
-                printShiftCountry(IT, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
-                printShiftCountry(AT, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
-                printShiftCountry(CH, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
-                printShiftCountry(FR, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
-                printShiftCountry(SI, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
-                printShiftCountry(DE, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition));
-    }
-
-    private static String printNpCountry(Country country, ExchangeAndNetPosition exchangeAndNetPosition) {
-        return country.getName() + " = " +  Math.round(exchangeAndNetPosition.getNetPosition(country) * 1000.) / 1000. + " MW";
-    }
-
-    private static String printShiftCountry(Country country, ExchangeAndNetPosition marketBasedExchangeAndNetPosition, ExchangeAndNetPosition initialMarketBasedExchangeAndNetPosition) {
-        return country.getName() + " = " +  Math.round((marketBasedExchangeAndNetPosition.getNetPosition(country) - initialMarketBasedExchangeAndNetPosition.getNetPosition(country)) * 1000.) / 1000. + " MW";
-    }
-
-    private static String npSummaryForLogs(ExchangeAndNetPosition marketBasedExchangeAndNetPosition, ExchangeAndNetPosition referenceExchangeAndNetPosition) {
-        return "North Italian NP is " + marketBasedExchangeAndNetPosition.getNetPosition(IT)
-                + " MW for the market based network and " + referenceExchangeAndNetPosition.getNetPosition(IT)
-                + "MW for the reference network.";
-    }
-
     private static void shiftNetwork(Network marketBasedNetwork, Map<String, Double> reducedSplittingFactors, ZonalData<Scalable> zonalScalable, ExchangeAndNetPosition marketBasedExchangeAndNetPosition, ExchangeAndNetPosition referenceExchangeAndNetPosition) throws GlskLimitationException, ShiftingException {
         // shift target value: Italian import = opposite to the Italian NP in the reference network
         // ntc: ntc in the market based network
@@ -181,7 +152,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         return new ExchangeAndNetPosition(network);
     }
 
-    private static Map<String, Double> updateMarketBasedNtcs(ExchangeAndNetPosition marketBasedExchangeAndNetPosition) {
+    private static Map<String, Double> updateMarketBasedNtcs(ExchangeAndNetPositionInterface marketBasedExchangeAndNetPosition) {
         return Map.of(
                 new CountryEICode(FR).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(FR),
                 new CountryEICode(CH).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(CH) + marketBasedExchangeAndNetPosition.getNetPosition(DE),
@@ -190,7 +161,36 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         );
     }
 
-    public ItalyNorthExchangeAlignerResult getItalyNorthExchangeAlignerResult() {
-        return result;
+    private static String finalDebugLoggerNp(String networkName, ExchangeAndNetPositionInterface referenceExchangeAndNetPosition) {
+        return String.join("Net positions in the {} network: {}, {}, {}, {}, {}, {}.", networkName,
+                printNpCountry(IT, referenceExchangeAndNetPosition),
+                printNpCountry(AT, referenceExchangeAndNetPosition),
+                printNpCountry(CH, referenceExchangeAndNetPosition),
+                printNpCountry(FR, referenceExchangeAndNetPosition),
+                printNpCountry(SI, referenceExchangeAndNetPosition),
+                printNpCountry(DE, referenceExchangeAndNetPosition));
+    }
+
+    private static String finalDebugLoggerShift(ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition, ExchangeAndNetPositionInterface marketBasedExchangeAndNetPosition) {
+        return String.join("Shift performed on the market-based network: {}, {}, {}, {}, {}, {}.",
+                printShiftCountry(IT, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(AT, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(CH, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(FR, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(SI, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(DE, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition));
+    }
+
+    private static String npSummaryForLogs(ExchangeAndNetPositionInterface marketBasedExchangeAndNetPosition, ExchangeAndNetPositionInterface referenceExchangeAndNetPosition) {
+        return String.join("North Italian NP is {} MW for the market based network and {} MW for the reference network.",
+                String.valueOf(marketBasedExchangeAndNetPosition.getNetPosition(IT)), String.valueOf(referenceExchangeAndNetPosition.getNetPosition(IT)));
+    }
+
+    private static String printNpCountry(Country country, ExchangeAndNetPositionInterface exchangeAndNetPosition) {
+        return country.getName() + " = " +  Math.round(exchangeAndNetPosition.getNetPosition(country) * 1000.) / 1000. + " MW";
+    }
+
+    private static String printShiftCountry(Country country, ExchangeAndNetPositionInterface marketBasedExchangeAndNetPosition, ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition) {
+        return country.getName() + " = " +  Math.round((marketBasedExchangeAndNetPosition.getNetPosition(country) - initialMarketBasedExchangeAndNetPosition.getNetPosition(country)) * 1000.) / 1000. + " MW";
     }
 }
