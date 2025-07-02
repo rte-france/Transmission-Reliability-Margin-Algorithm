@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.powsybl.iidm.network.Country.*;
+import static com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerStatus.*;
 import static java.lang.Math.abs;
 
 /**
@@ -49,6 +50,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     private static final Logger LOGGER = LoggerFactory.getLogger(ItalyNorthExchangeAligner.class);
     private final LoadFlowParameters loadFlowParameters;
     private final Map<String, Double> reducedSplittingFactors;
+    private ItalyNorthExchangeAlignerResult result = null;
 
     public ItalyNorthExchangeAligner(LoadFlowParameters loadFlowParameters, Map<String, Double> reducedSplittingFactors) {
         this.loadFlowParameters = loadFlowParameters;
@@ -64,36 +66,49 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
 
         ZonalData<Scalable> zonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
 
+        ItalyNorthExchangeAlignerResult.Builder builder = ItalyNorthExchangeAlignerResult.builder()
+                .addReferenceExchangeAndNetPosition(referenceExchangeAndNetPosition)
+                .addInitialMarketBasedExchangeAndNetPositions(initialMarketBasedExchangeAndNetPosition);
+
+        if (abs(referenceExchangeAndNetPosition.getNetPosition(IT) - initialMarketBasedExchangeAndNetPosition.getNetPosition(IT)) < EXCHANGE_EPSILON) {
+            LOGGER.info("No significant exchange difference. Exchange alignment ignored!");
+            result = builder.addExchangeAlignerStatus(ALREADY_ALIGNED).build();
+            return;
+        }
+
         try {
             LOGGER.info("Initial {}", npSummaryForLogs(initialMarketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition));
             shiftNetwork(marketBasedNetwork, reducedSplittingFactors, zonalScalable, initialMarketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition);
 
-            referenceExchangeAndNetPosition = computeExchangeAndNetPosition(referenceNetwork);
-            ExchangeAndNetPosition marketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
+            ExchangeAndNetPosition newMarketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
 
             int nbIterations = 1;
-            while (nbIterations < 20 & abs(referenceExchangeAndNetPosition.getNetPosition(IT) - marketBasedExchangeAndNetPosition.getNetPosition(IT)) > EXCHANGE_EPSILON) {
+            while (nbIterations < 20 & abs(referenceExchangeAndNetPosition.getNetPosition(IT) - newMarketBasedExchangeAndNetPosition.getNetPosition(IT)) > EXCHANGE_EPSILON) {
 
                 nbIterations++;
                 LOGGER.info("{} Iteration {} will be run.",
-                        npSummaryForLogs(marketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition),
-                        nbIterations);
+                        npSummaryForLogs(newMarketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition), nbIterations);
 
-                shiftNetwork(marketBasedNetwork, reducedSplittingFactors, zonalScalable, marketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition);
+                shiftNetwork(marketBasedNetwork, reducedSplittingFactors, zonalScalable, newMarketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition);
                 referenceExchangeAndNetPosition = computeExchangeAndNetPosition(referenceNetwork);
-                marketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
+                newMarketBasedExchangeAndNetPosition = computeExchangeAndNetPosition(marketBasedNetwork);
             }
 
-            if (abs(referenceExchangeAndNetPosition.getNetPosition(IT) - marketBasedExchangeAndNetPosition.getNetPosition(IT)) > EXCHANGE_EPSILON) {
+            builder.addNewMarketBasedExchangeAndNetPositions(newMarketBasedExchangeAndNetPosition);
+
+            if (abs(referenceExchangeAndNetPosition.getNetPosition(IT) - newMarketBasedExchangeAndNetPosition.getNetPosition(IT)) > EXCHANGE_EPSILON) {
                 LOGGER.error("North Italian exchange aligner failed: nb max iterations is reached. {}",
                         npSummaryForLogs(initialMarketBasedExchangeAndNetPosition, referenceExchangeAndNetPosition));
+                result = builder.addExchangeAlignerStatus(NOT_ALIGNED).build();
+                return;
             }
-            LOGGER.info("Both networks are aligned. North Italian NP is {} MW.", marketBasedExchangeAndNetPosition.getNetPosition(IT));
+            LOGGER.info("Both networks are aligned. North Italian NP is {} MW.", newMarketBasedExchangeAndNetPosition.getNetPosition(IT));
+            result = builder.addExchangeAlignerStatus(ALIGNED_WITH_SHIFT).build();
 
             finalDebugLoggerNp("reference", referenceExchangeAndNetPosition);
             finalDebugLoggerNp("initial market-based", initialMarketBasedExchangeAndNetPosition);
-            finalDebugLoggerNp("final market-based", marketBasedExchangeAndNetPosition);
-            finalDebugLoggerShift(initialMarketBasedExchangeAndNetPosition, marketBasedExchangeAndNetPosition);
+            finalDebugLoggerNp("final market-based", newMarketBasedExchangeAndNetPosition);
+            finalDebugLoggerShift(initialMarketBasedExchangeAndNetPosition, newMarketBasedExchangeAndNetPosition);
 
         } catch (ShiftingException | GlskLimitationException e) {
             throw new TrmException(e);
@@ -173,5 +188,9 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
                 new CountryEICode(AT).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(AT),
                 new CountryEICode(SI).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(SI)
         );
+    }
+
+    public ItalyNorthExchangeAlignerResult getItalyNorthExchangeAlignerResult() {
+        return result;
     }
 }

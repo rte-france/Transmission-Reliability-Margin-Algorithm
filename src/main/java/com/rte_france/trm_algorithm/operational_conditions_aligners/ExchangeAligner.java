@@ -93,7 +93,7 @@ public class ExchangeAligner implements OperationalConditionAligner {
             .addTargetNetPosition(targetNetPositions);
 
         if (referenceExchangeAndNetPosition.getMaxAbsoluteExchangeDifference(initialMarketBasedExchangeAndNetPosition) < EXCHANGE_EPSILON) {
-            LOGGER.info("No significant exchange difference. Exchange alignment ignored !");
+            LOGGER.info("No significant exchange difference. Exchange alignment ignored!");
             result = builder.addExchangeAlignerStatus(ALREADY_ALIGNED).build();
             return;
         }

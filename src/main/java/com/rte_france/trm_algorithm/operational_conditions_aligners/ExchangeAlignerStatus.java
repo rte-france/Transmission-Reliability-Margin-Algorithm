@@ -13,6 +13,7 @@ package com.rte_france.trm_algorithm.operational_conditions_aligners;
  */
 public enum ExchangeAlignerStatus {
     ALIGNED_WITH_BALANCE_ADJUSTMENT,
+    ALIGNED_WITH_SHIFT,
     ALREADY_ALIGNED,
     NOT_ALIGNED,
     TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED,
