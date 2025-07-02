@@ -19,7 +19,6 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 
 import static com.powsybl.iidm.network.Country.*;
-import static com.powsybl.iidm.network.Country.SI;
 import static com.rte_france.trm_algorithm.operational_conditions_aligners.ItalyNorthExchangeAligner.importSplittingFactorsFromNtcDocs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

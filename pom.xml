@@ -43,8 +43,8 @@
 
         <!-- Dependencies versions -->
         <farao-dichotomy.version>4.28.0</farao-dichotomy.version>
-        <gridcapa-swe.version>1.37.0</gridcapa-swe.version>
         <gridcapa-cse.version>1.45.0</gridcapa-cse.version>
+        <gridcapa-swe.version>1.37.0</gridcapa-swe.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <logback.version>1.5.6</logback.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
@@ -251,7 +251,7 @@
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-glsk-document-ucte</artifactId>
             <version>${powsybl.entsoe.version}</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>

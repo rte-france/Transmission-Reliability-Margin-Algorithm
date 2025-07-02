@@ -19,7 +19,6 @@ import com.farao_community.farao.dichotomy.shift.LinearScaler;
 import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.glsk.ucte.UcteGlskDocument;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
@@ -49,7 +48,6 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     private final Map<String, Double> reducedSplittingFactors;
 
     public ItalyNorthExchangeAligner(Map<String, Double> reducedSplittingFactors) {
-        UcteGlskDocument ucteGlskDocument = null;
         this.reducedSplittingFactors = reducedSplittingFactors;
     }
 
@@ -95,33 +93,58 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
             finalDebugLoggerNp("initial market-based", initialMarketBasedExchangeAndNetPosition);
             finalDebugLoggerNp("final market-based", marketBasedExchangeAndNetPosition);
             finalDebugLoggerShift(initialMarketBasedExchangeAndNetPosition, marketBasedExchangeAndNetPosition);
-            int i = 1;
-        } catch (ShiftingException e) {
+
+        } catch (ShiftingException | GlskLimitationException e) {
             throw new RuntimeException(e);
-        } catch (GlskLimitationException e) {
-            throw new RuntimeException(e);
+        }
+    }
+
+    static Map<String, Double> importSplittingFactorsFromNtcDocs(OffsetDateTime targetDateTime, String ntcAnnualPath, String ntcReductionsPath) {
+        try (InputStream yearlyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcAnnualPath);
+             InputStream dailyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcReductionsPath)
+        ) {
+            YearlyNtcDocument yearlyNtcDocument = new YearlyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(yearlyData, NTCAnnualDocument.class));
+            DailyNtcDocument dailyNtcDocument = new DailyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(dailyData, NTCReductionsDocument.class));
+            Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, false);
+
+            Map<String, Double> reducedSplittingFactors = new HashMap<>();
+            ntc.computeReducedSplittingFactors().forEach((country, value) -> {
+                reducedSplittingFactors.put(new CountryEICode(Country.valueOf(country)).getCode(), value);
+            });
+
+            return reducedSplittingFactors;
+
+        } catch (IOException | JAXBException e) {
+            throw new RuntimeException("An error occured in the NTC files import for " + targetDateTime + ": ", e);
         }
     }
 
     private static void finalDebugLoggerNp(String networkName, ExchangeAndNetPosition referenceExchangeAndNetPosition) {
         LOGGER.debug("Net positions in the " + networkName
-                + " network: IT = " + referenceExchangeAndNetPosition.getNetPosition(Country.IT)
-                + " MW, AT = " + referenceExchangeAndNetPosition.getNetPosition(Country.AT)
-                + " MW, CH = " + referenceExchangeAndNetPosition.getNetPosition(Country.CH)
-                + " MW, DE = " + referenceExchangeAndNetPosition.getNetPosition(Country.DE)
-                + " MW, FR = " + referenceExchangeAndNetPosition.getNetPosition(Country.FR)
-                + " MW, SI = " + referenceExchangeAndNetPosition.getNetPosition(Country.SI) + " MW.");
+                + " network: " + printNpCountry(IT, referenceExchangeAndNetPosition) + ", "
+                + printNpCountry(AT, referenceExchangeAndNetPosition) + ", "
+                + printNpCountry(CH, referenceExchangeAndNetPosition) + ", "
+                + printNpCountry(FR, referenceExchangeAndNetPosition) + ", "
+                + printNpCountry(SI, referenceExchangeAndNetPosition) + ", "
+                + printNpCountry(DE, referenceExchangeAndNetPosition) + ".");
     }
 
     private static void finalDebugLoggerShift(ExchangeAndNetPosition initialMarketBasedExchangeAndNetPosition, ExchangeAndNetPosition marketBasedExchangeAndNetPosition) {
         LOGGER.debug("Shift performed on the market-based network: "
-                + " IT = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.IT) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.IT))
-                + " MW, AT = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.AT) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.AT))
-                + " MW, CH = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.CH) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.CH))
-                + " MW, DE = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.DE) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.DE))
-                + " MW, FR = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.FR) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.FR))
-                + " MW, SI = " + (marketBasedExchangeAndNetPosition.getNetPosition(Country.SI) - initialMarketBasedExchangeAndNetPosition.getNetPosition(Country.SI))
-                + " MW.");
+                + printShiftCountry(IT, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition) + ", "
+                + printShiftCountry(AT, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition) + ", "
+                + printShiftCountry(CH, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition) + ", "
+                + printShiftCountry(FR, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition) + ", "
+                + printShiftCountry(SI, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition) + ", "
+                + printShiftCountry(DE, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition) + ".");
+    }
+
+    private static String printNpCountry(Country country, ExchangeAndNetPosition exchangeAndNetPosition) {
+        return country.getName() + " = " +  Math.round(exchangeAndNetPosition.getNetPosition(country) * 1000.) / 1000. + " MW";
+    }
+
+    private static String printShiftCountry(Country country, ExchangeAndNetPosition marketBasedExchangeAndNetPosition, ExchangeAndNetPosition initialMarketBasedExchangeAndNetPosition) {
+        return country.getName() + " = " +  Math.round((marketBasedExchangeAndNetPosition.getNetPosition(country) - initialMarketBasedExchangeAndNetPosition.getNetPosition(country)) * 1000.) / 1000. + " MW";
     }
 
     private static String npSummaryForLogs(ExchangeAndNetPosition marketBasedExchangeAndNetPosition, ExchangeAndNetPosition referenceExchangeAndNetPosition) {
@@ -149,26 +172,5 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
                 new CountryEICode(SI).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(SI)
         );
         return ntcs;
-    }
-
-    static Map<String, Double> importSplittingFactorsFromNtcDocs(OffsetDateTime targetDateTime, String ntcAnnualPath, String ntcReductionsPath) {
-        try (InputStream yearlyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcAnnualPath);
-             InputStream dailyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcReductionsPath)
-        ) {
-            YearlyNtcDocument yearlyNtcDocument = new YearlyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(yearlyData, NTCAnnualDocument.class));
-            DailyNtcDocument dailyNtcDocument = new DailyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(dailyData, NTCReductionsDocument.class));
-            Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, false);
-
-            Map<String, Double> reducedSplittingFactors = new HashMap<>();
-            ntc.computeReducedSplittingFactors().forEach((country, value) -> {
-                reducedSplittingFactors.put(new CountryEICode(Country.valueOf(country)).getCode(), value);
-            });
-
-            return reducedSplittingFactors;
-
-        } catch (IOException | JAXBException e) {
-            //TODO
-            throw new RuntimeException("Impossible to create NTC", e);
-        }
     }
 }
