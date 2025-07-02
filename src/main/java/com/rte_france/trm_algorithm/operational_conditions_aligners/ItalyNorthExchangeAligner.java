@@ -24,6 +24,7 @@ import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 
+import com.powsybl.loadflow.LoadFlowParameters;
 import com.rte_france.trm_algorithm.TrmException;
 import com.rte_france.trm_algorithm.TrmUtils;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPosition;
@@ -46,9 +47,11 @@ import static java.lang.Math.abs;
 public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     private static final double EXCHANGE_EPSILON = 1e-1;
     private static final Logger LOGGER = LoggerFactory.getLogger(ItalyNorthExchangeAligner.class);
+    private final LoadFlowParameters loadFlowParameters;
     private final Map<String, Double> reducedSplittingFactors;
 
-    public ItalyNorthExchangeAligner(Map<String, Double> reducedSplittingFactors) {
+    public ItalyNorthExchangeAligner(LoadFlowParameters loadFlowParameters, Map<String, Double> reducedSplittingFactors) {
+        this.loadFlowParameters = loadFlowParameters;
         this.reducedSplittingFactors = reducedSplittingFactors;
     }
 
@@ -159,7 +162,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     }
 
     ExchangeAndNetPosition computeExchangeAndNetPosition(Network network) {
-        LoadFlow.run(network);
+        LoadFlow.run(network, loadFlowParameters);
         return new ExchangeAndNetPosition(network);
     }
 

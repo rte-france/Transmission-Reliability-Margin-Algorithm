@@ -10,6 +10,7 @@ package com.rte_france.trm_algorithm.operational_conditions_aligners;
 import com.google.common.collect.ImmutableMap;
 import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlowParameters;
 import com.rte_france.trm_algorithm.TestUtils;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPosition;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ class ItalyNorthExchangeAlignerTest {
     void testSimpleShift() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
+        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
 
         Map<String, Double> reducedSplittingFactors = ImmutableMap.of(
                 new CountryEICode(FR).getCode(), 0.4,
@@ -40,7 +42,7 @@ class ItalyNorthExchangeAlignerTest {
                 new CountryEICode(SI).getCode(), 0.2
         );
 
-        ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(reducedSplittingFactors);
+        ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(loadFlowParameters, reducedSplittingFactors);
 
         ExchangeAndNetPosition referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
         ExchangeAndNetPosition marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
@@ -77,12 +79,13 @@ class ItalyNorthExchangeAlignerTest {
     void testShiftWithImportedSplittingFactors() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
+        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
 
         String ntcReductionsPath = "../TestCase12Nodes/NTC_reductions_CSE.xml";
         String ntcAnnualPath = "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml";
         Map<String, Double> reducedSplittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), ntcAnnualPath, ntcReductionsPath);
 
-        ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(reducedSplittingFactors);
+        ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(loadFlowParameters, reducedSplittingFactors);
 
         ExchangeAndNetPosition referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
         ExchangeAndNetPosition marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
@@ -103,12 +106,13 @@ class ItalyNorthExchangeAlignerTest {
     void testShiftWithImportedSplittingFactors2() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
+        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
 
         String ntcReductionsPath = "../TestCase12Nodes/NTC_reductions_CSE.xml";
         String ntcAnnualPath = "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml";
         Map<String, Double> reducedSplittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), ntcAnnualPath, ntcReductionsPath);
 
-        ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(reducedSplittingFactors);
+        ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(loadFlowParameters, reducedSplittingFactors);
 
         ExchangeAndNetPosition referenceExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(referenceNetwork);
         ExchangeAndNetPosition marketBasedExchangeAndNetPosition = italyNorthExchangeAligner.computeExchangeAndNetPosition(marketBasedNetwork);
