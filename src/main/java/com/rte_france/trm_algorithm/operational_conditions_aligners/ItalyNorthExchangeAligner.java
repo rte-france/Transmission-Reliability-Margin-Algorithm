@@ -7,12 +7,6 @@
  */
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
-import com.farao_community.farao.cse.data.DataUtil;
-import com.farao_community.farao.cse.data.ntc.DailyNtcDocument;
-import com.farao_community.farao.cse.data.ntc.Ntc;
-import com.farao_community.farao.cse.data.ntc.YearlyNtcDocument;
-import com.farao_community.farao.cse.data.xsd.NTCAnnualDocument;
-import com.farao_community.farao.cse.data.xsd.NTCReductionsDocument;
 import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationException;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.LinearScaler;
@@ -20,7 +14,6 @@ import com.farao_community.farao.dichotomy.shift.ShiftDispatcher;
 import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 
@@ -29,14 +22,9 @@ import com.rte_france.trm_algorithm.TrmException;
 import com.rte_france.trm_algorithm.TrmUtils;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPosition;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPositionInterface;
-import jakarta.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.powsybl.iidm.network.Country.*;
@@ -112,24 +100,6 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
 
         } catch (ShiftingException | GlskLimitationException e) {
             throw new TrmException(e);
-        }
-    }
-
-    static Map<String, Double> importSplittingFactorsFromNtcDocs(OffsetDateTime targetDateTime, String ntcAnnualPath, String ntcReductionsPath) {
-        try (InputStream yearlyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcAnnualPath);
-             InputStream dailyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcReductionsPath)
-        ) {
-            YearlyNtcDocument yearlyNtcDocument = new YearlyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(yearlyData, NTCAnnualDocument.class));
-            DailyNtcDocument dailyNtcDocument = new DailyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(dailyData, NTCReductionsDocument.class));
-            Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, false);
-
-            Map<String, Double> reducedSplittingFactors = new HashMap<>();
-            ntc.computeReducedSplittingFactors().forEach((country, value) -> reducedSplittingFactors.put(new CountryEICode(Country.valueOf(country)).getCode(), value));
-
-            return reducedSplittingFactors;
-
-        } catch (IOException | JAXBException e) {
-            throw new TrmException("An error occurred in the NTC files import for " + targetDateTime + ": " + e);
         }
     }
 
