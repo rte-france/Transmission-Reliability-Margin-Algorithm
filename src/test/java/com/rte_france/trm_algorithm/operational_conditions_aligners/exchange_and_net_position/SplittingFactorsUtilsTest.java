@@ -10,11 +10,11 @@ package com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_an
 import com.powsybl.glsk.commons.CountryEICode;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
 import static com.powsybl.iidm.network.Country.*;
-import static com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.SplittingFactorsUtils.importSplittingFactorsFromNtcDocs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -25,7 +25,11 @@ class SplittingFactorsUtilsTest {
 
     @Test
     void testNtcReductionsImport() {
-        Map<String, Double> splittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml", "../TestCase12Nodes/NTC_reductions_CSE.xml");
+
+        InputStream yearlyData = SplittingFactorsUtilsTest.class.getResourceAsStream("../../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml");
+        InputStream dailyData = SplittingFactorsUtilsTest.class.getResourceAsStream("../../TestCase12Nodes/NTC_reductions_CSE.xml");
+
+        Map<String, Double> splittingFactors = SplittingFactorsUtils.importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), yearlyData, dailyData);
 
         assertEquals(4, splittingFactors.size());
         assertEquals(0.456, splittingFactors.get(new CountryEICode(FR).getCode()), DOUBLE_PRECISION);

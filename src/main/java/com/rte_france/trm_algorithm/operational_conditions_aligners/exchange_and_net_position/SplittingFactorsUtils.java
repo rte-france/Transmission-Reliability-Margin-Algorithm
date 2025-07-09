@@ -16,10 +16,8 @@ import com.farao_community.farao.cse.data.xsd.NTCReductionsDocument;
 import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.iidm.network.Country;
 import com.rte_france.trm_algorithm.TrmException;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.ItalyNorthExchangeAligner;
 import jakarta.xml.bind.JAXBException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -34,21 +32,23 @@ public final class SplittingFactorsUtils {
         // Utility class
     }
 
-    public static Map<String, Double> importSplittingFactorsFromNtcDocs(OffsetDateTime targetDateTime, String ntcAnnualPath, String ntcReductionsPath) {
-        try (InputStream yearlyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcAnnualPath);
-             InputStream dailyData = ItalyNorthExchangeAligner.class.getResourceAsStream(ntcReductionsPath)
-        ) {
-            YearlyNtcDocument yearlyNtcDocument = new YearlyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(yearlyData, NTCAnnualDocument.class));
-            DailyNtcDocument dailyNtcDocument = new DailyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(dailyData, NTCReductionsDocument.class));
-            Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, false);
+    public static Map<String, Double> importSplittingFactorsFromNtcDocs(OffsetDateTime targetDateTime, InputStream ntcAnnualPath, InputStream ntcReductionsPath) {
 
-            Map<String, Double> reducedSplittingFactors = new HashMap<>();
-            ntc.computeReducedSplittingFactors().forEach((country, value) -> reducedSplittingFactors.put(new CountryEICode(Country.valueOf(country)).getCode(), value));
+        YearlyNtcDocument yearlyNtcDocument;
+        DailyNtcDocument dailyNtcDocument;
+        try {
+            yearlyNtcDocument = new YearlyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(ntcAnnualPath, NTCAnnualDocument.class));
+            dailyNtcDocument = new DailyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(ntcReductionsPath, NTCReductionsDocument.class));
 
-            return reducedSplittingFactors;
-
-        } catch (IOException | JAXBException e) {
+        } catch (JAXBException e) {
             throw new TrmException("An error occurred in the NTC files import for " + targetDateTime + ": " + e);
         }
+
+        Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, false);
+        Map<String, Double> reducedSplittingFactors = new HashMap<>();
+        ntc.computeReducedSplittingFactors().forEach((country, value) -> reducedSplittingFactors.put(new CountryEICode(Country.valueOf(country)).getCode(), value));
+
+        return reducedSplittingFactors;
+
     }
 }

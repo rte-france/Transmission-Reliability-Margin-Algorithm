@@ -14,6 +14,7 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import com.rte_france.trm_algorithm.TestUtils;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
@@ -86,9 +87,10 @@ class ItalyNorthExchangeAlignerTest {
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
         LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
 
-        String ntcReductionsPath = "../TestCase12Nodes/NTC_reductions_CSE.xml";
-        String ntcAnnualPath = "../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml";
-        Map<String, Double> reducedSplittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), ntcAnnualPath, ntcReductionsPath);
+        InputStream yearlyData = ItalyNorthExchangeAlignerTest.class.getResourceAsStream("../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml");
+        InputStream dailyData = ItalyNorthExchangeAlignerTest.class.getResourceAsStream("../TestCase12Nodes/NTC_reductions_CSE.xml");
+
+        Map<String, Double> reducedSplittingFactors = importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), yearlyData, dailyData);
 
         // These are not the splitting factors but the reduced splitting factors
         assertEquals(0.046, reducedSplittingFactors.get(new CountryEICode(AT).getCode()), EPSILON);
