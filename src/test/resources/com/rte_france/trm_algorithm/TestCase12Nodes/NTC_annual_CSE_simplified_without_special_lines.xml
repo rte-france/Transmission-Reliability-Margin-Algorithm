@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NTC_annual_document DtdVersion="4" DtdRelease="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="ntc-document.xsd">
+    <DocumentIdentification v="2021_2Dp_NTC_annual_CSE"/>
+    <DocumentVersion v="01"/>
+    <DocumentType v="A36"/>
+    <ProcessType v="A12"/>
+    <SenderIdentification v="10X1001A1001A345" codingScheme="A01"/>
+    <SenderRole v="A04"/>
+    <ReceiverIdentification v="22XCORESO------S" codingScheme="A01"/>
+    <ReceiverRole v="A36"/>
+    <CreationDateTime v="2020-12-16T16:42:18Z"/>
+    <Domain v="10YDOM-1001A061T" codingScheme="A01"/>
+    <NTCvalues>
+        <SpecialDays>
+            <Day day="2021-02-25Z" description="">
+                <TimeInterval tini="T00:00Z" tfin="T01:00Z">
+                    <NTC v="1248" country="FR"/>
+                    <NTC v="1480" country="CH"/>
+                    <NTC v="131" country="AT"/>
+                    <NTC v="235" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T01:00Z" tfin="T02:00Z">
+                    <NTC v="1248" country="FR"/>
+                    <NTC v="1480" country="CH"/>
+                    <NTC v="131" country="AT"/>
+                    <NTC v="235" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T02:00Z" tfin="T03:00Z">
+                    <NTC v="1248" country="FR"/>
+                    <NTC v="1480" country="CH"/>
+                    <NTC v="131" country="AT"/>
+                    <NTC v="235" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T03:00Z" tfin="T04:00Z">
+                    <NTC v="1248" country="FR"/>
+                    <NTC v="1480" country="CH"/>
+                    <NTC v="131" country="AT"/>
+                    <NTC v="235" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T04:00Z" tfin="T05:00Z">
+                    <NTC v="1201" country="FR"/>
+                    <NTC v="1823" country="CH"/>
+                    <NTC v="138" country="AT"/>
+                    <NTC v="251" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T05:00Z" tfin="T06:00Z">
+                    <NTC v="1201" country="FR"/>
+                    <NTC v="1823" country="CH"/>
+                    <NTC v="138" country="AT"/>
+                    <NTC v="251" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T06:00Z" tfin="T07:00Z">
+                    <NTC v="1201" country="FR"/>
+                    <NTC v="1823" country="CH"/>
+                    <NTC v="138" country="AT"/>
+                    <NTC v="251" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T07:00Z" tfin="T08:00Z">
+                    <NTC v="1201" country="FR"/>
+                    <NTC v="1823" country="CH"/>
+                    <NTC v="138" country="AT"/>
+                    <NTC v="251" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T08:00Z" tfin="T09:00Z">
+                    <NTC v="1201" country="FR"/>
+                    <NTC v="1823" country="CH"/>
+                    <NTC v="138" country="AT"/>
+                    <NTC v="251" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T09:00Z" tfin="T10:00Z">
+                    <NTC v="793" country="FR"/>
+                    <NTC v="1507" country="CH"/>
+                    <NTC v="121" country="AT"/>
+                    <NTC v="178" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T10:00Z" tfin="T11:00Z">
+                    <NTC v="793" country="FR"/>
+                    <NTC v="1507" country="CH"/>
+                    <NTC v="121" country="AT"/>
+                    <NTC v="178" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T11:00Z" tfin="T12:00Z">
+                    <NTC v="793" country="FR"/>
+                    <NTC v="1507" country="CH"/>
+                    <NTC v="121" country="AT"/>
+                    <NTC v="178" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T12:00Z" tfin="T13:00Z">
+                    <NTC v="793" country="FR"/>
+                    <NTC v="1507" country="CH"/>
+                    <NTC v="121" country="AT"/>
+                    <NTC v="178" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T13:00Z" tfin="T14:00Z">
+                    <NTC v="793" country="FR"/>
+                    <NTC v="1507" country="CH"/>
+                    <NTC v="121" country="AT"/>
+                    <NTC v="178" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T14:00Z" tfin="T15:00Z">
+                    <NTC v="793" country="FR"/>
+                    <NTC v="1507" country="CH"/>
+                    <NTC v="121" country="AT"/>
+                    <NTC v="178" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T15:00Z" tfin="T16:00Z">
+                    <NTC v="793" country="FR"/>
+                    <NTC v="1507" country="CH"/>
+                    <NTC v="121" country="AT"/>
+                    <NTC v="178" country="SI"/>
+                </TimeInterval>
+                <TimeInterval tini="T23:00Z" tfin="T24:00Z">
+                    <NTC v="2120" country="FR"/>
+                    <NTC v="3195" country="CH"/>
+                    <NTC v="280" country="AT"/>
+                    <NTC v="558" country="SI"/>
+                </TimeInterval>
+            </Day>
+        </SpecialDays>
+        <BasicDays>
+            <Period dtini="2020-12-31T23:00Z" dtfin="2021-03-28T01:00Z" description="winter-solar">
+                <DayOfWeek daynum="6" description="Saturday">
+                    <TimeInterval tini="T23:00Z" tfin="T24:00Z">
+                        <NTC v="5178" country="FR"/>
+                        <NTC v="3710" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="420" country="SI"/>
+                    </TimeInterval>
+                </DayOfWeek>
+                <DayOfWeek daynum="7" description="Sunday">
+                    <TimeInterval tini="T00:00Z" tfin="T23:00Z">
+                        <NTC v="5178" country="FR"/>
+                        <NTC v="3710" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="420" country="SI"/>
+                    </TimeInterval>
+                </DayOfWeek>
+                <DayOfWeek daynum="7" description="Sunday">
+                    <TimeInterval tini="T23:00Z" tfin="T24:00Z">
+                        <NTC v="5178" country="FR"/>
+                        <NTC v="3710" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="420" country="SI"/>
+                    </TimeInterval>
+                </DayOfWeek>
+                <DayOfWeek daynum="8" description="Mon-Fri">
+                    <TimeInterval tini="T00:00Z" tfin="T06:00Z">
+                        <NTC v="5178" country="FR"/>
+                        <NTC v="3710" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="420" country="SI"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T06:00Z" tfin="T22:00Z">
+                        <NTC v="5380" country="FR"/>
+                        <NTC v="5550" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="830" country="SI"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T22:00Z" tfin="T23:00Z">
+                        <NTC v="5178" country="FR"/>
+                        <NTC v="3710" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="420" country="SI"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T23:00Z" tfin="T24:00Z">
+                        <NTC v="5178" country="FR"/>
+                        <NTC v="3710" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="420" country="SI"/>
+                    </TimeInterval>
+                </DayOfWeek>
+                <DayOfWeek daynum="6" description="Saturday">
+                    <TimeInterval tini="T00:00Z" tfin="T06:00Z">
+                        <NTC v="5178" country="FR"/>
+                        <NTC v="3710" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="420" country="SI"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T06:00Z" tfin="T22:00Z">
+                        <NTC v="5380" country="FR"/>
+                        <NTC v="5550" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="830" country="SI"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T22:00Z" tfin="T23:00Z">
+                        <NTC v="5178" country="FR"/>
+                        <NTC v="3710" country="CH"/>
+                        <NTC v="388" country="AT"/>
+                        <NTC v="420" country="SI"/>
+                    </TimeInterval>
+                </DayOfWeek>
+            </Period>
+        </BasicDays>
+    </NTCvalues>
+    <SplittingFactors>
+        <SpecialDays>
+            <Day day="2021-02-25Z" description="">
+                <TimeInterval tini="T00:00Z" tfin="T01:00Z">
+                    <SplittingFactor country="FR" v="0.320000"/>
+                    <SplittingFactor country="CH" v="0.470000"/>
+                    <SplittingFactor country="AT" v="0.090000"/>
+                    <SplittingFactor country="SI" v="0.120000"/>
+                </TimeInterval>
+                <TimeInterval tini="T01:00Z" tfin="T02:00Z">
+                    <SplittingFactor country="FR" v="0.320000"/>
+                    <SplittingFactor country="CH" v="0.470000"/>
+                    <SplittingFactor country="AT" v="0.090000"/>
+                    <SplittingFactor country="SI" v="0.120000"/>
+                </TimeInterval>
+                <TimeInterval tini="T02:00Z" tfin="T03:00Z">
+                    <SplittingFactor country="FR" v="0.320000"/>
+                    <SplittingFactor country="CH" v="0.470000"/>
+                    <SplittingFactor country="AT" v="0.090000"/>
+                    <SplittingFactor country="SI" v="0.120000"/>
+                </TimeInterval>
+                <TimeInterval tini="T03:00Z" tfin="T04:00Z">
+                    <SplittingFactor country="FR" v="0.320000"/>
+                    <SplittingFactor country="CH" v="0.470000"/>
+                    <SplittingFactor country="AT" v="0.090000"/>
+                    <SplittingFactor country="SI" v="0.120000"/>
+                </TimeInterval>
+                <TimeInterval tini="T04:00Z" tfin="T05:00Z">
+                    <SplittingFactor country="FR" v="0.330000"/>
+                    <SplittingFactor country="CH" v="0.510000"/>
+                    <SplittingFactor country="AT" v="0.070000"/>
+                    <SplittingFactor country="SI" v="0.090000"/>
+                </TimeInterval>
+                <TimeInterval tini="T05:00Z" tfin="T06:00Z">
+                    <SplittingFactor country="FR" v="0.330000"/>
+                    <SplittingFactor country="CH" v="0.510000"/>
+                    <SplittingFactor country="AT" v="0.070000"/>
+                    <SplittingFactor country="SI" v="0.090000"/>
+                </TimeInterval>
+                <TimeInterval tini="T06:00Z" tfin="T07:00Z">
+                    <SplittingFactor country="FR" v="0.330000"/>
+                    <SplittingFactor country="CH" v="0.510000"/>
+                    <SplittingFactor country="AT" v="0.070000"/>
+                    <SplittingFactor country="SI" v="0.090000"/>
+                </TimeInterval>
+                <TimeInterval tini="T07:00Z" tfin="T08:00Z">
+                    <SplittingFactor country="FR" v="0.330000"/>
+                    <SplittingFactor country="CH" v="0.510000"/>
+                    <SplittingFactor country="AT" v="0.070000"/>
+                    <SplittingFactor country="SI" v="0.090000"/>
+                </TimeInterval>
+                <TimeInterval tini="T08:00Z" tfin="T09:00Z">
+                    <SplittingFactor country="FR" v="0.330000"/>
+                    <SplittingFactor country="CH" v="0.510000"/>
+                    <SplittingFactor country="AT" v="0.070000"/>
+                    <SplittingFactor country="SI" v="0.090000"/>
+                </TimeInterval>
+                <TimeInterval tini="T09:00Z" tfin="T10:00Z">
+                    <SplittingFactor country="FR" v="0.340000"/>
+                    <SplittingFactor country="CH" v="0.500000"/>
+                    <SplittingFactor country="AT" v="0.060000"/>
+                    <SplittingFactor country="SI" v="0.100000"/>
+                </TimeInterval>
+                <TimeInterval tini="T10:00Z" tfin="T11:00Z">
+                    <SplittingFactor country="FR" v="0.340000"/>
+                    <SplittingFactor country="CH" v="0.500000"/>
+                    <SplittingFactor country="AT" v="0.060000"/>
+                    <SplittingFactor country="SI" v="0.100000"/>
+                </TimeInterval>
+                <TimeInterval tini="T11:00Z" tfin="T12:00Z">
+                    <SplittingFactor country="FR" v="0.340000"/>
+                    <SplittingFactor country="CH" v="0.500000"/>
+                    <SplittingFactor country="AT" v="0.060000"/>
+                    <SplittingFactor country="SI" v="0.100000"/>
+                </TimeInterval>
+                <TimeInterval tini="T12:00Z" tfin="T13:00Z">
+                    <SplittingFactor country="FR" v="0.340000"/>
+                    <SplittingFactor country="CH" v="0.500000"/>
+                    <SplittingFactor country="AT" v="0.060000"/>
+                    <SplittingFactor country="SI" v="0.100000"/>
+                </TimeInterval>
+                <TimeInterval tini="T13:00Z" tfin="T14:00Z">
+                    <SplittingFactor country="FR" v="0.340000"/>
+                    <SplittingFactor country="CH" v="0.500000"/>
+                    <SplittingFactor country="AT" v="0.060000"/>
+                    <SplittingFactor country="SI" v="0.100000"/>
+                </TimeInterval>
+                <TimeInterval tini="T14:00Z" tfin="T15:00Z">
+                    <SplittingFactor country="FR" v="0.340000"/>
+                    <SplittingFactor country="CH" v="0.500000"/>
+                    <SplittingFactor country="AT" v="0.060000"/>
+                    <SplittingFactor country="SI" v="0.100000"/>
+                </TimeInterval>
+                <TimeInterval tini="T15:00Z" tfin="T16:00Z">
+                    <SplittingFactor country="FR" v="0.340000"/>
+                    <SplittingFactor country="CH" v="0.500000"/>
+                    <SplittingFactor country="AT" v="0.060000"/>
+                    <SplittingFactor country="SI" v="0.100000"/>
+                </TimeInterval>
+                <TimeInterval tini="T23:00Z" tfin="T24:00Z">
+                    <SplittingFactor country="FR" v="0.350000"/>
+                    <SplittingFactor country="CH" v="0.480000"/>
+                    <SplittingFactor country="AT" v="0.070000"/>
+                    <SplittingFactor country="SI" v="0.100000"/>
+                </TimeInterval>
+            </Day>
+        </SpecialDays>
+        <BasicDays>
+            <Period dtini="2020-12-31T23:00Z" dtfin="2021-03-28T01:00Z" description="winter-solar">
+                <DayOfWeek daynum="6" description="Saturday">
+                    <TimeInterval tini="T23:00Z" tfin="T24:00Z">
+                        <SplittingFactor country="FR" v="0.480000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.060000"/>
+                    </TimeInterval>
+                </DayOfWeek>
+                <DayOfWeek daynum="7" description="Sunday">
+                    <TimeInterval tini="T00:00Z" tfin="T23:00Z">
+                        <SplittingFactor country="FR" v="0.480000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.060000"/>
+                    </TimeInterval>
+                </DayOfWeek>
+                <DayOfWeek daynum="7" description="Sunday">
+                    <TimeInterval tini="T23:00Z" tfin="T24:00Z">
+                        <SplittingFactor country="FR" v="0.480000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.060000"/>
+                    </TimeInterval>
+                </DayOfWeek>
+                <DayOfWeek daynum="8" description="Mon-Fri">
+                    <TimeInterval tini="T00:00Z" tfin="T06:00Z">
+                        <SplittingFactor country="FR" v="0.480000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.060000"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T06:00Z" tfin="T22:00Z">
+                        <SplittingFactor country="FR" v="0.470000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.070000"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T22:00Z" tfin="T23:00Z">
+                        <SplittingFactor country="FR" v="0.480000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.060000"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T23:00Z" tfin="T24:00Z">
+                        <SplittingFactor country="FR" v="0.480000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.060000"/>
+                    </TimeInterval>
+                </DayOfWeek>
+                <DayOfWeek daynum="6" description="Saturday">
+                    <TimeInterval tini="T00:00Z" tfin="T06:00Z">
+                        <SplittingFactor country="FR" v="0.480000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.060000"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T06:00Z" tfin="T22:00Z">
+                        <SplittingFactor country="FR" v="0.470000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.070000"/>
+                    </TimeInterval>
+                    <TimeInterval tini="T22:00Z" tfin="T23:00Z">
+                        <SplittingFactor country="FR" v="0.480000"/>
+                        <SplittingFactor country="CH" v="0.410000"/>
+                        <SplittingFactor country="AT" v="0.050000"/>
+                        <SplittingFactor country="SI" v="0.060000"/>
+                    </TimeInterval>
+                </DayOfWeek>
+            </Period>
+        </BasicDays>
+    </SplittingFactors>
+    <TRM v="800"/>
+</NTC_annual_document>

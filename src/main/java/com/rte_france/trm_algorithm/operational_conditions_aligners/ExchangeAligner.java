@@ -27,6 +27,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import static com.rte_france.trm_algorithm.operational_conditions_aligners.ExchangeAlignerStatus.*;
+
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
@@ -91,8 +93,8 @@ public class ExchangeAligner implements OperationalConditionAligner {
             .addTargetNetPosition(targetNetPositions);
 
         if (referenceExchangeAndNetPosition.getMaxAbsoluteExchangeDifference(initialMarketBasedExchangeAndNetPosition) < EXCHANGE_EPSILON) {
-            LOGGER.info("No significant exchange difference. Exchange alignment ignored !");
-            result = builder.addExchangeAlignerStatus(Status.ALREADY_ALIGNED).build();
+            LOGGER.info("No significant exchange difference. Exchange alignment ignored!");
+            result = builder.addExchangeAlignerStatus(ALREADY_ALIGNED).build();
             return;
         }
 
@@ -104,15 +106,15 @@ public class ExchangeAligner implements OperationalConditionAligner {
 
         if (balanceComputationResult.getStatus().equals(BalanceComputationResult.Status.FAILED)) {
             LOGGER.error("Balance computation failed");
-            result = builder.addExchangeAlignerStatus(Status.NOT_ALIGNED).build();
+            result = builder.addExchangeAlignerStatus(NOT_ALIGNED).build();
             return;
         }
         if (referenceExchangeAndNetPosition.getMaxAbsoluteExchangeDifference(newMarketBasedExchangeAndNetPosition) > EXCHANGE_EPSILON) {
             LOGGER.error("Net positions have reached their targets but exchange are not aligned. This may be explained by the NTC hypothesis");
-            result = builder.addExchangeAlignerStatus(Status.TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED).build();
+            result = builder.addExchangeAlignerStatus(TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED).build();
             return;
         }
-        result = builder.addExchangeAlignerStatus(Status.ALIGNED_WITH_BALANCE_ADJUSTMENT).build();
+        result = builder.addExchangeAlignerStatus(ALIGNED_WITH_BALANCE_ADJUSTMENT).build();
     }
 
     private BalanceComputationResult align(Network marketBasedNetwork, TargetNetPosition targetNetPositions) {
@@ -120,12 +122,5 @@ public class ExchangeAligner implements OperationalConditionAligner {
         BalanceComputation balanceComputation = balanceComputationFactory.create(areas, loadFlowRunner, computationManager);
         String variantId = marketBasedNetwork.getVariantManager().getWorkingVariantId();
         return balanceComputation.run(marketBasedNetwork, variantId, balanceComputationParameters).join();
-    }
-
-    public enum Status {
-        ALIGNED_WITH_BALANCE_ADJUSTMENT,
-        ALREADY_ALIGNED,
-        NOT_ALIGNED,
-        TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED,
     }
 }

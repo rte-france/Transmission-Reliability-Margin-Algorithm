@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, RTE (http://www.rte-france.com)
+ * Copyright (c) 2025, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -7,30 +7,29 @@
  */
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
+import com.powsybl.iidm.network.Country;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.EmptyExchangeAndNetPosition;
 import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.ExchangeAndNetPositionInterface;
-import com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position.NetPositionInterface;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
+import static com.powsybl.iidm.network.Country.*;
+
 /**
- * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
  * @author Viktor Terrier {@literal <viktor.terrier at rte-france.com>}
  */
-public final class ExchangeAlignerResult {
+public final class ItalyNorthExchangeAlignerResult {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ItalyNorthExchangeAlignerResult.class);
     private final ExchangeAndNetPositionInterface referenceExchangeAndNetPosition;
     private final ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition;
-    private final NetPositionInterface targetNetPositions;
-    private final BalanceComputationResult balanceComputationResult;
     private final ExchangeAndNetPositionInterface newMarketBasedExchangeAndNetPosition;
     private final ExchangeAlignerStatus status;
 
-    public ExchangeAlignerResult(Builder builder) {
+    public ItalyNorthExchangeAlignerResult(Builder builder) {
         referenceExchangeAndNetPosition = builder.referenceExchangeAndNetPosition;
         initialMarketBasedExchangeAndNetPosition = builder.initialMarketBasedExchangeAndNetPosition;
-        targetNetPositions = builder.targetNetPositions;
-        balanceComputationResult = builder.balanceComputationResult;
         newMarketBasedExchangeAndNetPosition = builder.newMarketBasedExchangeAndNetPosition;
         status = builder.status;
     }
@@ -47,14 +46,6 @@ public final class ExchangeAlignerResult {
         return initialMarketBasedExchangeAndNetPosition;
     }
 
-    public NetPositionInterface getTargetNetPositions() {
-        return targetNetPositions;
-    }
-
-    public BalanceComputationResult getBalanceComputationResult() {
-        return balanceComputationResult;
-    }
-
     public ExchangeAndNetPositionInterface getNewMarketBasedExchangeAndNetPosition() {
         return newMarketBasedExchangeAndNetPosition;
     }
@@ -63,19 +54,9 @@ public final class ExchangeAlignerResult {
         return status;
     }
 
-    public double getInitialMaxAbsoluteExchangeDifference() {
-        return referenceExchangeAndNetPosition.getMaxAbsoluteExchangeDifference(initialMarketBasedExchangeAndNetPosition);
-    }
-
-    public double getNewMaxAbsoluteExchangeDifference() {
-        return referenceExchangeAndNetPosition.getMaxAbsoluteExchangeDifference(newMarketBasedExchangeAndNetPosition);
-    }
-
     public static final class Builder {
         private ExchangeAndNetPositionInterface referenceExchangeAndNetPosition;
         private ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition;
-        private NetPositionInterface targetNetPositions;
-        private BalanceComputationResult balanceComputationResult;
         private ExchangeAndNetPositionInterface newMarketBasedExchangeAndNetPosition = new EmptyExchangeAndNetPosition();
         private ExchangeAlignerStatus status;
 
@@ -93,16 +74,6 @@ public final class ExchangeAlignerResult {
             return this;
         }
 
-        public Builder addTargetNetPosition(NetPositionInterface targetNetPositions) {
-            this.targetNetPositions = targetNetPositions;
-            return this;
-        }
-
-        public Builder addBalanceComputationResult(BalanceComputationResult balanceComputationResult) {
-            this.balanceComputationResult = balanceComputationResult;
-            return this;
-        }
-
         public Builder addNewMarketBasedExchangeAndNetPositions(ExchangeAndNetPositionInterface newMarketBasedExchangeAndNetPosition) {
             this.newMarketBasedExchangeAndNetPosition = newMarketBasedExchangeAndNetPosition;
             return this;
@@ -113,13 +84,45 @@ public final class ExchangeAlignerResult {
             return this;
         }
 
-        public ExchangeAlignerResult build() {
+        public ItalyNorthExchangeAlignerResult build() {
             Objects.requireNonNull(referenceExchangeAndNetPosition, "referenceExchangeAndNetPosition must not be null");
             Objects.requireNonNull(initialMarketBasedExchangeAndNetPosition, "initialMarketBasedExchangeAndNetPosition must not be null");
-            Objects.requireNonNull(targetNetPositions, "targetNetPositions must not be null");
             Objects.requireNonNull(status, "status must not be null");
-            return new ExchangeAlignerResult(this);
+
+            finalDebugLoggerNp("reference", referenceExchangeAndNetPosition);
+            finalDebugLoggerNp("initial market-based", initialMarketBasedExchangeAndNetPosition);
+            finalDebugLoggerNp("final market-based", newMarketBasedExchangeAndNetPosition);
+            finalDebugLoggerShift(initialMarketBasedExchangeAndNetPosition, newMarketBasedExchangeAndNetPosition);
+
+            return new ItalyNorthExchangeAlignerResult(this);
         }
     }
 
+    private static void finalDebugLoggerNp(String networkName, ExchangeAndNetPositionInterface referenceExchangeAndNetPosition) {
+        LOGGER.info("Net positions in the {} network: {}, {}, {}, {}, {}, {}.", networkName,
+                printNpCountry(IT, referenceExchangeAndNetPosition),
+                printNpCountry(AT, referenceExchangeAndNetPosition),
+                printNpCountry(CH, referenceExchangeAndNetPosition),
+                printNpCountry(FR, referenceExchangeAndNetPosition),
+                printNpCountry(SI, referenceExchangeAndNetPosition),
+                printNpCountry(DE, referenceExchangeAndNetPosition));
+    }
+
+    private static void finalDebugLoggerShift(ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition, ExchangeAndNetPositionInterface marketBasedExchangeAndNetPosition) {
+        LOGGER.info("Shift performed on the market-based network: {}, {}, {}, {}, {}, {}.",
+                printShiftCountry(IT, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(AT, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(CH, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(FR, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(SI, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition),
+                printShiftCountry(DE, marketBasedExchangeAndNetPosition, initialMarketBasedExchangeAndNetPosition));
+    }
+
+    private static String printNpCountry(Country country, ExchangeAndNetPositionInterface exchangeAndNetPosition) {
+        return country.getName() + " = " +  Math.round(exchangeAndNetPosition.getNetPosition(country) * 1000.) / 1000. + " MW";
+    }
+
+    private static String printShiftCountry(Country country, ExchangeAndNetPositionInterface marketBasedExchangeAndNetPosition, ExchangeAndNetPositionInterface initialMarketBasedExchangeAndNetPosition) {
+        return country.getName() + " = " +  Math.round((marketBasedExchangeAndNetPosition.getNetPosition(country) - initialMarketBasedExchangeAndNetPosition.getNetPosition(country)) * 1000.) / 1000. + " MW";
+    }
 }
