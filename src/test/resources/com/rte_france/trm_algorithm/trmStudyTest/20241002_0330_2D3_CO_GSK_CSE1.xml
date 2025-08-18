@@ -1,0 +1,1377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GSKDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DtdVersion="1" DtdRelease="0" xsi:noNamespaceSchemaLocation="gsk-document.xsd">
+    <DocumentIdentification v="20241002_0330_2D3_CO_GSK_CSE"/>
+    <DocumentVersion v="1"/>
+    <DocumentScenario v="Transit"/>
+    <DocumentType v="Z02"/>
+    <ProcessType v="Z02"/>
+    <SenderIdentification v="10VCSEEH4MMD-NDO" codingScheme="A01"/>
+    <SenderRole v="A36"/>
+    <ReceiverIdentification v="10X1001A1001A345" codingScheme="A01"/>
+    <ReceiverRole v="A36"/>
+    <CreationDateTime v="2024-09-30T18:03:09Z"/>
+    <GSKTimeInterval v="2024-10-02T01:00Z/2024-10-02T02:00Z"/>
+    <Domain v="10YDOM-1001A061T" codingScheme="A01"/>
+    <CalculationDirections>
+        <CalculationDirection>
+            <Direction v="Import"/>
+            <Country v="FR"/>
+            <InArea v="10YIT-GRTN-----B" codingScheme="A01"/>
+            <OutArea v="10YFR-RTE------C" codingScheme="A01"/>
+        </CalculationDirection>
+        <CalculationDirection>
+            <Direction v="Import"/>
+            <Country v="CH"/>
+            <InArea v="10YIT-GRTN-----B" codingScheme="A01"/>
+            <OutArea v="10YCH-SWISSGRIDZ" codingScheme="A01"/>
+        </CalculationDirection>
+        <CalculationDirection>
+            <Direction v="Import"/>
+            <Country v="SI"/>
+            <InArea v="10YIT-GRTN-----B" codingScheme="A01"/>
+            <OutArea v="10YSI-ELES-----O" codingScheme="A01"/>
+        </CalculationDirection>
+        <CalculationDirection>
+            <Direction v="Import"/>
+            <Country v="AT"/>
+            <InArea v="10YIT-GRTN-----B" codingScheme="A01"/>
+            <OutArea v="10YAT-APG------L" codingScheme="A01"/>
+        </CalculationDirection>
+    </CalculationDirections>
+    <TimeSeries>
+        <TimeSeriesIdentification v="1"/>
+        <BusinessType v="Z02"/>
+        <Area v="10YFR-RTE------C" codingScheme="A01"/>
+        <Name v="FR"/>
+        <TimeInterval v="2024-10-02T01:00Z/2024-10-02T02:00Z"/>
+        <PropGSKBlock>
+            <Node>
+                <Name v="FRUHBO71"/>
+            </Node>
+            <Node>
+                <Name v="FVAROI21"/>
+            </Node>
+            <Node>
+                <Name v="FVICOG21"/>
+            </Node>
+            <Node>
+                <Name v="FVIGNE21"/>
+            </Node>
+            <Node>
+                <Name v="FVOUGL71"/>
+            </Node>
+            <Node>
+                <Name v="FVOUGL72"/>
+            </Node>
+            <Node>
+                <Name v="FSSAL771"/>
+            </Node>
+            <Node>
+                <Name v="FSSEA272"/>
+            </Node>
+            <Node>
+                <Name v="FSSFLO21"/>
+            </Node>
+            <Node>
+                <Name v="FSTRAS72"/>
+            </Node>
+            <Node>
+                <Name v="FTHIOT21"/>
+            </Node>
+            <Node>
+                <Name v="FS.CUR71"/>
+            </Node>
+            <Node>
+                <Name v="FSAVIG21"/>
+            </Node>
+            <Node>
+                <Name v="FROYE 21"/>
+            </Node>
+            <Node>
+                <Name v="FH.BOU71"/>
+            </Node>
+            <Node>
+                <Name v="FH.VIE21"/>
+            </Node>
+            <Node>
+                <Name v="FJ.VIL71"/>
+            </Node>
+            <Node>
+                <Name v="FJUSTI71"/>
+            </Node>
+            <Node>
+                <Name v="FKEMBS71"/>
+            </Node>
+            <Node>
+                <Name v="FGRAV576"/>
+            </Node>
+            <Node>
+                <Name v="FGUER871"/>
+            </Node>
+            <Node>
+                <Name v="FGRAV573"/>
+            </Node>
+            <Node>
+                <Name v="FGRAV574"/>
+            </Node>
+            <Node>
+                <Name v="FESPI571"/>
+            </Node>
+            <Node>
+                <Name v="FBRAEK72"/>
+            </Node>
+            <Node>
+                <Name v="FBRENS71"/>
+            </Node>
+            <Node>
+                <Name v="FBRIO621"/>
+            </Node>
+            <Node>
+                <Name v="FMUREM21"/>
+            </Node>
+            <Node>
+                <Name v="FN.SE171"/>
+            </Node>
+            <Node>
+                <Name v="FAIRVA21"/>
+            </Node>
+            <Node>
+                <Name v="FAIRVA51"/>
+            </Node>
+            <Node>
+                <Name v="FAMARG21"/>
+            </Node>
+            <Node>
+                <Name v="FCRENE22"/>
+            </Node>
+            <Node>
+                <Name v="FA.COM21"/>
+            </Node>
+            <Node>
+                <Name v="FARGOE23"/>
+            </Node>
+            <Node>
+                <Name v="FCRENE21"/>
+            </Node>
+            <Node>
+                <Name v="FBLOCA21"/>
+            </Node>
+            <Node>
+                <Name v="FBOLL571"/>
+            </Node>
+            <Node>
+                <Name v="FTRICA73"/>
+            </Node>
+            <Node>
+                <Name v="FTRICA74"/>
+            </Node>
+            <Node>
+                <Name v="FV.SEP21"/>
+            </Node>
+            <Node>
+                <Name v="FA.DOU21"/>
+            </Node>
+            <Node>
+                <Name v="FAGNEA51"/>
+            </Node>
+            <Node>
+                <Name v="FCHAPO21"/>
+            </Node>
+            <Node>
+                <Name v="FCHIN272"/>
+            </Node>
+            <Node>
+                <Name v="FCATG471"/>
+            </Node>
+            <Node>
+                <Name v="FCHA.S21"/>
+            </Node>
+            <Node>
+                <Name v="FCATG171"/>
+            </Node>
+            <Node>
+                <Name v="FCATG271"/>
+            </Node>
+            <Node>
+                <Name v="FCATG371"/>
+            </Node>
+            <Node>
+                <Name v="FC.RHO76"/>
+            </Node>
+            <Node>
+                <Name v="FC.VIL71"/>
+            </Node>
+            <Node>
+                <Name v="FFLAMA72"/>
+            </Node>
+            <Node>
+                <Name v="FFRUGE51"/>
+            </Node>
+            <Node>
+                <Name v="FKEMBS72"/>
+            </Node>
+            <Node>
+                <Name v="FKEMBS73"/>
+            </Node>
+            <Node>
+                <Name v="FMARCK72"/>
+            </Node>
+            <Node>
+                <Name v="FMARCK73"/>
+            </Node>
+            <Node>
+                <Name v="FMAROL21"/>
+            </Node>
+            <Node>
+                <Name v="FPOTEA22"/>
+            </Node>
+            <Node>
+                <Name v="FPOTEA23"/>
+            </Node>
+            <Node>
+                <Name v="FBVIL771"/>
+            </Node>
+            <Node>
+                <Name v="FBVILX71"/>
+            </Node>
+            <Node>
+                <Name v="FBXCAI71"/>
+            </Node>
+            <Node>
+                <Name v="FBXCAI72"/>
+            </Node>
+            <Node>
+                <Name v="FBXCHA71"/>
+            </Node>
+            <Node>
+                <Name v="FBUGEY72"/>
+            </Node>
+            <Node>
+                <Name v="FBUGEY73"/>
+            </Node>
+            <Node>
+                <Name v="FBRIZE21"/>
+            </Node>
+            <Node>
+                <Name v="FBUGEY71"/>
+            </Node>
+            <Node>
+                <Name v="FGRAND71"/>
+            </Node>
+            <Node>
+                <Name v="FGRAND72"/>
+            </Node>
+            <Node>
+                <Name v="FGRAV572"/>
+            </Node>
+            <Node>
+                <Name v="FGOLF571"/>
+            </Node>
+            <Node>
+                <Name v="FGOLF572"/>
+            </Node>
+            <Node>
+                <Name v="FRECOU21"/>
+            </Node>
+            <Node>
+                <Name v="FRIGOT71"/>
+            </Node>
+            <Node>
+                <Name v="FROUMA21"/>
+            </Node>
+            <Node>
+                <Name v="FCRUA573"/>
+            </Node>
+            <Node>
+                <Name v="FCRUA574"/>
+            </Node>
+            <Node>
+                <Name v="FD.BUR71"/>
+            </Node>
+            <Node>
+                <Name v="FCOUFF21"/>
+            </Node>
+            <Node>
+                <Name v="FCOUFF71"/>
+            </Node>
+            <Node>
+                <Name v="FDRONN21"/>
+            </Node>
+            <Node>
+                <Name v="FDRONN51"/>
+            </Node>
+            <Node>
+                <Name v="FEPIZO71"/>
+            </Node>
+            <Node>
+                <Name v="FG.CAI21"/>
+            </Node>
+            <Node>
+                <Name v="FGAMBS71"/>
+            </Node>
+            <Node>
+                <Name v="FLAVEY71"/>
+            </Node>
+            <Node>
+                <Name v="FLAVEY72"/>
+            </Node>
+            <Node>
+                <Name v="FM.MA521"/>
+            </Node>
+            <Node>
+                <Name v="FORELL72"/>
+            </Node>
+            <Node>
+                <Name v="FOTTMA71"/>
+            </Node>
+            <Node>
+                <Name v="FAMIEN21"/>
+            </Node>
+            <Node>
+                <Name v="FASTON72"/>
+            </Node>
+            <Node>
+                <Name v="FAUGUE71"/>
+            </Node>
+            <Node>
+                <Name v="FAMFAR71"/>
+            </Node>
+            <Node>
+                <Name v="FAMFAR72"/>
+            </Node>
+            <Node>
+                <Name v="FB.CO571"/>
+            </Node>
+            <Node>
+                <Name v="FB.MES71"/>
+            </Node>
+            <Node>
+                <Name v="FB.VAL71"/>
+            </Node>
+            <Node>
+                <Name v="FAVIG671"/>
+            </Node>
+            <Node>
+                <Name v="FAVIG672"/>
+            </Node>
+            <Node>
+                <Name v="FBOLL573"/>
+            </Node>
+            <Node>
+                <Name v="FBOLL574"/>
+            </Node>
+            <Node>
+                <Name v="FBOLL575"/>
+            </Node>
+            <Node>
+                <Name v="FTRAN571"/>
+            </Node>
+            <Node>
+                <Name v="FTRICA72"/>
+            </Node>
+            <Node>
+                <Name v="FC.RHO71"/>
+            </Node>
+            <Node>
+                <Name v="FC.RHO72"/>
+            </Node>
+            <Node>
+                <Name v="FC.RHO73"/>
+            </Node>
+            <Node>
+                <Name v="FBXCHA72"/>
+            </Node>
+            <Node>
+                <Name v="FC.OME71"/>
+            </Node>
+            <Node>
+                <Name v="FGENIS76"/>
+            </Node>
+            <Node>
+                <Name v="FGERST71"/>
+            </Node>
+            <Node>
+                <Name v="FGERST72"/>
+            </Node>
+            <Node>
+                <Name v="FGENIS74"/>
+            </Node>
+            <Node>
+                <Name v="FGENIS75"/>
+            </Node>
+            <Node>
+                <Name v="FMALLE73"/>
+            </Node>
+            <Node>
+                <Name v="FMARCK71"/>
+            </Node>
+            <Node>
+                <Name v="FPAUDY21"/>
+            </Node>
+            <Node>
+                <Name v="FPERIE51"/>
+            </Node>
+            <Node>
+                <Name v="FPOTEA21"/>
+            </Node>
+            <Node>
+                <Name v="FMTAHU21"/>
+            </Node>
+            <Node>
+                <Name v="FMTVAR71"/>
+            </Node>
+            <Node>
+                <Name v="FCHINX72"/>
+            </Node>
+            <Node>
+                <Name v="FCHOO171"/>
+            </Node>
+            <Node>
+                <Name v="FCIVAU71"/>
+            </Node>
+            <Node>
+                <Name v="FCIVAU72"/>
+            </Node>
+            <Node>
+                <Name v="FCORD571"/>
+            </Node>
+            <Node>
+                <Name v="FD.BUR72"/>
+            </Node>
+            <Node>
+                <Name v="FD.BUX72"/>
+            </Node>
+            <Node>
+                <Name v="FGARRI71"/>
+            </Node>
+            <Node>
+                <Name v="FGENIS71"/>
+            </Node>
+            <Node>
+                <Name v="FGENIS72"/>
+            </Node>
+            <Node>
+                <Name v="FP.ESC71"/>
+            </Node>
+            <Node>
+                <Name v="FP.VIL21"/>
+            </Node>
+            <Node>
+                <Name v="FPALUE71"/>
+            </Node>
+            <Node>
+                <Name v="FBERSA22"/>
+            </Node>
+            <Node>
+                <Name v="FBERSA23"/>
+            </Node>
+            <Node>
+                <Name v="FBLAYA71"/>
+            </Node>
+            <Node>
+                <Name v="FBLAYA73"/>
+            </Node>
+            <Node>
+                <Name v="FBLAYA74"/>
+            </Node>
+            <Node>
+                <Name v="FBARBU21"/>
+            </Node>
+            <Node>
+                <Name v="FBERSA21"/>
+            </Node>
+            <Node>
+                <Name v="FB.VAL72"/>
+            </Node>
+            <Node>
+                <Name v="FB.VAL73"/>
+            </Node>
+            <Node>
+                <Name v="FBOLL576"/>
+            </Node>
+            <Node>
+                <Name v="FBRAEK71"/>
+            </Node>
+            <Node>
+                <Name v="FPALUE72"/>
+            </Node>
+            <Node>
+                <Name v="FPALUE74"/>
+            </Node>
+        </PropGSKBlock>
+    </TimeSeries>
+    <TimeSeries>
+        <TimeSeriesIdentification v="1"/>
+        <BusinessType v="Z02"/>
+        <Area v="10YCH-SWISSGRIDZ" codingScheme="A01"/>
+        <Name v="CH"/>
+        <TimeInterval v="2024-10-02T01:00Z/2024-10-02T02:00Z"/>
+        <ReserveGSKBlock>
+            <Node>
+                <Name v="SAIROL7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-29"/>
+            </Node>
+            <Node>
+                <Name v="SAIROL7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-29"/>
+            </Node>
+            <Node>
+                <Name v="SASPHA1A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-100"/>
+            </Node>
+            <Node>
+                <Name v="SBAERE2A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-55"/>
+            </Node>
+            <Node>
+                <Name v="SBAERE2B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-55"/>
+            </Node>
+            <Node>
+                <Name v="SBAERE2C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-55"/>
+            </Node>
+            <Node>
+                <Name v="SBAERE2D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-55"/>
+            </Node>
+            <Node>
+                <Name v="SBATIA7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-94"/>
+            </Node>
+            <Node>
+                <Name v="SBATIA7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-94"/>
+            </Node>
+            <Node>
+                <Name v="SBAVON2A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-81"/>
+            </Node>
+            <Node>
+                <Name v="SBAVON2B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-81"/>
+            </Node>
+            <Node>
+                <Name v="SBIASC2C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-115"/>
+            </Node>
+            <Node>
+                <Name v="SBIASC2D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-115"/>
+            </Node>
+            <Node>
+                <Name v="SBIASC2E"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-115"/>
+            </Node>
+            <Node>
+                <Name v="SBIASC2F"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-72"/>
+            </Node>
+            <Node>
+                <Name v="SBITSC2C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-133"/>
+            </Node>
+            <Node>
+                <Name v="SBITSK7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-97"/>
+            </Node>
+            <Node>
+                <Name v="SCASTA7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-50"/>
+            </Node>
+            <Node>
+                <Name v="SCAVER7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-27"/>
+            </Node>
+            <Node>
+                <Name v="SCAVER7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-27"/>
+            </Node>
+            <Node>
+                <Name v="SCAVER7C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-27"/>
+            </Node>
+            <Node>
+                <Name v="SCAVER7D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-27"/>
+            </Node>
+            <Node>
+                <Name v="SCHAMO6A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-418"/>
+            </Node>
+            <Node>
+                <Name v="SCHAMO6B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-418"/>
+            </Node>
+            <Node>
+                <Name v="SCHAMO7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-64"/>
+            </Node>
+            <Node>
+                <Name v="SCHAMO7C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-64"/>
+            </Node>
+            <Node>
+                <Name v="SCHAMO7D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-64"/>
+            </Node>
+            <Node>
+                <Name v="SCHAMO7F"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-64"/>
+            </Node>
+            <Node>
+                <Name v="SFERRE2A"/>
+                <Pmin v="24.80"/>
+                <Pmax v="-60"/>
+            </Node>
+            <Node>
+                <Name v="SFERRE2B"/>
+                <Pmin v="24.80"/>
+                <Pmax v="-60"/>
+            </Node>
+            <Node>
+                <Name v="SFERRE2C"/>
+                <Pmin v="40.00"/>
+                <Pmax v="-60"/>
+            </Node>
+            <Node>
+                <Name v="SFIONG7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-52.8"/>
+            </Node>
+            <Node>
+                <Name v="SFIONG7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-52.8"/>
+            </Node>
+            <Node>
+                <Name v="SFIONG7D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-52.8"/>
+            </Node>
+            <Node>
+                <Name v="SFIONG7E"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-52.8"/>
+            </Node>
+            <Node>
+                <Name v="SFIONG7F"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-52.8"/>
+            </Node>
+            <Node>
+                <Name v="SFIONN7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-48"/>
+            </Node>
+            <Node>
+                <Name v="SFIONN7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-48"/>
+            </Node>
+            <Node>
+                <Name v="SFIONN7C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-48"/>
+            </Node>
+            <Node>
+                <Name v="SGOESC2B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-47.05"/>
+            </Node>
+            <Node>
+                <Name v="SGOESC2C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-47.05"/>
+            </Node>
+            <Node>
+                <Name v="SGONDO7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-19"/>
+            </Node>
+            <Node>
+                <Name v="SGRIMS2A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-67"/>
+            </Node>
+            <Node>
+                <Name v="SGRIMS2B"/>
+                <Pmin v="86.00"/>
+                <Pmax v="-95"/>
+            </Node>
+            <Node>
+                <Name v="SGRIMS2C"/>
+                <Pmin v="88.00"/>
+                <Pmax v="-95"/>
+            </Node>
+            <Node>
+                <Name v="SGRIMS2D"/>
+                <Pmin v="88.00"/>
+                <Pmax v="-95"/>
+            </Node>
+            <Node>
+                <Name v="SGRIMS2E"/>
+                <Pmin v="88.00"/>
+                <Pmax v="-95"/>
+            </Node>
+            <Node>
+                <Name v="SHAND17A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-25"/>
+            </Node>
+            <Node>
+                <Name v="SHAND17B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-25"/>
+            </Node>
+            <Node>
+                <Name v="SHAND27A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-34"/>
+            </Node>
+            <Node>
+                <Name v="SHAND27B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-34"/>
+            </Node>
+            <Node>
+                <Name v="SHAND27D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-34"/>
+            </Node>
+            <Node>
+                <Name v="SHAND27E"/>
+                <Pmin v="47.80"/>
+                <Pmax v="-55"/>
+            </Node>
+            <Node>
+                <Name v="SHANDA7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-93.3"/>
+            </Node>
+            <Node>
+                <Name v="SILANZ2A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-104"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-62"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3F"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3H"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3I"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3J"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3K"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-153.66"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3L"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-96.8"/>
+            </Node>
+            <Node>
+                <Name v="SINNER3M"/>
+                <Pmin v="4.60"/>
+                <Pmax v="-10"/>
+            </Node>
+            <Node>
+                <Name v="SLINTH1A"/>
+                <Pmin v="250.00"/>
+                <Pmax v="-250"/>
+            </Node>
+            <Node>
+                <Name v="SLINTH1B"/>
+                <Pmin v="250.00"/>
+                <Pmax v="-250"/>
+            </Node>
+            <Node>
+                <Name v="SLOEBB7B"/>
+                <Pmin v="29.00"/>
+                <Pmax v="-50"/>
+            </Node>
+            <Node>
+                <Name v="SLOEBB7D"/>
+                <Pmin v="7.00"/>
+                <Pmax v="-36"/>
+            </Node>
+            <Node>
+                <Name v="SOLIVO2A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-60.5"/>
+            </Node>
+            <Node>
+                <Name v="SOLIVO2B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-60.5"/>
+            </Node>
+            <Node>
+                <Name v="SPECCI7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-23"/>
+            </Node>
+            <Node>
+                <Name v="SPECCI7D"/>
+                <Pmin v="12.00"/>
+                <Pmax v="0"/>
+            </Node>
+            <Node>
+                <Name v="SPECCI7E"/>
+                <Pmin v="12.00"/>
+                <Pmax v="0"/>
+            </Node>
+            <Node>
+                <Name v="SPRADE5D"/>
+                <Pmin v="50.00"/>
+                <Pmax v="-50"/>
+            </Node>
+            <Node>
+                <Name v="SREALT7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-26"/>
+            </Node>
+            <Node>
+                <Name v="SRIDDE7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SRIDDE7C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SRIDDE7D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SRIDDE7E"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SROBIE7A"/>
+                <Pmin v="40.00"/>
+                <Pmax v="-41.3"/>
+            </Node>
+            <Node>
+                <Name v="SROBIE7B"/>
+                <Pmin v="40.00"/>
+                <Pmax v="-41.3"/>
+            </Node>
+            <Node>
+                <Name v="SROBIE7C"/>
+                <Pmin v="40.00"/>
+                <Pmax v="-41.3"/>
+            </Node>
+            <Node>
+                <Name v="SROBIE7D"/>
+                <Pmin v="40.00"/>
+                <Pmax v="-41.3"/>
+            </Node>
+            <Node>
+                <Name v="SROTHE3B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-106"/>
+            </Node>
+            <Node>
+                <Name v="SROTHE7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-43"/>
+            </Node>
+            <Node>
+                <Name v="SROTHE7C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-43"/>
+            </Node>
+            <Node>
+                <Name v="SROTHE7D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-43"/>
+            </Node>
+            <Node>
+                <Name v="SSEDRU2B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51.6"/>
+            </Node>
+            <Node>
+                <Name v="SSEDRU2C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51.6"/>
+            </Node>
+            <Node>
+                <Name v="SSEDRU2D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51.6"/>
+            </Node>
+            <Node>
+                <Name v="SSIEBN2A"/>
+                <Pmin v="8.00"/>
+                <Pmax v="-54"/>
+            </Node>
+            <Node>
+                <Name v="SSILS_7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-62"/>
+            </Node>
+            <Node>
+                <Name v="SSILS_7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-62"/>
+            </Node>
+            <Node>
+                <Name v="SSILS_7C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-62"/>
+            </Node>
+            <Node>
+                <Name v="SSOAZZ2B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-41.7"/>
+            </Node>
+            <Node>
+                <Name v="SSOAZZ2D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-41.7"/>
+            </Node>
+            <Node>
+                <Name v="SSTALD2B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-92.5"/>
+            </Node>
+            <Node>
+                <Name v="SSTALD2D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-92.5"/>
+            </Node>
+            <Node>
+                <Name v="STAVAN7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-45"/>
+            </Node>
+            <Node>
+                <Name v="STAVAN7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-45"/>
+            </Node>
+            <Node>
+                <Name v="STAVAN7C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-45"/>
+            </Node>
+            <Node>
+                <Name v="STAVAN7D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-45"/>
+            </Node>
+            <Node>
+                <Name v="STIEFE2A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-52"/>
+            </Node>
+            <Node>
+                <Name v="STIERF2B"/>
+                <Pmin v="17.00"/>
+                <Pmax v="-23"/>
+            </Node>
+            <Node>
+                <Name v="STIERF2D"/>
+                <Pmin v="17.00"/>
+                <Pmax v="-23"/>
+            </Node>
+            <Node>
+                <Name v="STIERF2F"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-102"/>
+            </Node>
+            <Node>
+                <Name v="STIERF2G"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-102"/>
+            </Node>
+            <Node>
+                <Name v="STIERF2H"/>
+                <Pmin v="131.00"/>
+                <Pmax v="-138"/>
+            </Node>
+            <Node>
+                <Name v="STINZE7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-26"/>
+            </Node>
+            <Node>
+                <Name v="STINZE7D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-26"/>
+            </Node>
+            <Node>
+                <Name v="STINZE7E"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-17"/>
+            </Node>
+            <Node>
+                <Name v="SVALLO2A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-70"/>
+            </Node>
+            <Node>
+                <Name v="SVERBA2A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-51"/>
+            </Node>
+            <Node>
+                <Name v="SVERBA7A"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-26"/>
+            </Node>
+            <Node>
+                <Name v="SVERBA7B"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-26"/>
+            </Node>
+            <Node>
+                <Name v="SVERBA7C"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-26"/>
+            </Node>
+            <Node>
+                <Name v="SVERBA7D"/>
+                <Pmin v="0.00"/>
+                <Pmax v="-26"/>
+            </Node>
+            <Node>
+                <Name v="SVEYTA1B"/>
+                <Pmin v="114.00"/>
+                <Pmax v="-122"/>
+            </Node>
+            <Node>
+                <Name v="SVEYTA1C"/>
+                <Pmin v="114.00"/>
+                <Pmax v="-122"/>
+            </Node>
+            <Node>
+                <Name v="SVEYTA2A"/>
+                <Pmin v="65.00"/>
+                <Pmax v="-64"/>
+            </Node>
+            <Node>
+                <Name v="SVEYTA2C"/>
+                <Pmin v="65.00"/>
+                <Pmax v="-64"/>
+            </Node>
+            <Node>
+                <Name v="SVEYTA2D"/>
+                <Pmin v="65.00"/>
+                <Pmax v="-64"/>
+            </Node>
+            <Node>
+                <Name v="SZERME2B"/>
+                <Pmin v="23.00"/>
+                <Pmax v="-36"/>
+            </Node>
+            <Node>
+                <Name v="SZERME2C"/>
+                <Pmin v="23.00"/>
+                <Pmax v="-36"/>
+            </Node>
+        </ReserveGSKBlock>
+    </TimeSeries>
+    <TimeSeries>
+        <TimeSeriesIdentification v="1"/>
+        <BusinessType v="Z02"/>
+        <Area v="10YAT-APG------L" codingScheme="A01"/>
+        <Name v="AT"/>
+        <TimeInterval v="2024-10-02T01:00Z/2024-10-02T02:00Z"/>
+        <ManualGSKBlock>
+            <Factor v="1"/>
+            <Node>
+                <Name v="OKAPRU11"/>
+                <Factor v="0.328084"/>
+            </Node>
+            <Node>
+                <Name v="OKAPRU51"/>
+                <Factor v="0.765529"/>
+            </Node>
+            <Node>
+                <Name v="OMALTA21"/>
+                <Factor v="1.662292"/>
+            </Node>
+            <Node>
+                <Name v="OMALTA22"/>
+                <Factor v="0.800525"/>
+            </Node>
+            <Node>
+                <Name v="OMAYRH22"/>
+                <Factor v="1.194226"/>
+            </Node>
+        </ManualGSKBlock>
+    </TimeSeries>
+    <TimeSeries>
+        <TimeSeriesIdentification v="1"/>
+        <BusinessType v="Z02"/>
+        <Area v="10YSI-ELES-----O" codingScheme="A01"/>
+        <Name v="SI"/>
+        <TimeInterval v="2024-10-02T01:00Z/2024-10-02T02:00Z"/>
+        <PropGSKBlock>
+            <Factor v="0.5"/>
+            <Node>
+                <Name v="LSOSTA11"/>
+            </Node>
+        </PropGSKBlock>
+        <PropLSKBlock>
+            <Factor v="0.5"/>
+            <Node>
+                <Name v="LKRSKO51"/>
+            </Node>
+            <Node>
+                <Name v="LOKROG51"/>
+            </Node>
+            <Node>
+                <Name v="LBERIC51"/>
+            </Node>
+            <Node>
+                <Name v="LPODLO51"/>
+            </Node>
+            <Node>
+                <Name v="LCIRKO51"/>
+            </Node>
+            <Node>
+                <Name v="LDIVAC51"/>
+            </Node>
+            <Node>
+                <Name v="LKLECE51"/>
+            </Node>
+            <Node>
+                <Name v="LMARIB51"/>
+            </Node>
+        </PropLSKBlock>
+    </TimeSeries>
+    <TimeSeries>
+        <TimeSeriesIdentification v="1"/>
+        <BusinessType v="Z02"/>
+        <Area v="10YIT-GRTN-----B" codingScheme="A01"/>
+        <Name v="IT"/>
+        <TimeInterval v="2024-10-02T01:00Z/2024-10-02T02:00Z"/>
+        <MeritOrderGSKBlock>
+            <Up>
+                <Factor v="1"/>
+                <Node>
+                    <Name v="IRELF111"/>
+                    <Pmax v="-369.00"/>
+                </Node>
+                <Node>
+                    <Name v="IGSCR211"/>
+                    <Pmax v="-373.00"/>
+                </Node>
+                <Node>
+                    <Name v="ISERMC11"/>
+                    <Pmax v="-378.00"/>
+                </Node>
+                <Node>
+                    <Name v="IRICN111"/>
+                    <Pmax v="-364.00"/>
+                </Node>
+                <Node>
+                    <Name v="IECRF111"/>
+                    <Pmax v="-353.00"/>
+                </Node>
+                <Node>
+                    <Name v="IFRBM111"/>
+                    <Pmax v="-313.00"/>
+                </Node>
+                <Node>
+                    <Name v="IFRBM112"/>
+                    <Pmax v="-330.00"/>
+                </Node>
+                <Node>
+                    <Name v="IMTVM211"/>
+                    <Pmax v="-349.00"/>
+                </Node>
+                <Node>
+                    <Name v="IMTVM311"/>
+                    <Pmax v="-357.00"/>
+                </Node>
+                <Node>
+                    <Name v="IEPBN111"/>
+                    <Pmax v="-322.00"/>
+                </Node>
+                <Node>
+                    <Name v="IEPBN112"/>
+                    <Pmax v="-329.00"/>
+                </Node>
+                <Node>
+                    <Name v="IEFEF111"/>
+                    <Pmax v="-343.00"/>
+                </Node>
+                <Node>
+                    <Name v="ILCSM311"/>
+                    <Pmax v="-370.00"/>
+                </Node>
+                <Node>
+                    <Name v="ISBAF111"/>
+                    <Pmax v="-126.00"/>
+                </Node>
+                <Node>
+                    <Name v="ISBAF211"/>
+                    <Pmax v="-234.00"/>
+                </Node>
+                <Node>
+                    <Name v="IBLVMA21"/>
+                    <Pmax v="-38.02"/>
+                </Node>
+                <Node>
+                    <Name v="IGDAM121"/>
+                    <Pmax v="-34.21"/>
+                </Node>
+                <Node>
+                    <Name v="IKVNMA21"/>
+                    <Pmax v="-76.03"/>
+                </Node>
+            </Up>
+            <Down>
+                <Factor v="1"/>
+                <Node>
+                    <Name v="IGSCR211"/>
+                    <Pmin v="-167.00"/>
+                </Node>
+                <Node>
+                    <Name v="IFRBM112"/>
+                    <Pmin v="-132.00"/>
+                </Node>
+                <Node>
+                    <Name v="IRELF111"/>
+                    <Pmin v="-230.00"/>
+                </Node>
+                <Node>
+                    <Name v="ICSSM121"/>
+                    <Pmin v="-55.80"/>
+                </Node>
+                <Node>
+                    <Name v="ICSSM111"/>
+                    <Pmin v="-124.20"/>
+                </Node>
+                <Node>
+                    <Name v="ITZCM111"/>
+                    <Pmin v="-179.00"/>
+                </Node>
+                <Node>
+                    <Name v="IOSCM411"/>
+                    <Pmin v="0.00"/>
+                </Node>
+                <Node>
+                    <Name v="IEONT112"/>
+                    <Pmin v="-68.00"/>
+                </Node>
+                <Node>
+                    <Name v="IEONT111"/>
+                    <Pmin v="-132.00"/>
+                </Node>
+                <Node>
+                    <Name v="ITURM211"/>
+                    <Pmin v="-71.40"/>
+                </Node>
+                <Node>
+                    <Name v="ITURM111"/>
+                    <Pmin v="-138.60"/>
+                </Node>
+                <Node>
+                    <Name v="IMOATA22"/>
+                    <Pmin v="-160.00"/>
+                </Node>
+                <Node>
+                    <Name v="IRICN111"/>
+                    <Pmin v="-219.00"/>
+                </Node>
+                <Node>
+                    <Name v="IRATN111"/>
+                    <Pmin v="-160.00"/>
+                </Node>
+                <Node>
+                    <Name v="ITRBV122"/>
+                    <Pmin v="0.00"/>
+                </Node>
+                <Node>
+                    <Name v="ISMCVA21"/>
+                    <Pmin v="0.00"/>
+                </Node>
+                <Node>
+                    <Name v="IALCN311"/>
+                    <Pmin v="-95.00"/>
+                </Node>
+                <Node>
+                    <Name v="IALCN111"/>
+                    <Pmin v="-95.00"/>
+                </Node>
+                <Node>
+                    <Name v="IKVNMA21"/>
+                    <Pmin v="0.00"/>
+                </Node>
+                <Node>
+                    <Name v="IGDAM121"/>
+                    <Pmin v="0.00"/>
+                </Node>
+                <Node>
+                    <Name v="IBLVMA21"/>
+                    <Pmin v="0.00"/>
+                </Node>
+                <Node>
+                    <Name v="IVALT122"/>
+                    <Pmin v="-13.00"/>
+                </Node>
+            </Down>
+        </MeritOrderGSKBlock>
+    </TimeSeries>
+</GSKDocument>

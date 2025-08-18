@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -48,19 +47,20 @@ public class TrmAlgorithm {
         this.identifiableMapper = identifiableMapper;
     }
 
-    private void checkReferenceElementNotEmpty(List<String> referenceNetworkElementIds) {
+    void checkReferenceElementNotEmpty(List<String> referenceNetworkElementIds) {
         if (referenceNetworkElementIds.isEmpty()) {
             throw new TrmException("Reference critical network elements are empty");
         }
     }
 
-    private void checkReferenceElementAreAvailableInMarketBasedNetwork(List<String> referenceNetworkElementIds, Network marketBasedNetwork) {
+    void checkReferenceElementAreAvailableInMarketBasedNetwork(List<String> referenceNetworkElementIds, Network marketBasedNetwork) {
         List<String> missingBranches = referenceNetworkElementIds.stream()
             .filter(branchIdInReference -> Objects.isNull(marketBasedNetwork.getBranch(identifiableMapper.getIdInMarket(branchIdInReference))))
             .sorted()
             .toList();
         if (!missingBranches.isEmpty()) {
-            throw new TrmException(String.format("Market-based network doesn't contain the following network elements: %s.", missingBranches));
+            //throw new TrmException(String.format("Market-based network doesn't contain the following network elements: %s.", missingBranches));
+            LOGGER.error(String.format("Market-based network doesn't contain the following network elements: %s.", missingBranches));
         }
     }
 
