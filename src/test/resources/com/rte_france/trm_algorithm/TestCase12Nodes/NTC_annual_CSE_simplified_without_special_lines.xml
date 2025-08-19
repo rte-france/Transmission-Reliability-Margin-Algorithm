@@ -11,7 +11,7 @@
     <ReceiverRole v="A36"/>
     <CreationDateTime v="2020-12-16T16:42:18Z"/>
     <Domain v="10YDOM-1001A061T" codingScheme="A01"/>
-    <NTCvalues>
+    <NTCvaluesImport>
         <SpecialDays>
             <Day day="2021-02-25Z" description="">
                 <TimeInterval tini="T00:00Z" tfin="T01:00Z">
@@ -192,7 +192,7 @@
                 </DayOfWeek>
             </Period>
         </BasicDays>
-    </NTCvalues>
+    </NTCvaluesImport>
     <SplittingFactors>
         <SpecialDays>
             <Day day="2021-02-25Z" description="">
