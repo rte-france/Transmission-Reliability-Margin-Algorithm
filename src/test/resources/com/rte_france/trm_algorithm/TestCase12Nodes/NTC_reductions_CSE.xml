@@ -10,7 +10,7 @@
 	<ReceiverRole v="A36" />
 	<CreationDateTime v="2021-06-23T15:14:59Z" />
 	<Domain v="10YDOM-1001A061T" codingScheme="A01" />
-	<NTCreductions>
+	<NTCreductionsImport>
 		<Period description="NTC 2021-02-24T22:00Z/2021-02-24T23:00Z" dtini="2021-02-24T22:00Z" dtfin="2021-02-24T23:00Z">
 			<DayOfWeek description="Everyday" daynum="0">
 				<TimeInterval tini="T22:00Z" tfin="T23:00Z">
@@ -251,7 +251,7 @@
 				</TimeInterval>
 			</DayOfWeek>
 		</Period>
-	</NTCreductions>
+	</NTCreductionsImport>
 	<SplittingFactors>
 		<Period description="SplittingFactor 2021-02-24T22:00Z/2021-02-24T23:00Z" dtini="2021-02-24T22:00Z" dtfin="2021-02-24T23:00Z">
 			<DayOfWeek description="Everyday" daynum="0">
