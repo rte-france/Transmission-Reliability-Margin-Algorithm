@@ -50,6 +50,10 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         return result;
     }
 
+    public ItalyNorthExchangeAlignerResult getResult() {
+        return result;
+    }
+
     @Override
     public void align(Network referenceNetwork, Network marketBasedNetwork) {
         LOGGER.info("Aligning North Italian exchanges");
@@ -109,7 +113,8 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         Map<String, Double> ntcs = updateMarketBasedNtcs(marketBasedExchangeAndNetPosition);
         ShiftDispatcher shiftDispatcher = new CseD2ccShiftDispatcherTmp(LOGGER, reducedSplittingFactors, ntcs);
         LinearScaler linearScaler = new LinearScaler(zonalScalable, shiftDispatcher);
-        linearScaler.shiftNetwork(-referenceExchangeAndNetPosition.getNetPosition(IT), marketBasedNetwork);
+        double targetNetPosition = -referenceExchangeAndNetPosition.getNetPosition(IT) + marketBasedExchangeAndNetPosition.getNetPosition(IT) + ntcs.values().stream().mapToDouble(Double::doubleValue).sum();
+        linearScaler.shiftNetwork(targetNetPosition, marketBasedNetwork);
     }
 
     ExchangeAndNetPosition computeExchangeAndNetPosition(Network network) {
