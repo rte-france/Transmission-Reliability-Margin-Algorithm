@@ -9,11 +9,14 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.ucte.UcteGlskDocument;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openrao.commons.EICode;
 import com.powsybl.sensitivity.SensitivityVariableSet;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +38,7 @@ class ZonalSensitivityComputerTest {
         List<String> branchIds = List.of("FFR2AA1  DDE3AA1  1", "FFR1AA1  FFR2AA1  1");
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
-        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters(), new ArrayList<>());
         Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
         assertEquals(2, pdtf.keySet().size());
         assertEquals(0.315, pdtf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
@@ -45,13 +48,31 @@ class ZonalSensitivityComputerTest {
     }
 
     @Test
+    void testSimpleNetworkWithCountryFiltering() {
+        Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
+
+        List<String> countries = List.of(new EICode(Country.BE).getAreaCode(), new EICode(Country.NL).getAreaCode());
+
+        List<String> branchIds = List.of("FFR2AA1  DDE3AA1  1", "FFR1AA1  FFR2AA1  1");
+        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
+        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters(), countries);
+        Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
+        assertEquals(2, ptdf.size());
+        assertEquals(0.173, ptdf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
+        assertEquals(820.095, ptdf.get("FFR2AA1  DDE3AA1  1").getFlow(), EPSILON);
+        assertEquals(0.014, ptdf.get("FFR1AA1  FFR2AA1  1").getZonalPtdf(), EPSILON);
+        assertEquals(430.064, ptdf.get("FFR1AA1  FFR2AA1  1").getFlow(), EPSILON);
+    }
+
+    @Test
     void testSimpleNetworkWithoutBranch() {
         Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
 
         List<String> branchIds = Collections.emptyList();
         UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
-        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters(), new ArrayList<>());
         Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
         assertTrue(pdtf.keySet().isEmpty());
     }
@@ -65,7 +86,7 @@ class ZonalSensitivityComputerTest {
 
         LoadFlowParameters loadFlowParameters = new LoadFlowParameters().setDc(true);
 
-        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters, new ArrayList<>());
         Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
         assertEquals(1, pdtf.keySet().size());
         assertEquals(0.315, pdtf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
@@ -77,7 +98,7 @@ class ZonalSensitivityComputerTest {
         Network network = TestUtils.importNetwork("simple_networks/NETWORK_LOOP_FLOW_WITH_COUNTRIES.uct");
         List<String> branchIds = List.of("EGEN  11 FGEN  11 1");
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(network);
-        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters(), new ArrayList<>());
         assertThrows(Exception.class, () -> zonalSensitivityComputer.run(network, branchIds, zonalGlsks));
     }
 }

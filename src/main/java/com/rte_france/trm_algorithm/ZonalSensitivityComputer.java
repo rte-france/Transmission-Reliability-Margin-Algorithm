@@ -29,10 +29,12 @@ import static com.powsybl.sensitivity.SensitivityVariableType.INJECTION_ACTIVE_P
  */
 public final class ZonalSensitivityComputer {
     private final SensitivityAnalysisParameters sensitivityAnalysisParameters;
+    private final List<String> countryRestrictionEiCode; // if empty, no restriction
 
-    public ZonalSensitivityComputer(LoadFlowParameters loadFlowParameters) {
+    public ZonalSensitivityComputer(LoadFlowParameters loadFlowParameters, List<String> countryRestrictionEiCode) {
         this.sensitivityAnalysisParameters = new SensitivityAnalysisParameters()
             .setLoadFlowParameters(loadFlowParameters.copy().setDc(false));
+        this.countryRestrictionEiCode = countryRestrictionEiCode;
     }
 
     private static Map<String, ZonalPtdfAndFlow> extractZonalPtdfs(List<String> branchIds, SensitivityAnalysisResult sensitivityAnalysisResult, List<SensitivityFactor> factors) {
@@ -71,6 +73,9 @@ public final class ZonalSensitivityComputer {
         Map<String, SensitivityVariableSet> dataPerZone = glsk.getDataPerZone();
         List<SensitivityVariableSet> variableSets = getSensitivityVariableSets(glsk, dataPerZone);
         List<SensitivityFactor> factors = getSensitivityFactors(branchIds, dataPerZone);
+        if (!countryRestrictionEiCode.isEmpty()) {
+            factors = factors.stream().filter(factor -> countryRestrictionEiCode.contains(factor.getVariableId())).toList();
+        }
         SensitivityAnalysisResult sensitivityAnalysisResult = SensitivityAnalysis.run(network, factors, Collections.emptyList(), variableSets, sensitivityAnalysisParameters);
         return extractZonalPtdfs(branchIds, sensitivityAnalysisResult, factors);
     }
