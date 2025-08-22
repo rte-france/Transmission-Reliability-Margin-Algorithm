@@ -37,7 +37,7 @@ class ZonalSensitivityComputerTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
         Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
-        assertEquals(2, ptdf.keySet().size());
+        assertEquals(2, ptdf.size());
         assertEquals(0.315, ptdf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
         assertEquals(820.095, ptdf.get("FFR2AA1  DDE3AA1  1").getFlow(), EPSILON);
         assertEquals(0.058, ptdf.get("FFR1AA1  FFR2AA1  1").getZonalPtdf(), EPSILON);
@@ -53,7 +53,7 @@ class ZonalSensitivityComputerTest {
         ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
         Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
-        assertTrue(ptdf.keySet().isEmpty());
+        assertTrue(ptdf.isEmpty());
     }
 
     @Test
@@ -67,7 +67,7 @@ class ZonalSensitivityComputerTest {
 
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
         Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
-        assertEquals(1, ptdf.keySet().size());
+        assertEquals(1, ptdf.size());
         assertEquals(0.315, ptdf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
         assertEquals(820.095, ptdf.get("FFR2AA1  DDE3AA1  1").getFlow(), EPSILON);
     }
