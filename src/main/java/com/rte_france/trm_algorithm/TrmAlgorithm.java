@@ -46,14 +46,15 @@ public class TrmAlgorithm {
         }
     }
 
-    private void checkReferenceElementAreAvailableInMarketBasedNetwork(List<String> referenceNetworkElementIds, Network marketBasedNetwork) {
+    private List<String> checkReferenceElementAreAvailableInMarketBasedNetwork(List<String> referenceNetworkElementIds, Network marketBasedNetwork) {
         List<String> missingBranches = referenceNetworkElementIds.stream()
             .filter(branchId -> Objects.isNull(marketBasedNetwork.getBranch(branchId)))
             .sorted()
             .toList();
         if (!missingBranches.isEmpty()) {
-            throw new TrmException(String.format("Market-based network doesn't contain the following network elements: %s.", missingBranches));
+            LOGGER.error("Market-based network doesn't contain the following network elements: {}.", missingBranches);
         }
+        return referenceNetworkElementIds.stream().filter(branchId -> !missingBranches.contains(branchId)).collect(Collectors.toList());
     }
 
     public TrmResults computeUncertainties(Network referenceNetwork, Network marketBasedNetwork, XnecProvider xnecProvider, ZonalData<SensitivityVariableSet> referenceZonalGlsks) {
@@ -62,7 +63,7 @@ public class TrmAlgorithm {
         LOGGER.info("Selecting Critical network elements");
         List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().toList();
         checkReferenceElementNotEmpty(referenceNetworkElementIds);
-        checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
+        referenceNetworkElementIds = checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
 
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
         Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, referenceNetworkElementIds);
