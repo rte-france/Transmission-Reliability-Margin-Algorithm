@@ -397,30 +397,9 @@ class TrmAlgorithmTest {
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
 
         Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
-        assertEquals(4, result.size());
-        assertEquals(0.0, result.get("BBE2AA1  FFR3AA1  1").getUncertainty(), EPSILON);
+        assertEquals(3, result.size());
         assertEquals(0.0, result.get("DDE2AA1  NNL3AA1  1").getUncertainty(), EPSILON);
         assertEquals(0.0, result.get("FFR2AA1  DDE3AA1  1").getUncertainty(), EPSILON);
         assertEquals(0.0, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
-
-    /*@Test
-    void testNetworksReelsTrmStudy() {
-        Network referenceNetwork = TestUtils.importNetwork("trmStudyTest/20241002_0330_SN3_UX0.uct");
-        Network marketBasedNetwork = TestUtils.importNetwork("trmStudyTest/20241002_0330_2D3_CO_Final_CSE1.uct");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("trmStudyTest/20241002_0330_2D3_CO_GSK_CSE1.xml"));
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
-        XnecProvider xnecProvider = new XnecProviderInterconnection();
-        TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), localMarketZonalScalable, UcteMapper.mapNetworks(referenceNetwork, marketBasedNetwork));
-
-        List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().toList();
-        trmAlgorithm.checkReferenceElementNotEmpty(referenceNetworkElementIds);
-        trmAlgorithm.checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
-        operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
-        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
-        Map<String, UncertaintyResult> result = trmResults.getUncertaintiesMap();
-
-
-    }*/
 }

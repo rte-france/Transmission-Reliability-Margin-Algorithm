@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -59,8 +60,7 @@ public class TrmAlgorithm {
             .sorted()
             .toList();
         if (!missingBranches.isEmpty()) {
-            //throw new TrmException(String.format("Market-based network doesn't contain the following network elements: %s.", missingBranches));
-            LOGGER.error(String.format("Market-based network doesn't contain the following network elements: %s.", missingBranches));
+            throw new TrmException(String.format("Market-based network doesn't contain the following network elements: %s.", missingBranches));
         }
     }
 
@@ -68,12 +68,10 @@ public class TrmAlgorithm {
         TrmResults.Builder builder = TrmResults.builder();
 
         LOGGER.info("Selecting Critical network elements");
-        // Filtrer pour n'utiliser que les branches présentes dans les deux fichiers
-//        Set<String> idsMarket = marketBasedNetwork.getBranchStream()
-//            .map(Identifiable::getId)
-//            .collect(Collectors.toSet());
-//        List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().filter(idsMarket::contains).toList();
-        List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().toList();
+        Set<String> idsMarket = marketBasedNetwork.getBranchStream()
+            .map(Identifiable::getId)
+            .collect(Collectors.toSet());
+        List<String> referenceNetworkElementIds = xnecProvider.getNetworkElements(referenceNetwork).stream().map(Identifiable::getId).sorted().filter(idsMarket::contains).toList();
         checkReferenceElementNotEmpty(referenceNetworkElementIds);
         checkReferenceElementAreAvailableInMarketBasedNetwork(referenceNetworkElementIds, marketBasedNetwork);
 
