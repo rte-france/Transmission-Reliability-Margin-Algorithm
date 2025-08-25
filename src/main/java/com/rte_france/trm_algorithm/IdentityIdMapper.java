@@ -18,6 +18,6 @@ public class IdentityIdMapper implements IdentifiableMapper {
 
     @Override
     public String getIdInReference(String idInMarket) {
-        return "";
+        return idInMarket;
     }
 }
