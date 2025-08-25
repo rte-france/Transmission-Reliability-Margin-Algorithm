@@ -8,7 +8,7 @@
 package com.rte_france.trm_algorithm;
 
 import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.glsk.ucte.UcteGlskDocument;
+import com.powsybl.glsk.cse.CseGlskDocument;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.sensitivity.SensitivityVariableSet;
@@ -33,8 +33,8 @@ class ZonalSensitivityComputerTest {
         Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
 
         List<String> branchIds = List.of("FFR2AA1  DDE3AA1  1", "FFR1AA1  FFR2AA1  1");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(network);
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
         Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
         assertEquals(2, pdtf.keySet().size());
@@ -49,8 +49,8 @@ class ZonalSensitivityComputerTest {
         Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
 
         List<String> branchIds = Collections.emptyList();
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(network);
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
         Map<String, ZonalPtdfAndFlow> pdtf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
         assertTrue(pdtf.keySet().isEmpty());
@@ -60,8 +60,8 @@ class ZonalSensitivityComputerTest {
     void testForceAcSensitivityAnalysis() {
         Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         List<String> branchIds = List.of("FFR2AA1  DDE3AA1  1");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(network);
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(network);
 
         LoadFlowParameters loadFlowParameters = new LoadFlowParameters().setDc(true);
 
