@@ -46,10 +46,6 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         this.reducedSplittingFactors = reducedSplittingFactors;
     }
 
-    public ItalyNorthExchangeAlignerResult getItalyNorthExchangeAlignerResult() {
-        return result;
-    }
-
     public ItalyNorthExchangeAlignerResult getResult() {
         return result;
     }
@@ -113,8 +109,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         Map<String, Double> ntcs = updateMarketBasedNtcs(marketBasedExchangeAndNetPosition);
         ShiftDispatcher shiftDispatcher = new CseD2ccShiftDispatcherTmp(LOGGER, reducedSplittingFactors, ntcs);
         LinearScaler linearScaler = new LinearScaler(zonalScalable, shiftDispatcher);
-        double targetNetPosition = -referenceExchangeAndNetPosition.getNetPosition(IT) + marketBasedExchangeAndNetPosition.getNetPosition(IT) + ntcs.values().stream().mapToDouble(Double::doubleValue).sum();
-        linearScaler.shiftNetwork(targetNetPosition, marketBasedNetwork);
+        linearScaler.shiftNetwork(-referenceExchangeAndNetPosition.getNetPosition(IT), marketBasedNetwork);
     }
 
     ExchangeAndNetPosition computeExchangeAndNetPosition(Network network) {
