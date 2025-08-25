@@ -261,7 +261,7 @@ class TrmAlgorithmTest {
         XnecProvider xnecProvider = new XnecProviderInterconnection();
         TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), new ZonalDataImpl<>(Collections.emptyMap()));
         TrmException exception = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, null));
-        //assertEquals("Market-based network doesn't contain the following network elements: [BBE1AA1  FFR5AA1  1, BBE2AA1  FFR3AA1  1, BBE4AA1  FFR5AA1  1, DDE2AA1  NNL3AA1  1, FFR2AA1  DDE3AA1  1, FFR4AA1  DDE1AA1  1, FFR4AA1  DDE4AA1  1, NNL2AA1  BBE3AA1  1].", exception.getMessage());
+        assertEquals("Reference critical network elements are empty", exception.getMessage());
     }
 
     @Test
