@@ -16,7 +16,6 @@ import java.util.*;
 /**
  * @author Sebastian Huaraca {@literal <sebastian.huaracalapa at rte-france.com>}
  */
-
 public final class UcteMapper {
     private static final UcteNetworkAnalyzerProperties UCTE_NETWORK_ANALYZER_PROPERTIES = new UcteNetworkAnalyzerProperties(UcteNetworkAnalyzerProperties.BusIdMatchPolicy.REPLACE_8TH_CHARACTER_WITH_WILDCARD);
 
