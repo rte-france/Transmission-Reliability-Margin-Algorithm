@@ -72,9 +72,9 @@ public class TrmAlgorithm {
 
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
         Map<String, Double> marketBasedFlows = flowExtractor.extract(marketBasedNetwork, referenceNetworkElementIds);
-        Map<String, ZonalPtdfAndFlow> referencePdtfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElementIds, referenceZonalGlsks);
+        Map<String, ZonalPtdfAndFlow> referencePtdfAndFlow = zonalSensitivityComputer.run(referenceNetwork, referenceNetworkElementIds, referenceZonalGlsks);
         LOGGER.info("Computing uncertainties");
-        Map<String, UncertaintyResult> uncertaintiesMap = referencePdtfAndFlow.entrySet().stream().collect(Collectors.toMap(
+        Map<String, UncertaintyResult> uncertaintiesMap = referencePtdfAndFlow.entrySet().stream().collect(Collectors.toMap(
             Map.Entry::getKey,
             entry -> {
                 Branch<?> referenceBranch = referenceNetwork.getBranch(entry.getKey());
