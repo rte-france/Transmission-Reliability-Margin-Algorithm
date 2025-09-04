@@ -46,7 +46,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         this.reducedSplittingFactors = reducedSplittingFactors;
     }
 
-    public ItalyNorthExchangeAlignerResult getItalyNorthExchangeAlignerResult() {
+    public ItalyNorthExchangeAlignerResult getResult() {
         return result;
     }
 
