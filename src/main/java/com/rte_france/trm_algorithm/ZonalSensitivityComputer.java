@@ -29,7 +29,12 @@ import static com.powsybl.sensitivity.SensitivityVariableType.INJECTION_ACTIVE_P
  */
 public final class ZonalSensitivityComputer {
     private final SensitivityAnalysisParameters sensitivityAnalysisParameters;
-    private final List<String> countryRestrictionEiCode; // if empty, no restriction
+    private List<String> countryRestrictionEiCode = new ArrayList<>(); // if empty, no restriction
+
+    public ZonalSensitivityComputer(LoadFlowParameters loadFlowParameters) {
+        this.sensitivityAnalysisParameters = new SensitivityAnalysisParameters()
+                .setLoadFlowParameters(loadFlowParameters.copy().setDc(false));
+    }
 
     public ZonalSensitivityComputer(LoadFlowParameters loadFlowParameters, List<String> countryRestrictionEiCode) {
         this.sensitivityAnalysisParameters = new SensitivityAnalysisParameters()
@@ -54,7 +59,7 @@ public final class ZonalSensitivityComputer {
         if (flowValues.size() > 1) {
             throw new TrmException("Flow value of branch '" + branchId + "' is not unique");
         }
-        return new ZonalPtdfAndFlow(Collections.max(sensitivityValues) - Collections.min(sensitivityValues), flowValues.get(0));
+        return new ZonalPtdfAndFlow(Collections.max(sensitivityValues) - Collections.min(sensitivityValues), flowValues.getFirst());
     }
 
     private static List<SensitivityFactor> getSensitivityFactors(List<String> branchIds, Map<String, SensitivityVariableSet> dataPerZone) {

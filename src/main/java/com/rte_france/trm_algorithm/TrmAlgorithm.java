@@ -34,6 +34,12 @@ public class TrmAlgorithm {
     private final ZonalSensitivityComputer zonalSensitivityComputer;
     private final FlowExtractor flowExtractor;
 
+    public TrmAlgorithm(LoadFlowParameters loadFlowParameters, OperationalConditionAligner operationalConditionAligner) {
+        this.operationalConditionAligner = operationalConditionAligner;
+        this.flowExtractor = new FlowExtractor(loadFlowParameters);
+        this.zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
+    }
+
     public TrmAlgorithm(LoadFlowParameters loadFlowParameters, OperationalConditionAligner operationalConditionAligner, List<String> countryRestrictionEiCode) {
         this.operationalConditionAligner = operationalConditionAligner;
         this.flowExtractor = new FlowExtractor(loadFlowParameters);

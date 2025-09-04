@@ -57,7 +57,7 @@ class TrmAlgorithmTest {
         DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
         ExchangeAligner exchangeAligner = new ExchangeAligner(balanceComputationParameters, loadFlowRunner, computationManager, marketZonalScalable);
         OperationalConditionAligner operationalConditionAligner = new OperationalConditionAlignerPipeline(cracAligner, hvdcAligner, pstAligner, danglingLineAligner, exchangeAligner);
-        return new TrmAlgorithm(loadFlowParameters, operationalConditionAligner, new ArrayList<>());
+        return new TrmAlgorithm(loadFlowParameters, operationalConditionAligner);
     }
 
     @Test
