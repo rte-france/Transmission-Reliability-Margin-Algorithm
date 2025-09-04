@@ -249,7 +249,7 @@
         </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
-            <artifactId>powsybl-glsk-document-ucte</artifactId>
+            <artifactId>powsybl-glsk-document-cse</artifactId>
             <version>${powsybl.entsoe.version}</version>
             <scope>test</scope>
         </dependency>
