@@ -44,7 +44,7 @@ class ItalyNorthExchangeAlignerTest {
 
         ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(loadFlowParameters, reducedSplittingFactors);
         italyNorthExchangeAligner.align(referenceNetwork, marketBasedNetwork);
-        ItalyNorthExchangeAlignerResult italyNorthExchangeAlignerResult = italyNorthExchangeAligner.getItalyNorthExchangeAlignerResult();
+        ItalyNorthExchangeAlignerResult italyNorthExchangeAlignerResult = italyNorthExchangeAligner.getResult();
 
         assertEquals(ALIGNED_WITH_SHIFT, italyNorthExchangeAlignerResult.getStatus());
         assertEquals(-2970.077, italyNorthExchangeAlignerResult.getReferenceExchangeAndNetPosition().getNetPosition(IT), EPSILON);
@@ -72,12 +72,12 @@ class ItalyNorthExchangeAlignerTest {
 
         ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(loadFlowParameters, reducedSplittingFactors);
         italyNorthExchangeAligner.align(referenceNetwork, marketBasedNetwork);
-        ItalyNorthExchangeAlignerResult italyNorthExchangeAlignerResult = italyNorthExchangeAligner.getItalyNorthExchangeAlignerResult();
+        ItalyNorthExchangeAlignerResult italyNorthExchangeAlignerResult = italyNorthExchangeAligner.getResult();
         assertEquals(ALIGNED_WITH_SHIFT, italyNorthExchangeAlignerResult.getStatus());
 
         ItalyNorthExchangeAligner italyNorthExchangeAligner2 = new ItalyNorthExchangeAligner(loadFlowParameters, reducedSplittingFactors);
         italyNorthExchangeAligner2.align(referenceNetwork, marketBasedNetwork);
-        ItalyNorthExchangeAlignerResult italyNorthExchangeAlignerResult2 = italyNorthExchangeAligner2.getItalyNorthExchangeAlignerResult();
+        ItalyNorthExchangeAlignerResult italyNorthExchangeAlignerResult2 = italyNorthExchangeAligner2.getResult();
         assertEquals(ALREADY_ALIGNED, italyNorthExchangeAlignerResult2.getStatus());
     }
 
@@ -100,7 +100,7 @@ class ItalyNorthExchangeAlignerTest {
 
         ItalyNorthExchangeAligner italyNorthExchangeAligner = new ItalyNorthExchangeAligner(loadFlowParameters, reducedSplittingFactors);
         italyNorthExchangeAligner.align(referenceNetwork, marketBasedNetwork);
-        ItalyNorthExchangeAlignerResult italyNorthExchangeAlignerResult = italyNorthExchangeAligner.getItalyNorthExchangeAlignerResult();
+        ItalyNorthExchangeAlignerResult italyNorthExchangeAlignerResult = italyNorthExchangeAligner.getResult();
 
         assertEquals(-2970.077, italyNorthExchangeAlignerResult.getReferenceExchangeAndNetPosition().getNetPosition(IT), EPSILON);
         assertEquals(-1948.416, italyNorthExchangeAlignerResult.getInitialMarketBasedExchangeAndNetPosition().getNetPosition(IT), EPSILON);

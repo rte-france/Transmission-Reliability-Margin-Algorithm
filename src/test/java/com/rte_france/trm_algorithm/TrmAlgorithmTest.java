@@ -16,7 +16,7 @@ import com.powsybl.flow_decomposition.xnec_provider.XnecProviderByIds;
 import com.powsybl.flow_decomposition.xnec_provider.XnecProviderInterconnection;
 import com.powsybl.flow_decomposition.xnec_provider.XnecProviderUnion;
 import com.powsybl.glsk.commons.ZonalData;
-import com.powsybl.glsk.ucte.UcteGlskDocument;
+import com.powsybl.glsk.cse.CseGlskDocument;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
@@ -108,9 +108,10 @@ class TrmAlgorithmTest {
     void testSameNetwork12Nodes() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"));
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        //  boolean useCalculationDirections, boolean validateSchema
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"), false, true);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = cseGlskDocument.getZonalScalable(marketBasedNetwork);
         XnecProvider xnecProvider = new XnecProviderInterconnection();
         TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), localMarketZonalScalable);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
@@ -126,9 +127,9 @@ class TrmAlgorithmTest {
     void testSameNetwork16Nodes() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = cseGlskDocument.getZonalScalable(marketBasedNetwork);
         XnecProvider xnecProvider = new XnecProviderInterconnection();
         TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), localMarketZonalScalable);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
@@ -150,9 +151,9 @@ class TrmAlgorithmTest {
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         referenceNetwork.getLoad("NNL2AA1 _load").setP0(1500);
         referenceNetwork.getGenerator("DDE2AA1 _generator").setTargetP(2500);
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"));
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"), false, true);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = cseGlskDocument.getZonalScalable(marketBasedNetwork);
         XnecProvider xnecProvider = new XnecProviderInterconnection();
         TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), localMarketZonalScalable);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
@@ -168,11 +169,11 @@ class TrmAlgorithmTest {
     void testSameNetwork16NodesWithOtherGenerationPlan() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
         referenceNetwork.getLoad("NNL2AA1 _load").setP0(1500);
         referenceNetwork.getGenerator("DDE2AA1 _generator").setTargetP(2500);
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = cseGlskDocument.getZonalScalable(marketBasedNetwork);
         XnecProvider xnecProvider = new XnecProviderInterconnection();
         TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), localMarketZonalScalable);
         TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
@@ -193,9 +194,9 @@ class TrmAlgorithmTest {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
         referenceNetwork.getLine("BBE2AA1  FFR3AA1  1").disconnect();
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"));
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase12Nodes/glsk_proportional_12nodes.xml"), false, true);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = cseGlskDocument.getZonalScalable(marketBasedNetwork);
         XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
             .addNetworkElementsOnBasecase(Set.of("BBE2AA1  FFR3AA1  1"))
             .build();
@@ -214,10 +215,10 @@ class TrmAlgorithmTest {
     void testSameNetwork16NodesWithDisconnectedLine() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
         referenceNetwork.getLine("BBE1AA1  FFR5AA1  1").disconnect();
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = cseGlskDocument.getZonalScalable(marketBasedNetwork);
         XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
             .addNetworkElementsOnBasecase(Set.of("BBE1AA1  FFR5AA1  1"))
             .build();
@@ -240,10 +241,10 @@ class TrmAlgorithmTest {
     void testDifferentNetwork() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
         marketBasedNetwork.getLine("BBE1AA1  FFR5AA1  1").remove();
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = cseGlskDocument.getZonalScalable(marketBasedNetwork);
         XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
                 .addNetworkElementsOnBasecase(Set.of("BBE1AA1  FFR5AA1  1"))
                 .build();
@@ -291,12 +292,12 @@ class TrmAlgorithmTest {
     void testSameNetwork16NodesWithDisconnectedReconnectedLine() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
-        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
         referenceNetwork.getLine("BBE1AA1  FFR5AA1  1").disconnect();
         marketBasedNetwork.getLine("BBE4AA1  FFR5AA1  1").disconnect(); // This line will be reconnected
-        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(referenceNetwork);
         Crac localCrac = TestUtils.getIdealTopologicalAlignerCrac(referenceNetwork);
-        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = cseGlskDocument.getZonalScalable(marketBasedNetwork);
         XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
             .addNetworkElementsOnBasecase(Set.of("BBE1AA1  FFR5AA1  1"))
             .build();
