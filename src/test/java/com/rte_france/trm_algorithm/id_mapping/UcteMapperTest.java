@@ -110,4 +110,16 @@ public class UcteMapperTest {
             assertEquals("DGENE111 DLOAD111 1", mappingResultsChosenCountrys.idInReference("DGENE111 DLOAD111 1"));
         });
     }
+
+    @Test
+    void testApplyMappingAliases() {
+        // Given
+        Network networkReference = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes_NewId.uct");
+        Network networkMarketBased = TestUtils.importNetwork("TestCase12Nodes/TestCase12Nodes.uct");
+        // When
+        UcteMapper.mapNetworksAndAddAliases(networkReference, networkMarketBased);
+        //Then
+        assertEquals(networkReference.getIdentifiable("BBE1AA1  BBE2AA1  1"), networkReference.getIdentifiable("BBE1AA12 BBE2AA11 1"));
+        assertEquals(networkMarketBased.getIdentifiable("BBE1AA1  BBE2AA1  1"), networkMarketBased.getIdentifiable("BBE1AA12 BBE2AA11 1"));
+    }
 }

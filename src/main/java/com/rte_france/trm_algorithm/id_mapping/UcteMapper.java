@@ -41,6 +41,14 @@ public final class UcteMapper {
         return builder.build();
     }
 
+    public static void mapNetworksAndAddAliases(Network networkReference, Network networkMarketBased) {
+        IdentifiableMapping mapping = UcteMapper.mapNetworks(networkReference, networkMarketBased);
+        mapping.mappingFromMarketBasedToReference.forEach((marketBasedId, referenceId) -> {
+            networkReference.getIdentifiable(referenceId).addAlias(marketBasedId);
+            networkMarketBased.getIdentifiable(marketBasedId).addAlias(referenceId);
+        });
+    }
+
     private static boolean isBranchConnectedToAnyGivenCountry(Branch branch, Country... countries) {
         return Arrays.stream(countries).anyMatch(country -> isBranchConnectedToCountry(branch, country));
     }
