@@ -34,8 +34,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Hugo Schindler {@literal <hugo.schindler at rte-france.com>}
@@ -237,15 +236,22 @@ class TrmAlgorithmTest {
         assertEquals(16.353, result.get("NNL2AA1  BBE3AA1  1").getUncertainty(), EPSILON);
     }
 
-    /*@Test
+    @Test
     void testDifferentNetwork() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
-        Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
-        XnecProvider xnecProvider = new XnecProviderInterconnection();
-        TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), new ZonalDataImpl<>(Collections.emptyMap()));
-        TrmException exception = assertThrows(TrmException.class, () -> trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, null));
-        assertEquals("Market-based network doesn't contain the following network elements: [BBE1AA1  FFR5AA1  1, BBE2AA1  FFR3AA1  1, BBE4AA1  FFR5AA1  1, DDE2AA1  NNL3AA1  1, FFR2AA1  DDE3AA1  1, FFR4AA1  DDE1AA1  1, FFR4AA1  DDE4AA1  1, NNL2AA1  BBE3AA1  1].", exception.getMessage());
-    }*/
+        Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
+        UcteGlskDocument ucteGlskDocument = UcteGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"));
+        marketBasedNetwork.getLine("BBE1AA1  FFR5AA1  1").remove();
+        ZonalData<SensitivityVariableSet> zonalGlsks = ucteGlskDocument.getZonalGlsks(referenceNetwork);
+        ZonalData<Scalable> localMarketZonalScalable = ucteGlskDocument.getZonalScalable(marketBasedNetwork);
+        XnecProviderByIds xnecProviderByIds = XnecProviderByIds.builder()
+                .addNetworkElementsOnBasecase(Set.of("BBE1AA1  FFR5AA1  1"))
+                .build();
+        XnecProvider xnecProvider = new XnecProviderUnion(List.of(xnecProviderByIds, new XnecProviderInterconnection()));
+        TrmAlgorithm trmAlgorithm = setUp(CracFactory.findDefault().create("crac"), localMarketZonalScalable);
+        TrmResults trmResults = trmAlgorithm.computeUncertainties(referenceNetwork, marketBasedNetwork, xnecProvider, zonalGlsks);
+        assertNull(trmResults.getUncertaintiesMap().get("BBE1AA1  FFR5AA1  1"));
+    }
 
     @Test
     void testSameNetwork16NodesWithHvdcSelected() {
