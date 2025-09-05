@@ -9,8 +9,10 @@ package com.rte_france.trm_algorithm;
 
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.glsk.cse.CseGlskDocument;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.openrao.commons.EICode;
 import com.powsybl.sensitivity.SensitivityVariableSet;
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +43,24 @@ class ZonalSensitivityComputerTest {
         assertEquals(0.315, ptdf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
         assertEquals(820.095, ptdf.get("FFR2AA1  DDE3AA1  1").getFlow(), EPSILON);
         assertEquals(0.058, ptdf.get("FFR1AA1  FFR2AA1  1").getZonalPtdf(), EPSILON);
+        assertEquals(430.064, ptdf.get("FFR1AA1  FFR2AA1  1").getFlow(), EPSILON);
+    }
+
+    @Test
+    void testSimpleNetworkWithCountryFiltering() {
+        Network network = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
+
+        List<String> countries = List.of(new EICode(Country.BE).getAreaCode(), new EICode(Country.NL).getAreaCode());
+
+        List<String> branchIds = List.of("FFR2AA1  DDE3AA1  1", "FFR1AA1  FFR2AA1  1");
+        CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
+        ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(network);
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters(), countries);
+        Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
+        assertEquals(2, ptdf.size());
+        assertEquals(0.173, ptdf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
+        assertEquals(820.095, ptdf.get("FFR2AA1  DDE3AA1  1").getFlow(), EPSILON);
+        assertEquals(0.014, ptdf.get("FFR1AA1  FFR2AA1  1").getZonalPtdf(), EPSILON);
         assertEquals(430.064, ptdf.get("FFR1AA1  FFR2AA1  1").getFlow(), EPSILON);
     }
 

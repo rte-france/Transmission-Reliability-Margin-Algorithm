@@ -29,10 +29,16 @@ import static com.powsybl.sensitivity.SensitivityVariableType.INJECTION_ACTIVE_P
  */
 public final class ZonalSensitivityComputer {
     private final SensitivityAnalysisParameters sensitivityAnalysisParameters;
+    private final List<String> countryRestrictionEiCode; // if empty, no restriction
 
     public ZonalSensitivityComputer(LoadFlowParameters loadFlowParameters) {
+        this(loadFlowParameters, new ArrayList<>());
+    }
+
+    public ZonalSensitivityComputer(LoadFlowParameters loadFlowParameters, List<String> countryRestrictionEiCode) {
         this.sensitivityAnalysisParameters = new SensitivityAnalysisParameters()
             .setLoadFlowParameters(loadFlowParameters.copy().setDc(false));
+        this.countryRestrictionEiCode = countryRestrictionEiCode;
     }
 
     private static Map<String, ZonalPtdfAndFlow> extractZonalPtdfs(List<String> branchIds, SensitivityAnalysisResult sensitivityAnalysisResult, List<SensitivityFactor> factors) {
@@ -52,7 +58,7 @@ public final class ZonalSensitivityComputer {
         if (flowValues.size() > 1) {
             throw new TrmException("Flow value of branch '" + branchId + "' is not unique");
         }
-        return new ZonalPtdfAndFlow(Collections.max(sensitivityValues) - Collections.min(sensitivityValues), flowValues.get(0));
+        return new ZonalPtdfAndFlow(Collections.max(sensitivityValues) - Collections.min(sensitivityValues), flowValues.getFirst());
     }
 
     private static List<SensitivityFactor> getSensitivityFactors(List<String> branchIds, Map<String, SensitivityVariableSet> dataPerZone) {
@@ -71,6 +77,9 @@ public final class ZonalSensitivityComputer {
         Map<String, SensitivityVariableSet> dataPerZone = glsk.getDataPerZone();
         List<SensitivityVariableSet> variableSets = getSensitivityVariableSets(glsk, dataPerZone);
         List<SensitivityFactor> factors = getSensitivityFactors(branchIds, dataPerZone);
+        if (!countryRestrictionEiCode.isEmpty()) {
+            factors = factors.stream().filter(factor -> countryRestrictionEiCode.contains(factor.getVariableId())).toList();
+        }
         SensitivityAnalysisResult sensitivityAnalysisResult = SensitivityAnalysis.run(network, factors, Collections.emptyList(), variableSets, sensitivityAnalysisParameters);
         return extractZonalPtdfs(branchIds, sensitivityAnalysisResult, factors);
     }
