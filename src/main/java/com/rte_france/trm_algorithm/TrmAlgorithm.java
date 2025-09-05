@@ -18,6 +18,7 @@ import com.rte_france.trm_algorithm.operational_conditions_aligners.OperationalC
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,9 +36,7 @@ public class TrmAlgorithm {
     private final FlowExtractor flowExtractor;
 
     public TrmAlgorithm(LoadFlowParameters loadFlowParameters, OperationalConditionAligner operationalConditionAligner) {
-        this.operationalConditionAligner = operationalConditionAligner;
-        this.flowExtractor = new FlowExtractor(loadFlowParameters);
-        this.zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
+        this(loadFlowParameters, operationalConditionAligner, new ArrayList<>());
     }
 
     public TrmAlgorithm(LoadFlowParameters loadFlowParameters, OperationalConditionAligner operationalConditionAligner, List<String> countryRestrictionEiCode) {

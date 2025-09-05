@@ -29,11 +29,10 @@ import static com.powsybl.sensitivity.SensitivityVariableType.INJECTION_ACTIVE_P
  */
 public final class ZonalSensitivityComputer {
     private final SensitivityAnalysisParameters sensitivityAnalysisParameters;
-    private List<String> countryRestrictionEiCode = new ArrayList<>(); // if empty, no restriction
+    private final List<String> countryRestrictionEiCode; // if empty, no restriction
 
     public ZonalSensitivityComputer(LoadFlowParameters loadFlowParameters) {
-        this.sensitivityAnalysisParameters = new SensitivityAnalysisParameters()
-                .setLoadFlowParameters(loadFlowParameters.copy().setDc(false));
+        this(loadFlowParameters, new ArrayList<>());
     }
 
     public ZonalSensitivityComputer(LoadFlowParameters loadFlowParameters, List<String> countryRestrictionEiCode) {
