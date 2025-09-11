@@ -109,7 +109,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
         LinearScaler linearScaler = new LinearScaler(zonalScalable, shiftDispatcher);
         double deltaOfItalianNetPosition = referenceExchangeAndNetPosition.getNetPosition(IT) - marketBasedExchangeAndNetPosition.getNetPosition(IT);
         double deltaOfItalianImport = -deltaOfItalianNetPosition;
-        // In Italy North Shift Dispatcher, the actual shifted value is decreased by the initial NTC due (probably due to
+        // In Italy North Shift Dispatcher, the actual shifted value is decreased by the initial NTC (probably due to
         // a bug masked by the fact that initial network have been previously shifted to these NTCs). We have
         // to increase the shift asked to bypass this issue. If solved, we would only have to put target italian import,
         // i.e. the opposite of reference file net position.
