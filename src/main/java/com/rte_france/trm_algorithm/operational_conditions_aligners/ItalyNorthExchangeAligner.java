@@ -125,7 +125,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     private static Map<String, Double> updateMarketBasedNtcs(ExchangeAndNetPositionInterface marketBasedExchangeAndNetPosition) {
         return Map.of(
                 new CountryEICode(FR).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(FR),
-                new CountryEICode(CH).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(CH) + marketBasedExchangeAndNetPosition.getNetPosition(DE),
+                new CountryEICode(CH).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(CH),
                 new CountryEICode(AT).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(AT),
                 new CountryEICode(SI).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(SI)
         );
