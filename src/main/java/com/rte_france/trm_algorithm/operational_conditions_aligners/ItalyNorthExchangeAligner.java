@@ -104,12 +104,17 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     }
 
     private static void shiftNetwork(Network marketBasedNetwork, Map<String, Double> reducedSplittingFactors, ZonalData<Scalable> zonalScalable, ExchangeAndNetPosition marketBasedExchangeAndNetPosition, ExchangeAndNetPosition referenceExchangeAndNetPosition) throws GlskLimitationException, ShiftingException {
-        // shift target value: Italian import = opposite to the Italian NP in the reference network
-        // ntc: ntc in the market based network
         Map<String, Double> ntcs = updateMarketBasedNtcs(marketBasedExchangeAndNetPosition);
         ShiftDispatcher shiftDispatcher = new CseD2ccShiftDispatcherTmp(LOGGER, reducedSplittingFactors, ntcs);
         LinearScaler linearScaler = new LinearScaler(zonalScalable, shiftDispatcher);
-        linearScaler.shiftNetwork(-referenceExchangeAndNetPosition.getNetPosition(IT), marketBasedNetwork);
+        double deltaOfItalianNetPosition = referenceExchangeAndNetPosition.getNetPosition(IT) - marketBasedExchangeAndNetPosition.getNetPosition(IT);
+        double deltaOfItalianImport = -deltaOfItalianNetPosition;
+        // In Italy North Shift Dispatcher, the actual shifted value is decreased by the initial NTC (probably due to
+        // a bug masked by the fact that initial network have been previously shifted to these NTCs). We have
+        // to increase the shift asked to bypass this issue. If solved, we would only have to put target italian import,
+        // i.e. the opposite of reference file net position.
+        double actualNetPositionShift = deltaOfItalianImport + ntcs.values().stream().mapToDouble(Double::doubleValue).sum();
+        linearScaler.shiftNetwork(actualNetPositionShift, marketBasedNetwork);
     }
 
     ExchangeAndNetPosition computeExchangeAndNetPosition(Network network) {
@@ -120,7 +125,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
     private static Map<String, Double> updateMarketBasedNtcs(ExchangeAndNetPositionInterface marketBasedExchangeAndNetPosition) {
         return Map.of(
                 new CountryEICode(FR).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(FR),
-                new CountryEICode(CH).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(CH) + marketBasedExchangeAndNetPosition.getNetPosition(DE),
+                new CountryEICode(CH).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(CH),
                 new CountryEICode(AT).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(AT),
                 new CountryEICode(SI).getCode(), marketBasedExchangeAndNetPosition.getNetPosition(SI)
         );
