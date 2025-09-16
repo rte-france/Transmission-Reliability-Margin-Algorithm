@@ -140,15 +140,15 @@
                 <Factor v="1"/>
                 <Node>
                     <Name v="IGENE311"/>
-                    <Pmax v="-100.00"/>
+                    <Pmin v="-100.00"/>
                 </Node>
                 <Node>
                     <Name v="IGENE211"/>
-                    <Pmax v="-100.00"/>
+                    <Pmin v="-100.00"/>
                 </Node>
                 <Node>
                     <Name v="IGENE111"/>
-                    <Pmax v="-100.0"/>
+                    <Pmin v="-100.0"/>
                 </Node>
             </Down>
         </MeritOrderGSKBlock>
