@@ -7,6 +7,7 @@
  */
 package com.rte_france.trm_algorithm.operational_conditions_aligners;
 
+import com.farao_community.farao.cse.import_runner.app.dichotomy.CseD2ccShiftDispatcher;
 import com.farao_community.farao.dichotomy.api.exceptions.GlskLimitationException;
 import com.farao_community.farao.dichotomy.api.exceptions.ShiftingException;
 import com.farao_community.farao.dichotomy.shift.LinearScaler;
@@ -16,7 +17,6 @@ import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
-
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.rte_france.trm_algorithm.TrmException;
 import com.rte_france.trm_algorithm.TrmUtils;
@@ -105,7 +105,7 @@ public class ItalyNorthExchangeAligner implements OperationalConditionAligner {
 
     private static void shiftNetwork(Network marketBasedNetwork, Map<String, Double> reducedSplittingFactors, ZonalData<Scalable> zonalScalable, ExchangeAndNetPosition marketBasedExchangeAndNetPosition, ExchangeAndNetPosition referenceExchangeAndNetPosition) throws GlskLimitationException, ShiftingException {
         Map<String, Double> ntcs = updateMarketBasedNtcs(marketBasedExchangeAndNetPosition);
-        ShiftDispatcher shiftDispatcher = new CseD2ccShiftDispatcherTmp(LOGGER, reducedSplittingFactors, ntcs);
+        ShiftDispatcher shiftDispatcher = new CseD2ccShiftDispatcher(LOGGER, reducedSplittingFactors, ntcs);
         LinearScaler linearScaler = new LinearScaler(zonalScalable, shiftDispatcher);
         double deltaOfItalianNetPosition = referenceExchangeAndNetPosition.getNetPosition(IT) - marketBasedExchangeAndNetPosition.getNetPosition(IT);
         double deltaOfItalianImport = -deltaOfItalianNetPosition;
