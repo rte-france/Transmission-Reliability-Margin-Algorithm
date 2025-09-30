@@ -43,7 +43,7 @@
 
         <!-- Dependencies versions -->
         <farao-dichotomy.version>4.32.0</farao-dichotomy.version>
-        <gridcapa-cse.version>1.46.0</gridcapa-cse.version>
+        <gridcapa-cse.version>1.46.1</gridcapa-cse.version>
         <gridcapa-swe.version>1.40.0</gridcapa-swe.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <logback.version>1.5.18</logback.version>
@@ -74,6 +74,18 @@
         <dependency>
             <groupId>com.farao-community.farao</groupId>
             <artifactId>gridcapa-cse-data</artifactId>
+            <version>${gridcapa-cse.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.powsybl</groupId>
+                    <artifactId>powsybl-config-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.farao-community.farao</groupId>
+            <artifactId>gridcapa-cse-cc-import-runner-app</artifactId>
             <version>${gridcapa-cse.version}</version>
             <scope>compile</scope>
             <exclusions>
