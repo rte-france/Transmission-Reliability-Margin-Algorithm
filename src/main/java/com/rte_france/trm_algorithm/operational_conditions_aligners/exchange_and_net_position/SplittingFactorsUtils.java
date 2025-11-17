@@ -8,11 +8,7 @@
 package com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position;
 
 import com.farao_community.farao.cse.data.DataUtil;
-import com.farao_community.farao.cse.data.ntc.DailyNtcDocumentAdapted;
-import com.farao_community.farao.cse.data.ntc.Ntc;
-import com.farao_community.farao.cse.data.ntc.YearlyNtcDocumentAdapted;
-import com.farao_community.farao.cse.data.xsd.ntc_adapted.NTCAnnualDocument;
-import com.farao_community.farao.cse.data.xsd.ntc_adapted.NTCReductionsDocument;
+import com.farao_community.farao.cse.data.ntc.*;
 import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.iidm.network.Country;
 import com.rte_france.trm_algorithm.TrmException;
@@ -32,19 +28,39 @@ public final class SplittingFactorsUtils {
         // Utility class
     }
 
-    public static Map<String, Double> importSplittingFactorsFromNtcDocs(OffsetDateTime targetDateTime, InputStream ntcAnnualPath, InputStream ntcReductionsPath) {
+    public static Map<String, Double> importSplittingFactorsFromAdaptedNtcDocs(OffsetDateTime targetDateTime, InputStream ntcAnnualPath, InputStream ntcReductionsPath) {
 
         YearlyNtcDocumentAdapted yearlyNtcDocument;
         DailyNtcDocumentAdapted dailyNtcDocument;
         try {
-            yearlyNtcDocument = new YearlyNtcDocumentAdapted(targetDateTime, DataUtil.unmarshalFromInputStream(ntcAnnualPath, NTCAnnualDocument.class));
-            dailyNtcDocument = new DailyNtcDocumentAdapted(targetDateTime, DataUtil.unmarshalFromInputStream(ntcReductionsPath, NTCReductionsDocument.class));
+            yearlyNtcDocument = new YearlyNtcDocumentAdapted(targetDateTime, DataUtil.unmarshalFromInputStream(ntcAnnualPath, com.farao_community.farao.cse.data.xsd.ntc_adapted.NTCAnnualDocument.class));
+            dailyNtcDocument = new DailyNtcDocumentAdapted(targetDateTime, DataUtil.unmarshalFromInputStream(ntcReductionsPath, com.farao_community.farao.cse.data.xsd.ntc_adapted.NTCReductionsDocument.class));
+
+        } catch (JAXBException e) {
+            throw new TrmException("An error occurred in the adapted NTC files import for " + targetDateTime + ": " + e);
+        }
+
+        Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, true);
+        Map<String, Double> reducedSplittingFactors = new HashMap<>();
+        ntc.computeReducedSplittingFactors().forEach((country, value) -> reducedSplittingFactors.put(new CountryEICode(Country.valueOf(country)).getCode(), value));
+
+        return reducedSplittingFactors;
+
+    }
+
+    public static Map<String, Double> importSplittingFactorsFromNtcDocs(OffsetDateTime targetDateTime, InputStream ntcAnnualPath, InputStream ntcReductionsPath) {
+
+        YearlyNtcDocument yearlyNtcDocument;
+        DailyNtcDocument dailyNtcDocument;
+        try {
+            yearlyNtcDocument = new YearlyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(ntcAnnualPath, com.farao_community.farao.cse.data.xsd.NTCAnnualDocument.class));
+            dailyNtcDocument = new DailyNtcDocument(targetDateTime, DataUtil.unmarshalFromInputStream(ntcReductionsPath, com.farao_community.farao.cse.data.xsd.NTCReductionsDocument.class));
 
         } catch (JAXBException e) {
             throw new TrmException("An error occurred in the NTC files import for " + targetDateTime + ": " + e);
         }
 
-        Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, true);
+        Ntc ntc = new Ntc(yearlyNtcDocument, dailyNtcDocument, false);
         Map<String, Double> reducedSplittingFactors = new HashMap<>();
         ntc.computeReducedSplittingFactors().forEach((country, value) -> reducedSplittingFactors.put(new CountryEICode(Country.valueOf(country)).getCode(), value));
 
