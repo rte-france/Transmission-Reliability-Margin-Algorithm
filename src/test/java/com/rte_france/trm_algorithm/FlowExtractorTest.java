@@ -27,7 +27,7 @@ class FlowExtractorTest {
     void testExtractFlowTwoBranches() {
         Network network = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
 
-        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
+        LoadFlowParameters loadFlowParameters = LoadFlowParameters.load();
         FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
 
         List<String> branchIds = List.of("FGEN1 11 BLOAD 11 1", "BLOAD 11 BGEN2 11 1");
@@ -40,7 +40,7 @@ class FlowExtractorTest {
     void forceAcLoadFlow() {
         Network network = TestUtils.importNetwork("simple_networks/NETWORK_SINGLE_LOAD_TWO_GENERATORS_WITH_COUNTRIES.uct");
 
-        LoadFlowParameters loadFlowParameters = new LoadFlowParameters()
+        LoadFlowParameters loadFlowParameters = LoadFlowParameters.load()
             .setDc(true);
         FlowExtractor flowExtractor = new FlowExtractor(loadFlowParameters);
 

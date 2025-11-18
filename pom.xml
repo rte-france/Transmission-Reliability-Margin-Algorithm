@@ -50,10 +50,10 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven.checkstyle.version>3.3.1</maven.checkstyle.version>
         <maven.jacoco.version>0.8.10</maven.jacoco.version>
-        <powsybl.entsoe.version>2.14.0</powsybl.entsoe.version>
-        <powsybl.openloadflow.version>1.16.0</powsybl.openloadflow.version>
-        <powsybl.rao.version>6.6.0</powsybl.rao.version>
-        <powsybl.version>6.8.0</powsybl.version>
+        <powsybl.entsoe.version>3.0.1</powsybl.entsoe.version>
+        <powsybl.openloadflow.version>2.0.0</powsybl.openloadflow.version>
+        <powsybl.rao.version>7.0.0</powsybl.rao.version>
+        <powsybl.version>7.0.1</powsybl.version>
         <slf4j.version>2.0.13</slf4j.version>
     </properties>
 

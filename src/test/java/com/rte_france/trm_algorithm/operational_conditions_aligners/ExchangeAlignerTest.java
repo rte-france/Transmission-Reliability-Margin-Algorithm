@@ -54,7 +54,7 @@ class ExchangeAlignerTest {
         Load load2 = referenceNetwork.getLoad("PT_L1_1 _load");
         load2.setP0(load2.getP0() - 1000);
         ZonalData<Scalable> marketZonalScalable = new ZonalDataImpl<>(Collections.emptyMap());
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         TrmException trmException = assertThrows(TrmException.class, () -> exchangeAligner.align(referenceNetwork, marketBasedNetwork));
         assertEquals("Scalable not found: 10YFR-RTE------C", trmException.getMessage());
     }
@@ -75,7 +75,7 @@ class ExchangeAlignerTest {
             ));
 
         ZonalData<Scalable> marketZonalScalable = new ZonalDataImpl<>(scalableZonalData);
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(NOT_ALIGNED, result.getStatus());
@@ -96,7 +96,7 @@ class ExchangeAlignerTest {
         Network referenceNetwork = TestUtils.importNetwork("operational_conditions_aligners/shift/TestCase_with_transformers.xiidm");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/shift/TestCase_with_transformers.xiidm");
         ZonalData<Scalable> marketZonalScalable = new ZonalDataImpl<>(Collections.emptyMap());
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ALREADY_ALIGNED, result.getStatus());
@@ -128,7 +128,7 @@ class ExchangeAlignerTest {
         LoadFlow.Runner loadFlowRunner = LoadFlow.find();
         ComputationManager computationManager = LocalComputationManager.getDefault();
         BalanceComputation balanceComputation = balanceComputationFactory.create(areas, loadFlowRunner, computationManager);
-        BalanceComputationParameters parameters = new BalanceComputationParameters().setThresholdNetPosition(1e-2);
+        BalanceComputationParameters parameters = BalanceComputationParameters.load().setThresholdNetPosition(1e-2);
         BalanceComputationResult balanceComputationResult = balanceComputation.run(referenceNetwork, referenceNetwork.getVariantManager().getWorkingVariantId(), parameters).join();
         assertEquals(BalanceComputationResult.Status.SUCCESS, balanceComputationResult.getStatus());
 
@@ -167,13 +167,13 @@ class ExchangeAlignerTest {
         LoadFlow.Runner loadFlowRunner = LoadFlow.find();
         ComputationManager computationManager = LocalComputationManager.getDefault();
         BalanceComputation balanceComputation = balanceComputationFactory.create(areas, loadFlowRunner, computationManager);
-        BalanceComputationParameters parameters = new BalanceComputationParameters();
+        BalanceComputationParameters parameters = BalanceComputationParameters.load();
         BalanceComputationResult balanceComputationResult = balanceComputation.run(referenceNetwork, referenceNetwork.getVariantManager().getWorkingVariantId(), parameters).join();
         assertEquals(BalanceComputationResult.Status.SUCCESS, balanceComputationResult.getStatus());
 
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
@@ -194,7 +194,7 @@ class ExchangeAlignerTest {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ALREADY_ALIGNED, result.getStatus());
@@ -214,7 +214,7 @@ class ExchangeAlignerTest {
         Network referenceNetwork = TestUtils.importNetwork("TestCase16Nodes/TestCase16Nodes.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("operational_conditions_aligners/pst/NETWORK_PST_FLOW_WITH_COUNTRIES_NON_NEUTRAL.uct");
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         TrmException exception = assertThrows(TrmException.class, () -> exchangeAligner.align(referenceNetwork, marketBasedNetwork));
         assertEquals("Market based network contains countries [BE, FR]. It does not contain all reference network countries [BE, FR, DE, NL]", exception.getMessage());
     }
@@ -228,7 +228,7 @@ class ExchangeAlignerTest {
         Load load2 = marketBasedNetwork.getLoad("DDE4AA1 _load");
         load2.setP0(load2.getP0() - 500);
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(ALIGNED_WITH_BALANCE_ADJUSTMENT, result.getStatus());
@@ -253,7 +253,7 @@ class ExchangeAlignerTest {
         Load load2 = marketBasedNetwork.getLoad("DDE4AA1 _load");
         load2.setP0(load2.getP0() - 500);
         ZonalData<Scalable> marketZonalScalable = TrmUtils.getAutoScalable(marketBasedNetwork);
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), marketZonalScalable);
         exchangeAligner.align(referenceNetwork, marketBasedNetwork);
         ExchangeAlignerResult result = exchangeAligner.getResult();
         assertEquals(TARGET_NET_POSITION_REACHED_BUT_EXCHANGE_NOT_ALIGNED, result.getStatus());

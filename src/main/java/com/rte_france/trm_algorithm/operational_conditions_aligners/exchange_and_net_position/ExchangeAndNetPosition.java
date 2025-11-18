@@ -7,12 +7,13 @@
  */
 package com.rte_france.trm_algorithm.operational_conditions_aligners.exchange_and_net_position;
 
-import com.powsybl.balances_adjustment.util.CountryArea;
+import com.powsybl.balances_adjustment.util.BorderBasedCountryArea;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -40,11 +41,11 @@ public class ExchangeAndNetPosition implements ExchangeAndNetPositionInterface {
                 country -> new CountryAreaFactory(country).create(network).getNetPosition()));
     }
 
-    private static Map<Country, CountryArea> createCountryAreas(Network network) {
-        return network.getCountries().stream().collect(Collectors.toMap(Function.identity(), country -> new CountryAreaFactory(country).create(network)));
+    private static Map<Country, BorderBasedCountryArea> createCountryAreas(Network network) {
+        return network.getCountries().stream().collect(Collectors.toMap(Function.identity(), country -> new BorderBasedCountryArea(network, List.of(country))));
     }
 
-    private static Map<Country, Map<Country, Double>> computeExchanges(Map<Country, CountryArea> countryAreaMap) {
+    private static Map<Country, Map<Country, Double>> computeExchanges(Map<Country, BorderBasedCountryArea> countryAreaMap) {
         Set<Country> countries = countryAreaMap.keySet();
         return countries.stream()
             .collect(Collectors.toMap(
@@ -53,7 +54,7 @@ public class ExchangeAndNetPosition implements ExchangeAndNetPositionInterface {
             ));
     }
 
-    private static Map<Country, Double> computeExchangesOfCountrySource(Country countrySource, Set<Country> countries, Map<Country, CountryArea> countryAreaMap) {
+    private static Map<Country, Double> computeExchangesOfCountrySource(Country countrySource, Set<Country> countries, Map<Country, BorderBasedCountryArea> countryAreaMap) {
         return countries.stream()
             .filter(countrySink -> countrySource != countrySink)
             .collect(Collectors.toMap(
@@ -62,7 +63,7 @@ public class ExchangeAndNetPosition implements ExchangeAndNetPositionInterface {
             ));
     }
 
-    private static double getLeavingFlowToCountry(Country countrySource, Country countrySink, Map<Country, CountryArea> countryAreaMap) {
+    private static double getLeavingFlowToCountry(Country countrySource, Country countrySink, Map<Country, BorderBasedCountryArea> countryAreaMap) {
         return countryAreaMap.get(countrySource).getLeavingFlowToCountry(countryAreaMap.get(countrySink));
     }
 
