@@ -42,7 +42,7 @@
         </sonar.jacoco.reportPath>
 
         <!-- Dependencies versions -->
-        <farao-dichotomy.version>4.32.0</farao-dichotomy.version>
+        <farao-dichotomy.version>4.33.1</farao-dichotomy.version>
         <gridcapa-cse.version>1.46.1</gridcapa-cse.version>
         <gridcapa-swe.version>1.40.0</gridcapa-swe.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>

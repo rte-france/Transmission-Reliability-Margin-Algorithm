@@ -24,10 +24,25 @@ class SplittingFactorsUtilsTest {
     private static final double DOUBLE_PRECISION = 0.001;
 
     @Test
-    void testNtcReductionsImport() {
+    void testAdaptedNtcReductionsImport() {
 
         InputStream yearlyData = SplittingFactorsUtilsTest.class.getResourceAsStream("../../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml");
         InputStream dailyData = SplittingFactorsUtilsTest.class.getResourceAsStream("../../TestCase12Nodes/NTC_reductions_CSE.xml");
+
+        Map<String, Double> splittingFactors = SplittingFactorsUtils.importSplittingFactorsFromAdaptedNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), yearlyData, dailyData);
+
+        assertEquals(4, splittingFactors.size());
+        assertEquals(0.456, splittingFactors.get(new CountryEICode(FR).getCode()), DOUBLE_PRECISION);
+        assertEquals(0.425, splittingFactors.get(new CountryEICode(CH).getCode()), DOUBLE_PRECISION);
+        assertEquals(0.045, splittingFactors.get(new CountryEICode(AT).getCode()), DOUBLE_PRECISION);
+        assertEquals(0.073, splittingFactors.get(new CountryEICode(SI).getCode()), DOUBLE_PRECISION);
+    }
+
+    @Test
+    void testNtcReductionsImport() {
+
+        InputStream yearlyData = SplittingFactorsUtilsTest.class.getResourceAsStream("../../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines_old_format.xml");
+        InputStream dailyData = SplittingFactorsUtilsTest.class.getResourceAsStream("../../TestCase12Nodes/NTC_reductions_CSE_old_format.xml");
 
         Map<String, Double> splittingFactors = SplittingFactorsUtils.importSplittingFactorsFromNtcDocs(OffsetDateTime.parse("2021-02-25T16:30Z"), yearlyData, dailyData);
 
