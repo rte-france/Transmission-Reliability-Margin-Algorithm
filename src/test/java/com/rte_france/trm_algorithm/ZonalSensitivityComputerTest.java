@@ -37,7 +37,7 @@ class ZonalSensitivityComputerTest {
         List<String> branchIds = List.of("FFR2AA1  DDE3AA1  1", "FFR1AA1  FFR2AA1  1");
         CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
         ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(network);
-        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(LoadFlowParameters.load());
         Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
         assertEquals(2, ptdf.size());
         assertEquals(0.315, ptdf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
@@ -55,7 +55,7 @@ class ZonalSensitivityComputerTest {
         List<String> branchIds = List.of("FFR2AA1  DDE3AA1  1", "FFR1AA1  FFR2AA1  1");
         CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
         ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(network);
-        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters(), countries);
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(LoadFlowParameters.load(), countries);
         Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
         assertEquals(2, ptdf.size());
         assertEquals(0.173, ptdf.get("FFR2AA1  DDE3AA1  1").getZonalPtdf(), EPSILON);
@@ -71,7 +71,7 @@ class ZonalSensitivityComputerTest {
         List<String> branchIds = Collections.emptyList();
         CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
         ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(network);
-        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(LoadFlowParameters.load());
         Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
         assertTrue(ptdf.isEmpty());
     }
@@ -83,7 +83,7 @@ class ZonalSensitivityComputerTest {
         CseGlskDocument cseGlskDocument = CseGlskDocument.importGlsk(getClass().getResourceAsStream("TestCase16Nodes/glsk_proportional_16nodes.xml"), false, true);
         ZonalData<SensitivityVariableSet> zonalGlsks = cseGlskDocument.getZonalGlsks(network);
 
-        LoadFlowParameters loadFlowParameters = new LoadFlowParameters().setDc(true);
+        LoadFlowParameters loadFlowParameters = LoadFlowParameters.load().setDc(true);
 
         ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(loadFlowParameters);
         Map<String, ZonalPtdfAndFlow> ptdf = zonalSensitivityComputer.run(network, branchIds, zonalGlsks);
@@ -97,7 +97,7 @@ class ZonalSensitivityComputerTest {
         Network network = TestUtils.importNetwork("simple_networks/NETWORK_LOOP_FLOW_WITH_COUNTRIES.uct");
         List<String> branchIds = List.of("EGEN  11 FGEN  11 1");
         ZonalData<SensitivityVariableSet> zonalGlsks = TrmUtils.getAutoGlsk(network);
-        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(new LoadFlowParameters());
+        ZonalSensitivityComputer zonalSensitivityComputer = new ZonalSensitivityComputer(LoadFlowParameters.load());
         assertThrows(Exception.class, () -> zonalSensitivityComputer.run(network, branchIds, zonalGlsks));
     }
 }

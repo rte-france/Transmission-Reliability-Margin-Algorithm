@@ -44,8 +44,8 @@ class TrmAlgorithmTest {
     private static final double EPSILON = 1e-3;
 
     TrmAlgorithm setUp(Crac crac, ZonalData<Scalable> marketZonalScalable) {
-        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
-        BalanceComputationParameters balanceComputationParameters = new BalanceComputationParameters();
+        LoadFlowParameters loadFlowParameters = LoadFlowParameters.load();
+        BalanceComputationParameters balanceComputationParameters = BalanceComputationParameters.load();
         LoadFlow.Runner loadFlowRunner = LoadFlow.find();
         ComputationManager computationManager = LocalComputationManager.getDefault();
 

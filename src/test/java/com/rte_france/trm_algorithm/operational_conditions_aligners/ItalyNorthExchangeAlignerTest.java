@@ -33,7 +33,7 @@ class ItalyNorthExchangeAlignerTest {
     void testSimpleShift() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
-        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
+        LoadFlowParameters loadFlowParameters = LoadFlowParameters.load();
 
         Map<String, Double> reducedSplittingFactors = ImmutableMap.of(
                 new CountryEICode(FR).getCode(), 0.4,
@@ -61,7 +61,7 @@ class ItalyNorthExchangeAlignerTest {
     void testAlreadyAligned() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
-        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
+        LoadFlowParameters loadFlowParameters = LoadFlowParameters.load();
 
         Map<String, Double> reducedSplittingFactors = ImmutableMap.of(
                 new CountryEICode(AT).getCode(), 0.3,
@@ -85,7 +85,7 @@ class ItalyNorthExchangeAlignerTest {
     void testShiftWithImportedSplittingFactors() {
         Network referenceNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN_REFERENCE.uct");
         Network marketBasedNetwork = TestUtils.importNetwork("TestCase12Nodes/NETWORK_TEST_IN.uct");
-        LoadFlowParameters loadFlowParameters = new LoadFlowParameters();
+        LoadFlowParameters loadFlowParameters = LoadFlowParameters.load();
 
         InputStream yearlyData = ItalyNorthExchangeAlignerTest.class.getResourceAsStream("../TestCase12Nodes/NTC_annual_CSE_simplified_without_special_lines.xml");
         InputStream dailyData = ItalyNorthExchangeAlignerTest.class.getResourceAsStream("../TestCase12Nodes/NTC_reductions_CSE.xml");

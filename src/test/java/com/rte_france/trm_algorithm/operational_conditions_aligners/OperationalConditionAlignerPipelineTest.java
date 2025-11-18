@@ -71,7 +71,7 @@ class OperationalConditionAlignerPipelineTest {
         HvdcAligner hvdcAligner = new HvdcAligner();
         PstAligner pstAligner = new PstAligner();
         DanglingLineAligner danglingLineAligner = new DanglingLineAligner();
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), new ZonalDataImpl<>(Collections.emptyMap()));
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), new ZonalDataImpl<>(Collections.emptyMap()));
         OperationalConditionAligner operationalConditionAligner = new OperationalConditionAlignerPipeline(cracAligner, hvdcAligner, pstAligner, danglingLineAligner, exchangeAligner);
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
 
@@ -111,7 +111,7 @@ class OperationalConditionAlignerPipelineTest {
         Set<HvdcCreationParameters> creationParametersSet = params.getHvdcCreationParametersSet();
 
         PstAligner pstAligner = new PstAligner();
-        ExchangeAligner exchangeAligner = new ExchangeAligner(new BalanceComputationParameters(), LoadFlow.find(), LocalComputationManager.getDefault(), new ZonalDataImpl<>(Collections.emptyMap()));
+        ExchangeAligner exchangeAligner = new ExchangeAligner(BalanceComputationParameters.load(), LoadFlow.find(), LocalComputationManager.getDefault(), new ZonalDataImpl<>(Collections.emptyMap()));
         HvdcAcModelingEnvironment hvdcAcModelingEnvironment = new HvdcAcModelingEnvironment(creationParametersSet, exchangeAligner);
         OperationalConditionAligner operationalConditionAligner = new OperationalConditionAlignerPipeline(pstAligner, hvdcAcModelingEnvironment);
         operationalConditionAligner.align(referenceNetwork, marketBasedNetwork);
